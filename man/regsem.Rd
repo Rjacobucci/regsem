@@ -4,12 +4,13 @@
 \alias{regsem}
 \title{The main function that ties together and runs the models.}
 \usage{
-regsem(model, lambda = 0, alpha = 0, type = "none", start.matrix = F,
-  optMethod = "nlminb", gradFun = "timo", hessFun = "none",
-  parallel = "no", Start = "default", rstarts = "no", subOpt = "nlminb",
-  longMod = F, optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
-  matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
-  LB = -Inf, UB = Inf, calc = "normal", tol = 1e-10, max.iter = 2000)
+regsem(model, lambda = 0, alpha = 0, type = "none", data = NULL,
+  start.matrix = F, optMethod = "nlminb", gradFun = "timo",
+  hessFun = "none", parallel = "no", Start = "default", rstarts = "no",
+  subOpt = "nlminb", longMod = F, optNL = "NLOPT_LN_NEWUOA_BOUND",
+  fac.type = "cfa", matrices = "extractMatrices", pars_pen = NULL,
+  diff_par = NULL, LB = -Inf, UB = Inf, calc = "normal", tol = 1e-10,
+  max.iter = 2000, missing = "listwise")
 }
 \arguments{
 \item{model}{lavaan output object.}
@@ -19,6 +20,8 @@ regsem(model, lambda = 0, alpha = 0, type = "none", start.matrix = F,
 \item{alpha}{mixture for elastic net.}
 
 \item{type}{penalty type.}
+
+\item{data}{Optional dataframe. Only required for missing="fiml".}
 
 \item{start.matrix}{matrix of starting values.}
 
@@ -57,6 +60,9 @@ regsem(model, lambda = 0, alpha = 0, type = "none", start.matrix = F,
 \item{tol}{absolute tolerance for convergence.}
 
 \item{max.iter}{max iterations for optimization.}
+
+\item{missing}{How to handle missing data. Current options are "listwise"
+and "fiml".}
 }
 \description{
 The main function that ties together and runs the models.

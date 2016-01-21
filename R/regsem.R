@@ -5,6 +5,7 @@
 #' @param lambda penalty value.
 #' @param alpha mixture for elastic net.
 #' @param type penalty type.
+#' @param data Optional dataframe. Only required for missing="fiml".
 #' @param start.matrix matrix of starting values.
 #' @param optMethod solver to use.
 #' @param gradFun gradient function to use.
@@ -24,6 +25,8 @@
 #' @param calc type of calc function to use with means or not.
 #' @param tol absolute tolerance for convergence.
 #' @param max.iter max iterations for optimization.
+#' @param missing How to handle missing data. Current options are "listwise"
+#'        and "fiml".
 #' @keywords optim calc
 #' @export
 #' @examples
@@ -34,7 +37,7 @@
 
 
 
-regsem = function(model,lambda=0,alpha=0,type="none",start.matrix=F,optMethod="nlminb",
+regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,start.matrix=F,optMethod="nlminb",
                  gradFun="timo",hessFun="none",parallel="no",Start="default",
                  rstarts="no",subOpt="nlminb",longMod=F,
                  optNL="NLOPT_LN_NEWUOA_BOUND",fac.type="cfa",
@@ -45,28 +48,18 @@ regsem = function(model,lambda=0,alpha=0,type="none",start.matrix=F,optMethod="n
                  UB=Inf,
                  calc="normal",
                  tol=1e-10,
-                 max.iter=2000){
+                 max.iter=2000,
+                 missing="listwise"){
 
 
 
     nvar = model@pta$nvar[[1]][1]
     nfac = model@pta$nfac[[1]][1]
-    nobs = model@SampleStats@nobs[[1]][1]
-    #SampCov <- fitted(model)$cov
-    SampMean <- model@SampleStats@mean[][[1]]
-    #SampMean <- rep(0,nvar)
 
-    type2 = 0
-    if(type=="lasso"){
-      type2 = 1
-    }else if(type=="ridge"){
-      type2=2
-    }
-    else if(type=="diff_lasso"){
-      type2=3
-    }
-
-
+    if(missing=="listwise"){
+      calc_fit = "cov"
+      nobs = model@SampleStats@nobs[[1]][1]
+      SampMean <- model@SampleStats@mean[][[1]]
 
       if(length(model@ParTable$op[model@ParTable$op == "~1"]) > 0){
         SampCov1 <- model@SampleStats@cov[][[1]]
@@ -78,10 +71,38 @@ regsem = function(model,lambda=0,alpha=0,type="none",start.matrix=F,optMethod="n
         SampCov <- model@SampleStats@cov[][[1]]
       }
 
+      #for grad timo with mean
+      SampCov22 <- model@SampleStats@cov[][[1]]# + SampMean %*% t(SampMean)
+
+    }else if(missing=="fiml"){
+      #stop("FIML is currently not supported at this time")
+      calc_fit = "ind"
+      if(is.null(data)==TRUE){
+        stop("Dataset needs to be provided for missing==fiml")
+      }
 
 
-    #for grad timo with mean
-    SampCov22 <- model@SampleStats@cov[][[1]]# + SampMean %*% t(SampMean)
+      if(length(model@ParTable$op[model@ParTable$op == "~1"]) == 0){
+        stop("meanstructure needs to be equal to TRUE for FIML")
+      }
+
+    }
+    #SampCov <- fitted(model)$cov
+
+    #SampMean <- rep(0,nvar)
+
+    type2 = 0
+    if(type=="lasso"){
+      type2 = 1
+    }else if(type=="ridge"){
+      type2=2
+    }else if(type=="diff_lasso"){
+      type2=3
+    }
+
+
+
+
     #nUniq = nvar
     #nFacCov
     df = model@Fit@test[[1]]$df
@@ -204,9 +225,16 @@ if(fac.type=="cfa"){
          }else{
            pen_diff=0
          }
-         fit = fit_fun(ImpCov=mult$ImpCov,SampCov,Areg=mult$A_est22,lambda,alpha,type,pen_vec)
-         #fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,pen_vec,pen_diff)
-         fit
+         if(calc_fit=="cov"){
+           fit = fit_fun(ImpCov=mult$ImpCov,SampCov,Areg=mult$A_est22,lambda,alpha,type,pen_vec)
+           #fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,pen_vec,pen_diff)
+           fit
+         }else if(calc_fit=="ind"){
+           #stop("Not currently supported")
+           fit = fiml_calc(ImpCov=mult$ImpCov,data=data,
+                           Areg=mult$A_est22,lambda,alpha,type,pen_vec,nvar)
+         }
+
     }
   }else if(calc == "calc2"){
     calc = function(start){
@@ -387,8 +415,8 @@ if(optMethod=="nlminb"){
       }
     }else if(gradFun=="none"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
-        out <- nlminb(start,calc,lower=LB,upper=UB,eval.max=max.iter,
-                      iter.max=max.iter)
+        out <- nlminb(start,calc,lower=LB,upper=UB,control=list(eval.max=max.iter,
+                                                                 iter.max=max.iter))
         res$out <- out
         res$optim_fit <- out$objective
         res$convergence = out$convergence
@@ -592,7 +620,7 @@ if(optMethod=="nlminb"){
     Imp_Cov <- RAMmult(par=as.numeric(pars.df),A,S,F,A_fixed,A_est,S_fixed,S_est)$ImpCov
 
 
-    if(length(model@ParTable$op[model@ParTable$op == "~1"]) > 0){
+    if(length(model@ParTable$op[model@ParTable$op == "~1"]) > 0 & missing=="listwise"){
       Imp_Cov = Imp_Cov[1:(nrow(Imp_Cov)-1),1:(ncol(Imp_Cov)-1)] - SampMean %*% t(SampMean)
     }
 
@@ -600,19 +628,23 @@ if(optMethod=="nlminb"){
 
 
     #### KKT conditions #####
-
-    kk = try(all(grad(as.numeric(pars.df)) < 0.001))
-    if(inherits(kk, "try-error")){
-      res$KKT1 = "error"
+    if(gradFun=="none"){
+      res$KKT1 = "grad not specified"
     }else{
-      if(kk == TRUE){
-        res$KKT1 = TRUE
-     }else if(kk < 0.001){
-        res$KKT1 = FALSE
+      kk = try(all(grad(as.numeric(pars.df)) < 0.001))
+      if(inherits(kk, "try-error")){
+        res$KKT1 = "error"
       }else{
-       res$KKT1 = NA
+        if(kk == TRUE){
+          res$KKT1 = TRUE
+        }else if(kk < 0.001){
+          res$KKT1 = FALSE
+        }else{
+          res$KKT1 = NA
+        }
       }
     }
+
 
     if(hessFun=="none"){
       res$KKT2 = "hess not specified"
@@ -679,10 +711,13 @@ if(optMethod=="nlminb"){
       res$npar = npar - sum(pars_l2 < 0.001)
 
     }
+    if(missing == "listwise"){
+      SampCov <- model@SampleStats@cov[][[1]]
+      res$SampCov = SampCov
+      res$fit = 0.5*(log(det(Imp_Cov)) + trace(SampCov %*% solve(Imp_Cov)) -
+                     log(det(SampCov))  - nvar)
+    }
 
-    SampCov <- model@SampleStats@cov[][[1]]
-    res$SampCov = SampCov
-    res$fit = 0.5*(log(det(Imp_Cov)) + trace(SampCov %*% solve(Imp_Cov)) - log(det(SampCov))  - nvar)
     res$par.ests <- round(pars.df,3)
     res$nvar = nvar
     res$N = nobs
