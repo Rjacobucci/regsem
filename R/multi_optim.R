@@ -23,6 +23,7 @@ multi_optim <- function(lavObject,max.try=10,SHRINK,
                          lower=-Inf,upper=Inf,type,optMethod="nlminb",gradFun="timo",
                          pars_pen,diff_par=NULL,hessFun="timo"){
 
+  options(warn=2)
   sss = seq(1,max.try)
 
     mult_run <- function(lavObject,n.try=5,SHRINK,lower=-Inf,
