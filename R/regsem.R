@@ -226,8 +226,8 @@ if(fac.type=="cfa"){
            pen_diff=0
          }
          if(calc_fit=="cov"){
-           fit = fit_fun(ImpCov=mult$ImpCov,SampCov,Areg=mult$A_est22,lambda,alpha,type,pen_vec)
-           #fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,pen_vec,pen_diff)
+           #fit = fit_fun(ImpCov=mult$ImpCov,SampCov,Areg=mult$A_est22,lambda,alpha,type,pen_vec)
+           fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,pen_vec,pen_diff)
            fit
          }else if(calc_fit=="ind"){
            #stop("Not currently supported")

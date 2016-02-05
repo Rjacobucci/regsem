@@ -5,13 +5,14 @@
 \title{The main function that ties together and runs the models.}
 \usage{
 cv_regsem(model, n.lambda = 100, mult.start = TRUE, niter = 100,
-  jump = 0.002, lambda = 0, alpha = 0, type = "none", data = NULL,
-  start.matrix = F, optMethod = "nlminb", gradFun = "timo",
-  hessFun = "none", parallel = "no", Start = "default", rstarts = "no",
-  subOpt = "nlminb", longMod = F, optNL = "NLOPT_LN_NEWUOA_BOUND",
-  fac.type = "cfa", matrices = "extractMatrices", pars_pen = NULL,
-  diff_par = NULL, LB = -Inf, UB = Inf, calc = "normal", tol = 1e-10,
-  max.iter = 2000, missing = "listwise", ...)
+  jump = 0.002, type = "none", fit.ret = c("rmsea", "BIC"),
+  fit.ret2 = c("train", "test"), data = NULL, start.matrix = F,
+  optMethod = "nlminb", gradFun = "timo", hessFun = "none",
+  parallel = "no", Start = "default", rstarts = "no", subOpt = "nlminb",
+  longMod = F, optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
+  matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
+  LB = -Inf, UB = Inf, calc = "normal", tol = 1e-10, max.iter = 2000,
+  missing = "listwise", ...)
 }
 \arguments{
 \item{model}{lavaan output object.}
@@ -24,11 +25,11 @@ cv_regsem(model, n.lambda = 100, mult.start = TRUE, niter = 100,
 
 \item{jump}{Amount to increase penalization each iteration.}
 
-\item{lambda}{penalty value.}
-
-\item{alpha}{mixture for elastic net.}
-
 \item{type}{penalty type.}
+
+\item{fit.ret}{Fit indices to return.}
+
+\item{fit.ret2}{Return fits from just train sample?}
 
 \item{data}{Optional dataframe. Only required for missing="fiml".}
 
