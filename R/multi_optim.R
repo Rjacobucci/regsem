@@ -58,7 +58,7 @@ multi_optim <- function(lavObject,max.try=10,SHRINK,
     iter.optim = iter.optim + 5
 
     outt = mult_run(lavObject,n.try=10,SHRINK,lower,upper,type,
-                    optMethod=optMethod,gradFun,n.optim=iter.optim,
+                    optMethod=optMethod,gradFun=gradFun,n.optim=iter.optim,
                     pars_pen=pars_pen,diff_par=diff_par,hessFun=hessFun)
 
       if(all(is.na(outt[,2])==TRUE)){

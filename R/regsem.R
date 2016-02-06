@@ -28,6 +28,8 @@
 #' @param missing How to handle missing data. Current options are "listwise"
 #'        and "fiml".
 #' @keywords optim calc
+#' @useDynLib regsem
+#' @importFrom Rcpp sourceCpp
 #' @export
 #' @examples
 #' \dontrun{
@@ -217,8 +219,8 @@ if(fac.type=="cfa"){
 
   if(calc == "normal"){
     calc = function(start){
-         #mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
-         mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
+         mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+         #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
          pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
          if(type=="diff_lasso"){
            pen_diff = pen_vec - diff_par
@@ -245,8 +247,8 @@ if(fac.type=="cfa"){
     }
   }else if(calc == "boot"){
     calc = function(start){
-      #mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
-      mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
+      mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+      #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
       pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
       if(type=="diff_lasso"){
         pen_diff = pen_vec - diff_par
@@ -278,8 +280,8 @@ if(fac.type=="cfa"){
   if(gradFun=="norm"){
     grad = function(start){
 
-                #mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
-                mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
+                mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+                #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
                 ret = grad_fun(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
                                Sreg=mult$S_est22,A,A_fixed,A_est,S,S_fixed,S_est,
                                F,lambda,alpha,type,pars_pen)
@@ -288,11 +290,15 @@ if(fac.type=="cfa"){
 } else if(gradFun=="timo"){
     grad = function(start){
 
-      #mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
-      mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
-      ret = grad_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
-                     Sreg=mult$S_est22,A,S,
-                     F,lambda,type,pars_pen,diff_par)
+      mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+      #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
+        ret = grad_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+                       Sreg=mult$S_est22,A,S,
+                        F,lambda,type,pars_pen,diff_par)
+      #pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
+      # ret = rcpp_grad_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+      #                   Sreg=mult$S_est22,A,S,
+      #                   F,lambda,type2=type2,pars_pen,diff_par=0)
       ret
     }
 
@@ -321,8 +327,8 @@ if(fac.type=="cfa"){
 
     hess = function(start){
 
-        #mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
-        mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
+        mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+        #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
         retH = hessian(par=start,ImpCov=mult$ImpCov,SampCov,A,A_fixed,A_est,
                  S,S_fixed,S_est,F)
         retH
@@ -330,8 +336,8 @@ if(fac.type=="cfa"){
   } else if(parallel=="yes"){
 
     hess = function(start){
-
-    mult = RAMmult(par=start,A,S,F,A.fixed,A.est,S.fixed,S.est)
+    mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+    #mult = RAMmult(par=start,A,S,F,A.fixed,A.est,S.fixed,S.est)
     retH = hessian_parallel(par=start,ImpCov=mult$ImpCov,A,A.fixed,A.est,
                    S,S.fixed,S.est,F)
     retH
@@ -342,16 +348,16 @@ if(fac.type=="cfa"){
     if(parallel=="no"){
     hess = function(start){
 
-      #mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
-      mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
+      mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+      #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
       ret = hess_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
                       Sreg=mult$S_est22,A,S,F)
       ret
     }
   } else if(parallel=="yes"){
       hess = function(start){
-
-        mult = RAMmult(par=start,A,S,F,A.fixed,A.est,S.fixed,S.est)
+        mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+        #mult = RAMmult(par=start,A,S,F,A.fixed,A.est,S.fixed,S.est)
         ret = hess_timoParallel(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A.est22,
                         Sreg=mult$S.est22,A,S,F)
         ret
@@ -616,8 +622,9 @@ if(optMethod=="nlminb"){
     #res$ftt = rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)
       # get Implied Covariance matrix
 
-    #Imp_Cov <- rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)$ImpCov
-    Imp_Cov <- RAMmult(par=as.numeric(pars.df),A,S,F,A_fixed,A_est,S_fixed,S_est)$ImpCov
+    Imp_Cov <- rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)$ImpCov
+    #Imp_Cov <- RAMmult(par=as.numeric(pars.df),A,S,F,A_fixed,A_est,S_fixed,S_est)$ImpCov
+
 
 
     if(length(model@ParTable$op[model@ParTable$op == "~1"]) > 0 & missing=="listwise"){
@@ -626,11 +633,12 @@ if(optMethod=="nlminb"){
 
     res$Imp_Cov <- Imp_Cov
 
-
+    res$grad <- grad(as.numeric(pars.df))
     #### KKT conditions #####
     if(gradFun=="none"){
       res$KKT1 = "grad not specified"
     }else{
+      res$grad <- grad(as.numeric(pars.df))
       kk = try(all(grad(as.numeric(pars.df)) < 0.001))
       if(inherits(kk, "try-error")){
         res$KKT1 = "error"

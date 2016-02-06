@@ -9,3 +9,19 @@ rcpp_fit_fun <- function(ImpCov, SampCov, type2, lambda, pen_vec, pen_diff) {
     .Call('regsem_rcpp_fit_fun', PACKAGE = 'regsem', ImpCov, SampCov, type2, lambda, pen_vec, pen_diff)
 }
 
+#' Multiply a number by two
+#'
+#'
+#' @export
+rcpp_grad_timo <- function(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par) {
+    .Call('regsem_rcpp_grad_timo', PACKAGE = 'regsem', par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par)
+}
+
+#' Multiply a number by two
+#'
+#'
+#' @export
+rcpp_RAMmult <- function(par, A, S, S_fixed, A_fixed, A_est, S_est, F, I) {
+    .Call('regsem_rcpp_RAMmult', PACKAGE = 'regsem', par, A, S, S_fixed, A_fixed, A_est, S_est, F, I)
+}
+

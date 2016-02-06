@@ -122,10 +122,20 @@ if(mult.start==FALSE){
   #  fits[[count]]$test = NA #fit_indices(out,CV=TRUE)[fit.ret]
   #}else
   if(any(fit.ret2 == "train")==TRUE){
-    fits[count,3:ncol(fits)] = fit_indices(out,CV=FALSE)$fits[fit.ret]
+    fitt = try(fit_indices(out,CV=FALSE)$fits[fit.ret],silent=T)
+    if(inherits(fitt, "try-error")) {
+      fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)
+    }else{
+      fits[count,3:ncol(fits)] = fitt
+    }
+
   }
   fits[count,1] <- SHRINK
   fits[count,2] <- out$out$convergence
+
+  if(is.null(out$par.ests)==TRUE){
+    break
+  }
   par.matrix[count,] = as.matrix(out$par.ests)
 
 }

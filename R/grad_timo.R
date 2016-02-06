@@ -31,7 +31,6 @@ grad_timo = function(par,ImpCov,SampCov,Areg,Sreg,A,S,
   C = diag(nrow(ImpCov)) - solve(ImpCov) %*% SampCov
   E = B %*% Sreg %*% t(B)
 
-  A.iter <- max(A)
 
 
   # The S matrix gradients are exactly twice that of other methods
@@ -40,7 +39,7 @@ grad_timo = function(par,ImpCov,SampCov,Areg,Sreg,A,S,
 
     for(i in 1:length(grad.out)){
 
-      A2 <- A == i;
+      A2 <- A == i;+
       A2[A2==T] <- 1
       S2 <- S == i;
       S2[S2==T] <- 1
@@ -114,7 +113,7 @@ grad_timo = function(par,ImpCov,SampCov,Areg,Sreg,A,S,
 
 
 
-
-  grad.out[min(S[S!=0],0):max(S)] = grad.out[min(S[S!=0],0):max(S)] *0.5
+  grad.out[(max(A)+1):max(S)] = grad.out[(max(A)+1):max(S)] *0.5
+  #grad.out[min(S[S!=0],0):max(S)] = grad.out[min(S[S!=0],0):max(S)] *0.5
   grad.out
 }
