@@ -25,7 +25,7 @@ arma::vec rcpp_grad_timo(arma::vec par,
                   arma::vec pen_vec,
                   arma::vec diff_par) {
 
-
+    double add = 0;
     double m;
     m = ImpCov.n_rows;
     arma::vec grad_out; grad_out.zeros(par.n_elem);
@@ -42,6 +42,7 @@ arma::vec rcpp_grad_timo(arma::vec par,
     double Asize = A.n_rows * A.n_cols;
     double Ssize = S.n_rows * S.n_cols;
 
+// ml
     if(type2==0){
 
       for (double i = 0; i < grad_out.n_elem; i++) {
@@ -69,8 +70,9 @@ arma::vec rcpp_grad_timo(arma::vec par,
       }
 
     }
+// lasso
     else if(type2==1){
-      int add = 0;
+      //int add = 0;
       for (double i = 0; i < grad_out.n_elem; i++) {
 
         arma::mat A2; A2.zeros(size(A));
@@ -80,12 +82,12 @@ arma::vec rcpp_grad_timo(arma::vec par,
           if (A[j]==i+1) {
             A2[j] = 1;
 
-            if(any(A[j]==pen_vec)) {
-             add = lambda * ((A[j] > 0) - (A[j] < 0));
+            if(any((i+1)==pen_vec)==true) {
+             add = lambda * ((Areg[j] > 0) - (Areg[j] < 0));
             }
-            else{
-              add = 0;
-            }
+          //  else{
+          //    add = 0;
+           // }
 
 
           }
@@ -101,8 +103,89 @@ arma::vec rcpp_grad_timo(arma::vec par,
         // left out mean part
 
 
-        grad_out[i]  = trace(pinv(ImpCov) * deriv15 * C) + add;
+        grad_out[i]  = trace(pinv(ImpCov) * deriv15 * C)  + add;
+        add = 0;
 
+      }
+
+    }
+// ridge
+    else if(type2==2){
+      //int add = 0;
+      for (double i = 0; i < grad_out.n_elem; i++) {
+
+        arma::mat A2; A2.zeros(size(A));
+        arma::mat S2; S2.zeros(size(S));
+
+        for (double j = 0; j < Asize; j++) {
+          if (A[j]==i+1) {
+            A2[j] = 1;
+
+            if(any((i+1)==pen_vec)==true) {
+              add = 2 * lambda * Areg[j];
+            }
+            //  else{
+            //    add = 0;
+            // }
+
+
+          }
+        }
+        for (double j = 0; j < Ssize; j++) {
+          if (S[j]==i+1) {
+            S2[j] = 1;
+          }
+        }
+
+
+        deriv15 = F * B * A2 * E * F.t() + F * B * S2 * B.t() * F.t();
+        // left out mean part
+
+
+        grad_out[i]  = trace(pinv(ImpCov) * deriv15 * C)  + add;
+        add = 0;
+
+      }
+
+    }
+    // diff lasso
+    else if(type2==3){
+      //int add = 0;
+      int count = -1;
+      for (double i = 0; i < grad_out.n_elem; i++) {
+
+        arma::mat A2; A2.zeros(size(A));
+        arma::mat S2; S2.zeros(size(S));
+
+        for (double j = 0; j < Asize; j++) {
+          if (A[j]==i+1) {
+            A2[j] = 1;
+
+            if(any((i+1)==pen_vec)==true) {
+              count = count + 1;
+              double diff = Areg[j] - diff_par[count];
+              add = lambda * ((diff > 0) - (diff < 0));
+            }
+            //  else{
+            //    add = 0;
+            // }
+
+
+          }
+        }
+        for (double j = 0; j < Ssize; j++) {
+          if (S[j]==i+1) {
+            S2[j] = 1;
+          }
+        }
+
+
+        deriv15 = F * B * A2 * E * F.t() + F * B * S2 * B.t() * F.t();
+        // left out mean part
+
+
+        grad_out[i]  = trace(pinv(ImpCov) * deriv15 * C)  + add;
+        add = 0;
 
       }
 

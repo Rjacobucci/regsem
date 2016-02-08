@@ -292,13 +292,13 @@ if(fac.type=="cfa"){
 
       mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
       #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
-        ret = grad_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
-                       Sreg=mult$S_est22,A,S,
-                        F,lambda,type,pars_pen,diff_par)
+      #  ret = grad_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+      #                 Sreg=mult$S_est22,A,S,
+      #                  F,lambda,type,pars_pen,diff_par)
       #pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
-      # ret = rcpp_grad_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
-      #                   Sreg=mult$S_est22,A,S,
-      #                   F,lambda,type2=type2,pars_pen,diff_par=0)
+       ret = rcpp_grad_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+                         Sreg=mult$S_est22,A,S,
+                         F,lambda,type2=type2,pars_pen,diff_par=0)
       ret
     }
 
