@@ -5,8 +5,17 @@ using namespace Rcpp;
 using namespace arma;
 
 
-//' Multiply a number by two
+//' Take RAM matrices, multiplies, and returns Implied Covariance matrix.
 //'
+//' @param par parameter estimates.
+//' @param A A matrix with parameter labels.
+//' @param S S matrix with parameter labels.
+//' @param S_fixed S matrix with fixed indicators.
+//' @param A_fixed A matrix with fixed indicators.
+//' @param A_est A matrix with parameter estimates.
+//' @param S_est S matrix with parameter estimates.
+//' @param F F matrix.
+//' @param I Diagonal matrix of ones.
 //'
 //' @export
 // [[Rcpp::export]]

@@ -2,11 +2,24 @@
 % Please edit documentation in R/RcppExports.R
 \name{rcpp_fit_fun}
 \alias{rcpp_fit_fun}
-\title{Multiply a number by two}
+\title{Calculates the objective function values.}
 \usage{
 rcpp_fit_fun(ImpCov, SampCov, type2, lambda, pen_vec, pen_diff)
 }
+\arguments{
+\item{ImpCov}{expected covariance matrix.}
+
+\item{SampCov}{Sample covariance matrix.}
+
+\item{type2}{penalty type.}
+
+\item{lambda}{penalty value.}
+
+\item{pen_vec}{vector of penalized parameters.}
+
+\item{pen_diff}{Vector of values to take deviation from.}
+}
 \description{
-Multiply a number by two
+Calculates the objective function values.
 }
 

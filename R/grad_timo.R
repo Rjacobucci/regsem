@@ -39,7 +39,7 @@ grad_timo = function(par,ImpCov,SampCov,Areg,Sreg,A,S,
 
     for(i in 1:length(grad.out)){
 
-      A2 <- A == i;+
+      A2 <- A == i;
       A2[A2==T] <- 1
       S2 <- S == i;
       S2[S2==T] <- 1

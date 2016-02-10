@@ -5,14 +5,14 @@
                 "column" : 6,
                 "file" : "/Users/RJacobucci/Documents/Github/regsem/src/regsem_rcpp_RAMmult.cpp",
                 "kind" : 6,
-                "line" : 13,
+                "line" : 22,
                 "name" : "rcpp_RAMmult(NumericVector, NumericMatrix, NumericMatrix, LogicalMatrix, LogicalMatrix, NumericMatrix, NumericMatrix, IntegerMatrix, IntegerMatrix)",
                 "parent_name" : "",
                 "usr" : "c:@F@rcpp_RAMmult#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#S1_#$@N@Rcpp@C@Matrix>#VI10#@N@Rcpp@CT>1#T@PreserveStorage#S2_#S1_#S1_#$@N@Rcpp@C@Matrix>#VI13#@N@Rcpp@CT>1#T@PreserveStorage#S3_#"
             }
         ],
         "file" : "/Users/RJacobucci/Documents/Github/regsem/src/regsem_rcpp_RAMmult.cpp",
-        "file_last_write" : 1454778622
+        "file_last_write" : 1455135477
     },
     {
         "definitions" : [
@@ -20,14 +20,14 @@
                 "column" : 8,
                 "file" : "/Users/RJacobucci/Documents/Github/regsem/src/regsem_rcpp_fit_fun.cpp",
                 "kind" : 6,
-                "line" : 13,
+                "line" : 18,
                 "name" : "rcpp_fit_fun(Rcpp::NumericMatrix, Rcpp::NumericMatrix, int, double, arma::vec, arma::vec)",
                 "parent_name" : "",
                 "usr" : "c:@F@rcpp_fit_fun#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#S0_#I#d#$@N@arma@C@Col>#d#S1_#"
             }
         ],
         "file" : "/Users/RJacobucci/Documents/Github/regsem/src/regsem_rcpp_fit_fun.cpp",
-        "file_last_write" : 1454713646
+        "file_last_write" : 1455135679
     },
     {
         "definitions" : [
@@ -35,13 +35,13 @@
                 "column" : 11,
                 "file" : "/Users/RJacobucci/Documents/Github/regsem/src/regsem_rcpp_grad_timo.cpp",
                 "kind" : 6,
-                "line" : 15,
+                "line" : 26,
                 "name" : "rcpp_grad_timo(arma::vec, arma::mat, arma::mat, arma::mat, arma::mat, arma::mat, arma::mat, arma::mat, double, int, arma::vec, arma::vec)",
                 "parent_name" : "",
                 "usr" : "c:@F@rcpp_grad_timo#$@N@arma@C@Col>#d#$@N@arma@C@Mat>#d#S1_#S1_#S1_#S1_#S1_#S1_#d#I#S0_#S0_#"
             }
         ],
         "file" : "/Users/RJacobucci/Documents/Github/regsem/src/regsem_rcpp_grad_timo.cpp",
-        "file_last_write" : 1454968191
+        "file_last_write" : 1455135475
     }
 ]

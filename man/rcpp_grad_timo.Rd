@@ -2,12 +2,37 @@
 % Please edit documentation in R/RcppExports.R
 \name{rcpp_grad_timo}
 \alias{rcpp_grad_timo}
-\title{Multiply a number by two}
+\title{Calculates the gradient vector based on Von Oertzen \& Brick, 2014}
 \usage{
-rcpp_grad_timo(par, ImpCov, SampCov, Areg, Sreg, A, S, F, I, lambda, type2,
+rcpp_grad_timo(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2,
   pen_vec, diff_par)
 }
+\arguments{
+\item{par}{vector with parameters.}
+
+\item{ImpCov}{expected covariance matrix.}
+
+\item{SampCov}{Sample covariance matrix.}
+
+\item{Areg}{A matrix with current parameter estimates.}
+
+\item{Sreg}{S matrix with current parameter estimates.}
+
+\item{A}{A matrix with parameter labels.}
+
+\item{S}{S matrix with parameter labels.}
+
+\item{F}{F matrix.}
+
+\item{lambda}{penalty value.}
+
+\item{type2}{penalty type.}
+
+\item{pen_vec}{parameter indicators to be penalized.}
+
+\item{diff_par}{parameter values to take deviations from.}
+}
 \description{
-Multiply a number by two
+Calculates the gradient vector based on Von Oertzen \& Brick, 2014
 }
 

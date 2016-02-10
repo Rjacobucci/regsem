@@ -2,11 +2,30 @@
 % Please edit documentation in R/RcppExports.R
 \name{rcpp_RAMmult}
 \alias{rcpp_RAMmult}
-\title{Multiply a number by two}
+\title{Take RAM matrices, multiplies, and returns Implied Covariance matrix.}
 \usage{
 rcpp_RAMmult(par, A, S, S_fixed, A_fixed, A_est, S_est, F, I)
 }
+\arguments{
+\item{par}{parameter estimates.}
+
+\item{A}{A matrix with parameter labels.}
+
+\item{S}{S matrix with parameter labels.}
+
+\item{S_fixed}{S matrix with fixed indicators.}
+
+\item{A_fixed}{A matrix with fixed indicators.}
+
+\item{A_est}{A matrix with parameter estimates.}
+
+\item{S_est}{S matrix with parameter estimates.}
+
+\item{F}{F matrix.}
+
+\item{I}{Diagonal matrix of ones.}
+}
 \description{
-Multiply a number by two
+Take RAM matrices, multiplies, and returns Implied Covariance matrix.
 }
 

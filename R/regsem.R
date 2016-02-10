@@ -30,6 +30,7 @@
 #' @keywords optim calc
 #' @useDynLib regsem
 #' @importFrom Rcpp sourceCpp
+#' @import RcppArmadillo
 #' @export
 #' @examples
 #' \dontrun{

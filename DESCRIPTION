@@ -16,3 +16,4 @@ Depends: lavaan,
 Imports: snowfall, GA, rgenoud, Rsolnp, numDeriv, optimx, semPlot
 LinkingTo: Rcpp,
 	   RcppArmadillo
+Suggests: testthat

@@ -90,7 +90,7 @@ while(count < counts){
   SHRINK <- jump*(count-1) # 0.01 works well & 0.007 as well with 150 iterations
 
 if(mult.start==FALSE){
-  out <- regsem(model=model,lambda=SHRINK,alpha,type=type,data=data,
+  out <- regsem(model=model,lambda=SHRINK,type=type,data=data,
                    start.matrix=start.matrix,optMethod=optMethod,
                    gradFun=gradFun,hessFun=hessFun,
                    parallel=parallel,Start=Start,
