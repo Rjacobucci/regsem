@@ -22,11 +22,6 @@ optim_rj(start, func, grad, hess, tol, max.iter)
 \description{
 An attempt at optimization written by ross jacobucci
 }
-\examples{
-\dontrun{
-optim_rj()
-}
-}
 \keyword{calc}
 \keyword{optim}
 

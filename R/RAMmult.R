@@ -9,12 +9,7 @@
 #' @param A_est A matrix with parameter estimates.
 #' @param S_fixed S matrix with fixed indicators.
 #' @param S_est S matrix with parameter estimates.
-#' @keywords CFA expected
-#' @export
-#' @examples
-#' \dontrun{
-#' RAMmult()
-#' }
+
 
 RAMmult <- function(par,A,S,F,A_fixed,A_est,S_fixed,S_est){
 

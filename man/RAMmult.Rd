@@ -26,11 +26,4 @@ RAMmult(par, A, S, F, A_fixed, A_est, S_fixed, S_est)
 \description{
 Take RAM matrices, multiplies, and returns Implied Covariance matrix.
 }
-\examples{
-\dontrun{
-RAMmult()
-}
-}
-\keyword{CFA}
-\keyword{expected}
 

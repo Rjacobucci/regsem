@@ -13,7 +13,7 @@ LazyData: TRUE
 Depends: lavaan,
 	  Rcpp,
 	  RcppArmadillo
-Imports: snowfall, GA, rgenoud, Rsolnp, numDeriv, optimx, semPlot
+Suggests: snowfall, GA, rgenoud, Rsolnp, numDeriv, optimx, semPlot
 LinkingTo: Rcpp,
 	   RcppArmadillo
-Suggests: testthat
+

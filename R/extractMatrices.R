@@ -5,8 +5,9 @@
 #' @return The RAM matrices from \code{model}.
 #' @keywords extract
 #' @import lavaan
+#' @export
 #' @examples
-#' \dontrun{
+#'
 #' library(lavaan)
 #' data(HolzingerSwineford1939)
 #' HS.model <- ' visual =~ x1 + x2 + x3
@@ -14,7 +15,6 @@
 #' speed =~ x7 + x8 + x9 '
 #' mod <- cfa(HS.model, data=HolzingerSwineford1939)
 #' mats = extractMatrices(mod)
-#' }
 
 
 extractMatrices <- function(model){

@@ -9,7 +9,7 @@
 #' @param lambda penalty value.
 #' @param pen_vec vector of penalized parameters.
 #' @param pen_diff Vector of values to take deviation from.
-#' @export
+#'
 rcpp_fit_fun <- function(ImpCov, SampCov, type2, lambda, pen_vec, pen_diff) {
     .Call('regsem_rcpp_fit_fun', PACKAGE = 'regsem', ImpCov, SampCov, type2, lambda, pen_vec, pen_diff)
 }
@@ -28,7 +28,7 @@ rcpp_fit_fun <- function(ImpCov, SampCov, type2, lambda, pen_vec, pen_diff) {
 #' @param type2 penalty type.
 #' @param pen_vec parameter indicators to be penalized.
 #' @param diff_par parameter values to take deviations from.
-#' @export
+#'
 rcpp_grad_timo <- function(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par) {
     .Call('regsem_rcpp_grad_timo', PACKAGE = 'regsem', par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par)
 }
@@ -45,7 +45,7 @@ rcpp_grad_timo <- function(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, ty
 #' @param F F matrix.
 #' @param I Diagonal matrix of ones.
 #'
-#' @export
+#'
 rcpp_RAMmult <- function(par, A, S, S_fixed, A_fixed, A_est, S_est, F, I) {
     .Call('regsem_rcpp_RAMmult', PACKAGE = 'regsem', par, A, S, S_fixed, A_fixed, A_est, S_est, F, I)
 }

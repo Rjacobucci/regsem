@@ -8,13 +8,6 @@
 #' @param alpha mixture for elastic net.
 #' @param type penalty type.
 #' @param pen_vec vector of penalized parameters.
-#' @keywords fit maximum likelihood regularization
-#' @export
-#' @examples
-#' \dontrun{
-#' fit_fun()
-#' }
-
 
 
 fit_fun = function(ImpCov,SampCov,Areg,lambda,alpha,type,pen_vec){

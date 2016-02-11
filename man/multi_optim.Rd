@@ -4,16 +4,16 @@
 \alias{multi_optim}
 \title{uses multiple starts to try and get convergence, running regsem.}
 \usage{
-multi_optim(lavObject, max.try = 10, SHRINK, lower = -Inf, upper = Inf,
-  type, optMethod = "nlminb", gradFun = "timo", pars_pen, diff_par = NULL,
-  hessFun = "timo")
+multi_optim(lavObject, max.try = 10, lambda, lower = -Inf, upper = Inf,
+  type, optMethod = "nlminb", gradFun = "timo", pars_pen = NULL,
+  diff_par = NULL, hessFun = "timo")
 }
 \arguments{
 \item{lavObject}{lavaan output object.}
 
 \item{max.try}{number of starts to try before convergence.}
 
-\item{SHRINK}{shrinkage parameter.}
+\item{lambda}{shrinkage parameter.}
 
 \item{lower}{lower bound vector.}
 
@@ -36,7 +36,16 @@ uses multiple starts to try and get convergence, running regsem.
 }
 \examples{
 \dontrun{
-multi_optim()
+library(lavaan)
+HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
+mod <- '
+f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
+'
+outt = cfa(mod,HS)
+
+fit1 <- multi_optim(outt,max.try=40,
+                   lambda=0.1,type="lasso",
+                   optMethod="nlminb", gradFun="timo")
 }
 }
 \keyword{multiple}

@@ -35,11 +35,4 @@ hessian_parallel(par, ImpCov, A, S, F, A_fixed, A_est, S_fixed, S_est, lambda,
 \description{
 Parallel version of the finite forward difference method for the Hessian.
 }
-\examples{
-\dontrun{
-hessian_parallel()
-}
-}
-\keyword{derivative}
-\keyword{gradient}
 

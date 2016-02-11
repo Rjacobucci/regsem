@@ -9,12 +9,6 @@
 #' @param A_est A matrix with parameter estimates.
 #' @param S_fixed S matrix with fixed indicators.
 #' @param S_est S matrix with parameter estimates.
-#' @return The hessian.
-#' @keywords derivative gradient
-#' @examples
-#' \dontrun{
-#' ret_hess()
-#' }
 
 
 

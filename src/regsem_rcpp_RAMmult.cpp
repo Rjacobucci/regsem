@@ -17,7 +17,7 @@ using namespace arma;
 //' @param F F matrix.
 //' @param I Diagonal matrix of ones.
 //'
-//' @export
+//'
 // [[Rcpp::export]]
 List rcpp_RAMmult(NumericVector par,
           NumericMatrix A,

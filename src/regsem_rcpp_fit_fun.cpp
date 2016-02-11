@@ -13,7 +13,7 @@ using namespace arma;
 //' @param lambda penalty value.
 //' @param pen_vec vector of penalized parameters.
 //' @param pen_diff Vector of values to take deviation from.
-//' @export
+//'
 // [[Rcpp::export]]
 double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov,
                  Rcpp::NumericMatrix SampCov,

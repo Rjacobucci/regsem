@@ -26,12 +26,4 @@ hess_timo(par, ImpCov, SampCov, Areg, Sreg, A, S, F)
 \description{
 Calculates the hessian matrix from Von Oertzen \& Brick, 2014
 }
-\examples{
-\dontrun{
-hess_timo()
-}
-}
-\keyword{derivative}
-\keyword{gradient}
-\keyword{hessian}
 

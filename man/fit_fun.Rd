@@ -24,13 +24,4 @@ fit_fun(ImpCov, SampCov, Areg, lambda, alpha, type, pen_vec)
 \description{
 Calculates the objective function values.
 }
-\examples{
-\dontrun{
-fit_fun()
-}
-}
-\keyword{fit}
-\keyword{likelihood}
-\keyword{maximum}
-\keyword{regularization}
 

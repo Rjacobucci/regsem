@@ -13,12 +13,7 @@
 #' @param lambda penalty value.
 #' @param alpha value for elastic net penalty.
 #' @param type penalty function type.
-#' @keywords derivative gradient
-#' @export
-#' @examples
-#' \dontrun{
-#' hessian_parallel()
-#' }
+
 
 
 

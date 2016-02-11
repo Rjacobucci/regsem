@@ -17,12 +17,6 @@
 #' @param type penalty type.
 #' @param pars_pen parameter indicators to be penalized.
 #' @param I Identity matrix.
-#' @keywords derivative gradient
-#' @export
-#' @examples
-#' \dontrun{
-#' grad_fun()
-#' }
 
 
 

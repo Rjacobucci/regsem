@@ -26,11 +26,4 @@ hess_timoParallel(par, ImpCov, SampCov, Areg, Sreg, A, S, F)
 \description{
 Parallel version to create Hessian based on Von Oertzen \& Brick, 2014
 }
-\examples{
-\dontrun{
-hess_timoParallel()
-}
-}
-\keyword{derivative}
-\keyword{gradient}
 

@@ -111,7 +111,7 @@ if(mult.start==FALSE){
 
 
   }else if(mult.start==TRUE){
-   out <- multi_optim(lavObject=model,max.try=100,SHRINK=SHRINK,
+   out <- multi_optim(lavObject=model,max.try=100,lambda=SHRINK,
                       lower=LB,upper=UB,type=type,optMethod=optMethod,
                       gradFun=gradFun,hessFun=hessFun,
                       pars_pen=pars_pen,diff_par=NULL)

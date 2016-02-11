@@ -23,17 +23,7 @@ ret_hess(final_par, A, S, F, A_fixed, A_est, S_fixed, S_est)
 
 \item{S_est}{S matrix with parameter estimates.}
 }
-\value{
-The hessian.
-}
 \description{
 returns final hessian matrix
 }
-\examples{
-\dontrun{
-ret_hess()
-}
-}
-\keyword{derivative}
-\keyword{gradient}
 

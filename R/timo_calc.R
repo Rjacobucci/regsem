@@ -7,12 +7,6 @@
 #' @param S S matrix with parameter labels.
 #' @param F F matrix.
 #' @param SampMean sample mean vector.
-#' @keywords fit function
-#' @export
-#' @examples
-#' \dontrun{
-#' timo_calc()
-#'}
 
 
 

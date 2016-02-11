@@ -20,7 +20,9 @@
 #' @param matrices function to use for extracting RAM matrices.
 #' @param pars_pen parameter indicators to penalize.
 #' @param diff_par parameter values to deviate from.
-#' @param LB lower bound vector.
+#' @param LB lower bound vector. Note: This is very important to specify
+#'        when using regularization. It greatly increases the chances of
+#'        converging.
 #' @param UB upper bound vector
 #' @param calc type of calc function to use with means or not.
 #' @param tol absolute tolerance for convergence.
@@ -29,13 +31,21 @@
 #'        and "fiml".
 #' @keywords optim calc
 #' @useDynLib regsem
-#' @importFrom Rcpp sourceCpp
 #' @import RcppArmadillo
+#' @import Rcpp
+#' @import lavaan
 #' @export
 #' @examples
-#' \dontrun{
-#' regsem()
-#' }
+#' library(lavaan)
+#' HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
+#' mod <- '
+#' f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
+#' '
+#' outt = cfa(mod,HS)
+#'
+#' fit1 <- regsem(outt,lambda=0.1,type="lasso",optMethod="nlminb",
+#'                gradFun="timo")
+
 
 
 
@@ -50,8 +60,8 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,start.matrix=F,op
                  LB=-Inf,
                  UB=Inf,
                  calc="normal",
-                 tol=1e-10,
-                 max.iter=2000,
+                 tol=1e-6,
+                 max.iter=150,
                  missing="listwise"){
 
 
@@ -220,7 +230,7 @@ if(fac.type=="cfa"){
 
   if(calc == "normal"){
     calc = function(start){
-         mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+         mult = suppressWarnings(rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I))
          #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
          pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
          if(type=="diff_lasso"){
@@ -230,7 +240,7 @@ if(fac.type=="cfa"){
          }
          if(calc_fit=="cov"){
            #fit = fit_fun(ImpCov=mult$ImpCov,SampCov,Areg=mult$A_est22,lambda,alpha,type,pen_vec)
-           fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,pen_vec,pen_diff)
+           fit = suppressWarnings(rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,pen_vec,pen_diff))
            fit
          }else if(calc_fit=="ind"){
            #stop("Not currently supported")
@@ -291,15 +301,15 @@ if(fac.type=="cfa"){
 } else if(gradFun=="timo"){
     grad = function(start){
 
-      mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+      mult = suppressWarnings(rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I))
       #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
       #  ret = grad_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
       #                 Sreg=mult$S_est22,A,S,
       #                  F,lambda,type,pars_pen,diff_par)
       #pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
-       ret = rcpp_grad_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+       ret = suppressWarnings(rcpp_grad_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
                          Sreg=mult$S_est22,A,S,
-                         F,lambda,type2=type2,pars_pen,diff_par=0)
+                         F,lambda,type2=type2,pars_pen,diff_par=0))
       ret
     }
 
@@ -615,9 +625,9 @@ if(optMethod=="nlminb"){
     pars.df <- data.frame(matrix(NA,1,max(max(A),max(S))))
     pars.df[1,] <- res$par.ret
 
- #   if(any(pars.df[diag(S[diag(S) != 0])] < 0)){
-#      warning("Some Variances are Negative!")
- #   }
+    if(any(pars.df[diag(S[diag(S) != 0])] < 0)){
+      warning("Some Variances are Negative!")
+    }
 
 
     #res$ftt = rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)
@@ -738,6 +748,11 @@ if(optMethod=="nlminb"){
     #res$grad <- grad(res$par.ret)
 
     #res$hess <- hess(res$par.ret)
+
+
+    if(res$convergence != 0){
+      warning("WARNING: Model did not converge! It is recommended to try multi_optim()")
+    }
 
     return(res)
 }

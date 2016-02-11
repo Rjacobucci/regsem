@@ -43,11 +43,4 @@ grad_fun(par, ImpCov, SampCov, Areg, Sreg, A, S, F, A_fixed, A_est, S_fixed,
 \description{
 Calculates gradient using forward difference method.
 }
-\examples{
-\dontrun{
-grad_fun()
-}
-}
-\keyword{derivative}
-\keyword{gradient}
 

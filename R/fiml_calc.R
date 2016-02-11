@@ -10,7 +10,7 @@
 #' @param pen_vec vector of penalized parameters.
 #' @param nvar number of variables.
 #' @keywords fit maximum likelihood regularization
-#' @export
+#'
 #' @examples
 #' \dontrun{
 #' fiml_calc()

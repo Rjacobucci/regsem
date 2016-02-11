@@ -35,11 +35,4 @@ grad_timo(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type, pars_pen,
 \description{
 Calculates the gradient vector based on Von Oertzen \& Brick, 2014
 }
-\examples{
-\dontrun{
-grad_timo()
-}
-}
-\keyword{derivative}
-\keyword{gradient}
 

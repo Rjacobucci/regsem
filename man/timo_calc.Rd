@@ -22,11 +22,4 @@ timo_calc(par, SampCov22, A, S, F, SampMean)
 \description{
 Calculates the fit function for Von Oertzen \& Brick, 2014
 }
-\examples{
-\dontrun{
-timo_calc()
-}
-}
-\keyword{fit}
-\keyword{function}
 

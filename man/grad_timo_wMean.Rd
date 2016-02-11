@@ -39,11 +39,4 @@ grad_timo_wMean(par, ImpCov, SampCov22, Areg, Sreg, A, S, F, SampMean, lambda,
 \description{
 Calculates the gradient, accounting for means, Von Oertzen \& Brick, 2014
 }
-\examples{
-\dontrun{
-grad_timo_wMean()
-}
-}
-\keyword{derivative}
-\keyword{gradient}
 

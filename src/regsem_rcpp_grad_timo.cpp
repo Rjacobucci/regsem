@@ -20,7 +20,7 @@ using namespace arma;
 //' @param type2 penalty type.
 //' @param pen_vec parameter indicators to be penalized.
 //' @param diff_par parameter values to take deviations from.
-//' @export
+//'
 // [[Rcpp::export]]
 
 arma::vec rcpp_grad_timo(arma::vec par,

@@ -37,11 +37,4 @@ hessian(par, ImpCov, SampCov, A, A_fixed, A_est, S, S_fixed, S_est, F, lambda,
 \description{
 Calculates the maximum likelihood fit function
 }
-\examples{
-\dontrun{
-hessian()
-}
-}
-\keyword{derivative}
-\keyword{gradient}
 

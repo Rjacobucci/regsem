@@ -9,12 +9,7 @@
 #' @param A A matrix with parameter labels.
 #' @param S S matrix with parameter labels.
 #' @param F F matrix.
-#' @keywords derivative gradient hessian
-#' @export
-#' @examples
-#' \dontrun{
-#' hess_timo()
-#' }
+
 
 
 

@@ -15,12 +15,7 @@
 #' @param m not sure.
 #' @param mu not sure.
 #' @param m.pars which parameters to penalize
-#' @keywords derivative gradient
-#' @export
-#' @examples
-#' \dontrun{
-#' grad_timo_wMean()
-#' }
+
 
 
 

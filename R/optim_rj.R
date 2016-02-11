@@ -8,11 +8,7 @@
 #' @param tol absolute tolerance for convergence.
 #' @param max.iter number of iterations to allow for convergence.
 #' @keywords optim calc
-#' @export
-#' @examples
-#' \dontrun{
-#' optim_rj()
-#' }
+
 
 
 optim_rj <- function(start,func,grad,hess,tol,max.iter){

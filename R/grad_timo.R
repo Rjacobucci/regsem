@@ -13,12 +13,6 @@
 #' @param type penalty type.
 #' @param pars_pen parameter indicators to be penalized.
 #' @param diff_par parameter values to take deviations from.
-#' @keywords derivative gradient
-#' @export
-#' @examples
-#' \dontrun{
-#' grad_timo()
-#'}
 
 
 
