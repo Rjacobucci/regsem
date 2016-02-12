@@ -13,7 +13,7 @@
 
 
 
-hess_timoParallel = function(par,ImpCov,SampCov,Areg,Sreg,A,S,F){
+hess_ramParallel = function(par,ImpCov,SampCov,Areg,Sreg,A,S,F){
 
   #?sfClusterApplyLB
   #sfClusterApplyLB(index, simulationIteration, n, rho, g, h, pv, het=F)

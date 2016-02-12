@@ -2,70 +2,141 @@
 % Please edit documentation in R/regsem.R
 \name{regsem}
 \alias{regsem}
-\title{The main function that ties together and runs the models.}
+\title{The main function that performs regularization for SEM.}
 \usage{
 regsem(model, lambda = 0, alpha = 0, type = "none", data = NULL,
-  start.matrix = F, optMethod = "nlminb", gradFun = "timo",
-  hessFun = "none", parallel = "no", Start = "default", rstarts = "no",
-  subOpt = "nlminb", longMod = F, optNL = "NLOPT_LN_NEWUOA_BOUND",
-  fac.type = "cfa", matrices = "extractMatrices", pars_pen = NULL,
-  diff_par = NULL, LB = -Inf, UB = Inf, calc = "normal", tol = 1e-10,
-  max.iter = 2000, missing = "listwise")
+  optMethod = "nlminb", gradFun = "ram", hessFun = "none",
+  parallel = "no", Start = "default", subOpt = "nlminb", longMod = F,
+  optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
+  matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
+  LB = -Inf, UB = Inf, calc = "normal", tol = 1e-06, max.iter = 150,
+  missing = "listwise")
 }
 \arguments{
-\item{model}{lavaan output object.}
+\item{model}{Lavaan output object. This is a model that was previously
+run with any of the lavaan main functions: cfa(), lavaan(), sem(),
+or growth(). It also can be from the efaUnrotate() function from
+the semTools package. Currently, the parts of the model which cannot
+be handled in regsem is the use of multiple group models, missing
+other than listwise, thresholds from categorical variable models,
+the use of additional estimators other than
+ML, most notably WLSMV for categorical variables. Note: the model
+does not have to actually run (use do.fit=FALSE), converge etc...
+regsem() uses the lavaan object as more of a parser and to get
+sample covariance matrix.}
 
-\item{lambda}{penalty value.}
+\item{lambda}{Penalty value. Note: higher values will result in additional
+convergence issues. If using values > 0.1, it is recommended to use
+mutli_optim() instead. See \code{\link{multi_optim}} for more detail.}
 
-\item{alpha}{mixture for elastic net.}
+\item{alpha}{Mixture for elastic net. Not currently working applied.}
 
-\item{type}{penalty type.}
+\item{type}{Penalty type. Options include "none", "lasso", "ridge",
+and "diff_lasso". diff_lasso penalizes the discrepency between
+parameter estimates and some pre-specified values. The values
+to take the deviation from are specified in diff_par.}
 
-\item{data}{Optional dataframe. Only required for missing="fiml".}
+\item{data}{Optional dataframe. Only required for missing="fiml" which
+is not currently working well.}
 
-\item{start.matrix}{matrix of starting values.}
+\item{optMethod}{Solver to use. Recommended options include "nlminb" and
+"optimx". Note: for "optimx", the default method is to use nlminb.
+This can be changed in subOpt.}
 
-\item{optMethod}{solver to use.}
+\item{gradFun}{Gradient function to use. Recommended to use "ram",
+which refers to the method specified in von Oertzen & Brick (2014).
+The "norm" procedure uses the forward difference method for
+calculating the hessian. This is slower and less accurate.}
 
-\item{gradFun}{gradient function to use.}
+\item{hessFun}{Hessian function to use. Recommended to use "ram",
+which refers to the method specified in von Oertzen & Brick (2014).
+The "norm" procedure uses the forward difference method for
+calculating the hessian. This is slower and less accurate.}
 
-\item{hessFun}{hessian function to use.}
+\item{parallel}{Logical. Whether to parallelize the processes?}
 
-\item{parallel}{whether to parallelize the processes?}
+\item{Start}{type of starting values to use. Only recommended to use
+"default". This sets factor loadings and variances to 0.5.
+Start = "lavaan" uses the parameter estimates from the lavaan
+model object. This is not recommended as it can increase the
+chances in getting stuck at the previous parameter estimates.}
 
-\item{Start}{type of starting values to use.}
+\item{subOpt}{Type of optimization to use in the optimx package.}
 
-\item{rstarts}{use random starts?}
+\item{longMod}{If TRUE, the model is using longitudinal data? This changes
+the sample covariance used.}
 
-\item{subOpt}{type of optimization to use in the optimx package.}
+\item{optNL}{Type of optimization to use in the NLopt package. Currently
+not in use.}
 
-\item{longMod}{longitudinal model?}
+\item{fac.type}{Using "cfa" or "efa" type of model?}
 
-\item{optNL}{type of optimization to use in the NLopt package.}
+\item{matrices}{Function to use for extracting RAM matrices.Only recommended
+to use "extractMatrices".}
 
-\item{fac.type}{using cfa or efa type of model.}
+\item{pars_pen}{Parameter indicators to penalize. If left NULL, by default,
+all parameters in the \emph{A} matrix outside of the intercepts are
+penalized when lambda > 0 and type != "none".}
 
-\item{matrices}{function to use for extracting RAM matrices.}
+\item{diff_par}{Parameter values to deviate from. Only used when
+type="diff_lasso".}
 
-\item{pars_pen}{parameter indicators to penalize.}
+\item{LB}{lower bound vector. Note: This is very important to specify
+when using regularization. It greatly increases the chances of
+converging.}
 
-\item{diff_par}{parameter values to deviate from.}
+\item{UB}{Upper bound vector}
 
-\item{LB}{lower bound vector.}
+\item{calc}{Type of calc function to use with means or not. Not recommended
+for use.}
 
-\item{UB}{upper bound vector}
+\item{tol}{Absolute tolerance for convergence.}
 
-\item{calc}{type of calc function to use with means or not.}
-
-\item{tol}{absolute tolerance for convergence.}
-
-\item{max.iter}{max iterations for optimization.}
+\item{max.iter}{Max iterations for optimization.}
 
 \item{missing}{How to handle missing data. Current options are "listwise"
-and "fiml".}
+and "fiml". "fiml" is not currently working well.}
+}
+\value{
+out List of return values from optimization program
+
+convergence Convergence status.
+
+par.ret Final parameter estimates
+
+Imp_Cov Final implied covariance matrix
+
+grad Final gradient.
+
+KKT1 Were final gradient values close enough to 0.
+
+KKT2 Was the final Hessian positive definite.
+
+df Final degrees of freedom. Note that df changes with lasso
+        penalties.
+
+npar Final number of free parameters. Note that this can change
+        with lasso penalties.
+
+SampCov Sample covariance matrix.
+
+fit Final F_ml fit. Note this is the final parameter estimates
+        evaluated with the F_ml fit function.
+
+coefficients Final parameter estimates
+
+nvar Number of variables.
+
+N sample size.
+
+nfac Number of factors
+
+baseline.chisq Baseline chi-square.
+
+baseline.df Baseline degrees of freedom.
 }
 \description{
-The main function that ties together and runs the models.
+The main function that performs regularization for SEM.
 }
 \examples{
 library(lavaan)
@@ -76,7 +147,7 @@ f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 outt = cfa(mod,HS)
 
 fit1 <- regsem(outt,lambda=0.1,type="lasso",optMethod="nlminb",
-               gradFun="timo")
+               gradFun="ram")
 }
 \keyword{calc}
 \keyword{optim}

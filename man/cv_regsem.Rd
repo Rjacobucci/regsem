@@ -6,22 +6,22 @@
 \usage{
 cv_regsem(model, n.lambda = 100, mult.start = TRUE, niter = 100,
   jump = 0.002, type = "none", fit.ret = c("rmsea", "BIC"),
-  fit.ret2 = c("train", "test"), data = NULL, start.matrix = F,
-  optMethod = "nlminb", gradFun = "timo", hessFun = "none",
-  parallel = "no", Start = "default", rstarts = "no", subOpt = "nlminb",
-  longMod = F, optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
-  matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
-  LB = -Inf, UB = Inf, calc = "normal", tol = 1e-10, max.iter = 2000,
-  missing = "listwise", ...)
+  fit.ret2 = c("train", "test"), data = NULL, optMethod = "nlminb",
+  gradFun = "ram", hessFun = "none", parallel = "no", Start = "default",
+  subOpt = "nlminb", longMod = F, optNL = "NLOPT_LN_NEWUOA_BOUND",
+  fac.type = "cfa", matrices = "extractMatrices", pars_pen = NULL,
+  diff_par = NULL, LB = -Inf, UB = Inf, calc = "normal", tol = 1e-10,
+  max.iter = 2000, missing = "listwise", ...)
 }
 \arguments{
 \item{model}{lavaan output object.}
 
 \item{n.lambda}{number of penalization values to test.}
 
-\item{mult.start}{whether to use mult_optim or regsem.}
+\item{mult.start}{Logical. Whether to use multi_optim() (TRUE) or
+regsem() (FALSE).}
 
-\item{niter}{number of random starts for mult_optim}
+\item{niter}{number of random starts for multi_optim}
 
 \item{jump}{Amount to increase penalization each iteration.}
 
@@ -33,8 +33,6 @@ cv_regsem(model, n.lambda = 100, mult.start = TRUE, niter = 100,
 
 \item{data}{Optional dataframe. Only required for missing="fiml".}
 
-\item{start.matrix}{matrix of starting values.}
-
 \item{optMethod}{solver to use.}
 
 \item{gradFun}{gradient function to use.}
@@ -44,8 +42,6 @@ cv_regsem(model, n.lambda = 100, mult.start = TRUE, niter = 100,
 \item{parallel}{whether to parallelize the processes?}
 
 \item{Start}{type of starting values to use.}
-
-\item{rstarts}{use random starts?}
 
 \item{subOpt}{type of optimization to use in the optimx package.}
 

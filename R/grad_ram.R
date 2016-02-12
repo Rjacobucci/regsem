@@ -1,6 +1,6 @@
 #'
 #'
-#' Calculates the gradient vector based on Von Oertzen \& Brick, 2014
+#' Calculates the gradient vector based on von Oertzen & Brick, 2014
 #' @param par vector with parameters.
 #' @param ImpCov expected covariance matrix.
 #' @param SampCov Sample covariance matrix.
@@ -16,7 +16,7 @@
 
 
 
-grad_timo = function(par,ImpCov,SampCov,Areg,Sreg,A,S,
+grad_ram = function(par,ImpCov,SampCov,Areg,Sreg,A,S,
                      F,lambda,type,pars_pen,diff_par){
 
   grad.out <- rep(0,length(par))

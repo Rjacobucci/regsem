@@ -20,7 +20,7 @@
 
 
 
-grad_timo_wMean = function(par,ImpCov,SampCov22,Areg,Sreg,
+grad_ram_wMean = function(par,ImpCov,SampCov22,Areg,Sreg,
                            A,S,F,SampMean,lambda,type,m,mu,m.pars){
 
 

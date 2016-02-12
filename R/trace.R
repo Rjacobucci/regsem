@@ -8,7 +8,7 @@
 #' mm = matrix(c(1,2,3,4),2,2)
 #' trace(mm)
 #' }
-
+#'
 
 trace <- function(mat){
   return(sum(diag(mat)))

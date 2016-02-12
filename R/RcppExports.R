@@ -29,8 +29,8 @@ rcpp_fit_fun <- function(ImpCov, SampCov, type2, lambda, pen_vec, pen_diff) {
 #' @param pen_vec parameter indicators to be penalized.
 #' @param diff_par parameter values to take deviations from.
 #'
-rcpp_grad_timo <- function(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par) {
-    .Call('regsem_rcpp_grad_timo', PACKAGE = 'regsem', par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par)
+rcpp_grad_ram <- function(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par) {
+    .Call('regsem_rcpp_grad_ram', PACKAGE = 'regsem', par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par)
 }
 
 #' Take RAM matrices, multiplies, and returns Implied Covariance matrix.

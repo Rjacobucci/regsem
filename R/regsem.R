@@ -1,34 +1,87 @@
 #'
 #'
-#' The main function that ties together and runs the models.
-#' @param model lavaan output object.
-#' @param lambda penalty value.
-#' @param alpha mixture for elastic net.
-#' @param type penalty type.
-#' @param data Optional dataframe. Only required for missing="fiml".
-#' @param start.matrix matrix of starting values.
-#' @param optMethod solver to use.
-#' @param gradFun gradient function to use.
-#' @param hessFun hessian function to use.
-#' @param parallel whether to parallelize the processes?
-#' @param Start type of starting values to use.
-#' @param rstarts use random starts?
-#' @param subOpt type of optimization to use in the optimx package.
-#' @param longMod longitudinal model?
-#' @param optNL type of optimization to use in the NLopt package.
-#' @param fac.type using cfa or efa type of model.
-#' @param matrices function to use for extracting RAM matrices.
-#' @param pars_pen parameter indicators to penalize.
-#' @param diff_par parameter values to deviate from.
+#' The main function that performs regularization for SEM.
+#' @param model Lavaan output object. This is a model that was previously
+#'        run with any of the lavaan main functions: cfa(), lavaan(), sem(),
+#'        or growth(). It also can be from the efaUnrotate() function from
+#'        the semTools package. Currently, the parts of the model which cannot
+#'        be handled in regsem is the use of multiple group models, missing
+#'        other than listwise, thresholds from categorical variable models,
+#'        the use of additional estimators other than
+#'        ML, most notably WLSMV for categorical variables. Note: the model
+#'        does not have to actually run (use do.fit=FALSE), converge etc...
+#'        regsem() uses the lavaan object as more of a parser and to get
+#'        sample covariance matrix.
+#' @param lambda Penalty value. Note: higher values will result in additional
+#'        convergence issues. If using values > 0.1, it is recommended to use
+#'        mutli_optim() instead. See \code{\link{multi_optim}} for more detail.
+#' @param alpha Mixture for elastic net. Not currently working applied.
+#' @param type Penalty type. Options include "none", "lasso", "ridge",
+#'        and "diff_lasso". diff_lasso penalizes the discrepency between
+#'        parameter estimates and some pre-specified values. The values
+#'        to take the deviation from are specified in diff_par.
+#' @param data Optional dataframe. Only required for missing="fiml" which
+#'        is not currently working well.
+#' @param optMethod Solver to use. Recommended options include "nlminb" and
+#'        "optimx". Note: for "optimx", the default method is to use nlminb.
+#'        This can be changed in subOpt.
+#' @param gradFun Gradient function to use. Recommended to use "ram",
+#'        which refers to the method specified in von Oertzen & Brick (2014).
+#'        The "norm" procedure uses the forward difference method for
+#'        calculating the hessian. This is slower and less accurate.
+#' @param hessFun Hessian function to use. Recommended to use "ram",
+#'        which refers to the method specified in von Oertzen & Brick (2014).
+#'        The "norm" procedure uses the forward difference method for
+#'        calculating the hessian. This is slower and less accurate.
+#' @param parallel Logical. Whether to parallelize the processes?
+#' @param Start type of starting values to use. Only recommended to use
+#'        "default". This sets factor loadings and variances to 0.5.
+#'        Start = "lavaan" uses the parameter estimates from the lavaan
+#'        model object. This is not recommended as it can increase the
+#'        chances in getting stuck at the previous parameter estimates.
+#' @param subOpt Type of optimization to use in the optimx package.
+#' @param longMod If TRUE, the model is using longitudinal data? This changes
+#'        the sample covariance used.
+#' @param optNL Type of optimization to use in the NLopt package. Currently
+#'        not in use.
+#' @param fac.type Using "cfa" or "efa" type of model?
+#' @param matrices Function to use for extracting RAM matrices.Only recommended
+#'        to use "extractMatrices".
+#' @param pars_pen Parameter indicators to penalize. If left NULL, by default,
+#'        all parameters in the \emph{A} matrix outside of the intercepts are
+#'        penalized when lambda > 0 and type != "none".
+#' @param diff_par Parameter values to deviate from. Only used when
+#'        type="diff_lasso".
 #' @param LB lower bound vector. Note: This is very important to specify
 #'        when using regularization. It greatly increases the chances of
 #'        converging.
-#' @param UB upper bound vector
-#' @param calc type of calc function to use with means or not.
-#' @param tol absolute tolerance for convergence.
-#' @param max.iter max iterations for optimization.
+#' @param UB Upper bound vector
+#' @param calc Type of calc function to use with means or not. Not recommended
+#'        for use.
+#' @param tol Absolute tolerance for convergence.
+#' @param max.iter Max iterations for optimization.
 #' @param missing How to handle missing data. Current options are "listwise"
-#'        and "fiml".
+#'        and "fiml". "fiml" is not currently working well.
+#' @return out List of return values from optimization program
+#' @return convergence Convergence status.
+#' @return par.ret Final parameter estimates
+#' @return Imp_Cov Final implied covariance matrix
+#' @return grad Final gradient.
+#' @return KKT1 Were final gradient values close enough to 0.
+#' @return KKT2 Was the final Hessian positive definite.
+#' @return df Final degrees of freedom. Note that df changes with lasso
+#'         penalties.
+#' @return npar Final number of free parameters. Note that this can change
+#'         with lasso penalties.
+#' @return SampCov Sample covariance matrix.
+#' @return fit Final F_ml fit. Note this is the final parameter estimates
+#'         evaluated with the F_ml fit function.
+#' @return coefficients Final parameter estimates
+#' @return nvar Number of variables.
+#' @return N sample size.
+#' @return nfac Number of factors
+#' @return baseline.chisq Baseline chi-square.
+#' @return baseline.df Baseline degrees of freedom.
 #' @keywords optim calc
 #' @useDynLib regsem
 #' @import RcppArmadillo
@@ -44,15 +97,15 @@
 #' outt = cfa(mod,HS)
 #'
 #' fit1 <- regsem(outt,lambda=0.1,type="lasso",optMethod="nlminb",
-#'                gradFun="timo")
+#'                gradFun="ram")
 
 
 
 
 
-regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,start.matrix=F,optMethod="nlminb",
-                 gradFun="timo",hessFun="none",parallel="no",Start="default",
-                 rstarts="no",subOpt="nlminb",longMod=F,
+regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb",
+                 gradFun="ram",hessFun="none",parallel="no",Start="default",
+                 subOpt="nlminb",longMod=F,
                  optNL="NLOPT_LN_NEWUOA_BOUND",fac.type="cfa",
                  matrices="extractMatrices",
                  pars_pen=NULL,
@@ -84,7 +137,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,start.matrix=F,op
         SampCov <- model@SampleStats@cov[][[1]]
       }
 
-      #for grad timo with mean
+      #for grad ram with mean
       SampCov22 <- model@SampleStats@cov[][[1]]# + SampMean %*% t(SampMean)
 
     }else if(missing=="fiml"){
@@ -125,7 +178,6 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,start.matrix=F,op
 
 if(matrices == "semPlot"){
 if(fac.type=="cfa"){
-    #if(start.matrix == F){
     # get matrices using semPlot package
     out = semPlot::modelMatrices(model)
 
@@ -252,7 +304,7 @@ if(fac.type=="cfa"){
   }else if(calc == "calc2"){
     calc = function(start){
       #mult = RAMmult(par=start,A,S,F,A.fixed,A.est,S.fixed,S.est)
-      fit = timo_calc(par=start,SampCov22,A,S,F,SampMean)
+      fit = ram_calc(par=start,SampCov22,A,S,F,SampMean)
       like = fit$lik
       like
     }
@@ -298,26 +350,26 @@ if(fac.type=="cfa"){
                                F,lambda,alpha,type,pars_pen)
                ret
   }
-} else if(gradFun=="timo"){
+} else if(gradFun=="ram"){
     grad = function(start){
 
       mult = suppressWarnings(rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I))
       #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
-      #  ret = grad_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+      #  ret = grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
       #                 Sreg=mult$S_est22,A,S,
       #                  F,lambda,type,pars_pen,diff_par)
       #pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
-       ret = suppressWarnings(rcpp_grad_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+       ret = suppressWarnings(rcpp_grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
                          Sreg=mult$S_est22,A,S,
                          F,lambda,type2=type2,pars_pen,diff_par=0))
       ret
     }
 
-}else if(gradFun=="timo_mean"){
+}else if(gradFun=="ram_mean"){
   grad = function(start){
 
-    mult = timo_calc(par=start,SampCov22,A,S,F,SampMean)
-    ret = grad_timo_wMean(par=start,ImpCov=mult$ImpCov,SampCov22,Areg = mult$A2,
+    mult = ram_calc(par=start,SampCov22,A,S,F,SampMean)
+    ret = grad_ram_wMean(par=start,ImpCov=mult$ImpCov,SampCov22,Areg = mult$A2,
                     Sreg=mult$S2,A=mult$A.pars,S=mult$S.pars,
                     F=mult$F,SampMean,lambda,type,m=mult$m,mu=mult$mu,m.pars=mult$m.pars)
     ret
@@ -354,14 +406,14 @@ if(fac.type=="cfa"){
     retH
   }
 }
-}  else if(hessFun=="timo"){
+}  else if(hessFun=="ram"){
 
     if(parallel=="no"){
     hess = function(start){
 
       mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
       #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
-      ret = hess_timo(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+      ret = hess_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
                       Sreg=mult$S_est22,A,S,F)
       ret
     }
@@ -369,7 +421,7 @@ if(fac.type=="cfa"){
       hess = function(start){
         mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
         #mult = RAMmult(par=start,A,S,F,A.fixed,A.est,S.fixed,S.est)
-        ret = hess_timoParallel(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A.est22,
+        ret = hess_ramParallel(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A.est22,
                         Sreg=mult$S.est22,A,S,F)
         ret
       }
@@ -396,78 +448,79 @@ if(optMethod=="nlminb"){
         out <- nlminb(start,calc,grad,hess,lower=LB,upper=UB,control=list(eval.max=max.iter,
                                                                  iter.max=max.iter))
         res$out <- out
-        res$optim_fit <- out$objective
+        #res$optim_fit <- out$objective
         res$convergence = out$convergence
-        res$par.ret <- out$par
-        res$iterations <- out$iterations
+        par.ret <- out$par
+        #res$iterations <- out$iterations
       }else if(hessFun=="none"){
        #LB = c(rep(-6,max(A)),rep(1e-6,rep(-10,max(S)-max(diag(S))),max(diag(S))-max(A)))
         out <- nlminb(start,calc,grad,lower=LB,upper=UB,eval.max=max.iter,
                       iter.max=max.iter)
         res$out <- out
         res$convergence = out$convergence
-        res$optim_fit <- out$objective
-        res$par.ret <- out$par
-        res$iterations <- out$iterations
+        #res$optim_fit <- out$objective
+        par.ret <- out$par
+        #res$iterations <- out$iterations
       }
-    }else if(gradFun=="timo"){
-      if(hessFun=="timo"){
+    }else if(gradFun=="ram"){
+      if(hessFun=="ram"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
        out <- nlminb(start,calc,grad,hess,lower=LB,upper=UB,control=list(eval.max=max.iter,
                                                                          iter.max=max.iter))
         res$out <- out
-        res$optim_fit <- out$objective
+        #res$optim_fit <- out$objective
         res$convergence = out$convergence
-        res$par.ret <- out$par
-        res$iterations <- out$iterations
+        par.ret <- out$par
+        #res$iterations <- out$iterations
       }else if(hessFun=="none"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
-       suppressWarnings(out <- nlminb(start,calc,grad,lower=LB,upper=UB,control=list(eval.max=max.iter,
-                                                                                     iter.max=max.iter))) #,x.tol=1.5e-6
+       out <- nlminb(start,calc,grad,lower=LB,upper=UB,
+                     control=list(eval.max=max.iter,
+                     iter.max=max.iter)) #,x.tol=1.5e-6
         res$out <- out
-        res$optim_fit <- out$objective
+        #res$optim_fit <- out$objective
         res$convergence = out$convergence
-        res$par.ret <- out$par
-        res$iterations <- out$iterations
+        par.ret <- out$par
+        #res$iterations <- out$iterations
       }
     }else if(gradFun=="none"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
         out <- nlminb(start,calc,lower=LB,upper=UB,control=list(eval.max=max.iter,
                                                                  iter.max=max.iter))
         res$out <- out
-        res$optim_fit <- out$objective
+        #res$optim_fit <- out$objective
         res$convergence = out$convergence
-        res$par.ret <- out$par
-        res$iterations <- out$iterations
-    }else if(gradFun=="timo_mean"){
-      if(hessFun=="timo"){
+        par.ret <- out$par
+        #res$iterations <- out$iterations
+    }else if(gradFun=="ram_mean"){
+      if(hessFun=="ram"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
         out <- nlminb(start,calc,grad,hess,lower=LB,control=list(eval.max=max.iter,
                                                                  iter.max=max.iter))
         res$out <- out
-        res$optim_fit <- out$objective
+        #res$optim_fit <- out$objective
         res$convergence = out$convergence
-        res$par.ret <- out$par
-        res$iterations <- out$iterations
+        par.ret <- out$par
+        #res$iterations <- out$iterations
       }else if(hessFun=="none"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
         out <- nlminb(start,calc2,grad,lower=LB,upper=UB,eval.max=max.iter,
                       iter.max=max.iter)
         res$out <- out
         res$convergence = out$convergence
-        res$optim_fit <- out$objective
-        res$par.ret <- out$par
-        res$iterations <- out$iterations
+        #res$optim_fit <- out$objective
+        par.ret <- out$par
+        #res$iterations <- out$iterations
       }
     }else if(gradFun=="none"){
       #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
       out <- nlminb(start,calc,lower=LB,upper=UB,eval.max=max.iter,
                     iter.max=max.iter)
       res$out <- out
-      res$optim_fit <- out$objective
+      #res$optim_fit <- out$objective
       res$convergence = out$convergence
-      res$par.ret <- out$par
-      res$iterations <- out$iterations
+      par.ret <- out$par
+      #res$iterations <- out$iterations
     }else if(gradFun=="numDeriv"){
       if(hessFun=="numDeriv"){
         warning("numDeriv does not seem to be accurate at this time")
@@ -475,20 +528,20 @@ if(optMethod=="nlminb"){
         out <- nlminb(start,calc,grad,hess,lower=LB,upper=UB,eval.max=max.iter,
                       iter.max=max.iter)
         res$out <- out
-        res$optim_fit <- out$objective
+        #res$optim_fit <- out$objective
         res$convergence = out$convergence
-        res$par.ret <- out$par
-        res$iterations <- out$iterations
+        par.ret <- out$par
+        #res$iterations <- out$iterations
       }else if(hessFun=="none"){
         warning("numDeriv does not seem to be accurate at this time")
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
         out <- nlminb(start,calc,lower=LB,upper=UB,gradient=grad,eval.max=max.iter,
                       iter.max=max.iter)
         res$out <- out
-        res$optim_fit <- out$objective
+        #res$optim_fit <- out$objective
         res$convergence = out$convergence
-        res$par.ret <- out$par
-        res$iterations <- out$iterations
+        par.ret <- out$par
+        #res$iterations <- out$iterations
       }
     }
 }else if(optMethod=="optimx"){
@@ -497,79 +550,71 @@ if(optMethod=="nlminb"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
         out <- optimx::optimx(start,calc,grad,hess,method=subOpt,lower=LB,upper=UB,control=list(starttests=FALSE))
         res$out <- out
-        res$optim_fit <- out$value
+        #res$iterations <- out$fevals
         res$convergence = out$convcode
-        res$par.ret <- coef(out)
+        par.ret <- coef(out)
       }else if(hessFun=="none"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
         out <- optimx::optimx(start,calc,grad,lower=LB,upper=UB,method=subOpt,control=list(starttests=FALSE))
         res$out <- out
-        res$optim_fit <- out$value
+        #res$iterations <- out$fevals
         res$convergence = out$convcode
-        res$par.ret <- coef(out)
+        par.ret <- coef(out)
       }
-    }else if(gradFun=="timo_mean"){
-      if(hessFun=="timo"){
+    }else if(gradFun=="ram_mean"){
+      if(hessFun=="ram"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
         out <- optimx::optimx(start,calc,grad,hess,lower=LB,upper=UB,method=subOpt,control=list(starttests=FALSE))
         res$out <- out
+        #res$iterations <- out$fevals
         res$convergence = out$convcode
-        res$par.ret <- coef(out)
+        par.ret <- coef(out)
       }else if(hessFun=="none"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
         out <- optimx::optimx(start,calc,grad,method=subOpt,lower=LB,upper=UB,control=list(starttests=FALSE))
         res$out <- out
-        res$optim_fit <- out$value
         res$convergence = out$convcode
-        res$par.ret <- coef(out)
+        par.ret <- coef(out)
        }
-    }else if(gradFun=="timo"){
-      if(hessFun=="timo"){
+    }else if(gradFun=="ram"){
+      if(hessFun=="ram"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
         out <- optimx::optimx(start,calc,grad,hess,method=subOpt,lower=LB,upper=UB,control=list(starttests=FALSE))
         res$out <- out
-        res$optim_fit <- out$value
+        #res$optim_fit <- out$value
         res$convergence = out$convcode
-        res$par.ret <- coef(out)
+        par.ret <- coef(out)
       }else if(hessFun=="none"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
         out <- optimx::optimx(start,calc,grad,method=subOpt,lower=LB,upper=UB,control=list(starttests=FALSE))
         res$out <- out
-        res$optim_fit <- out$value
+        #res$iterations <- out$fevals
+        #res$optim_fit <- out$value
         res$convergence = out$convcode
-        res$par.ret <- coef(out)
+        par.ret <- coef(out)
       }
     }else if(gradFun=="none"){
       #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-S[1,1]+1),rep(-10,max(S)-max(diag(S))))
       out <- optimx::optimx(start,calc,method=subOpt,itnmax=1500,lower=LB,upper=UB,
                     hessian=T,control=list(maxit=1500,starttests=FALSE,all.methods=TRUE,abstol=1e-12))
       res$out <- out
-      res$optim_fit <- out$value
+      #res$iterations <- out$fevals
       res$convergence = out$convcode
       #pars <- coef(out)
       #res$pars <- pars
-      res$par.ret <- coef(out)
+      par.ret <- coef(out)
     }
 }else if(optMethod=="rsolnp"){
-    if(rstarts=="no"){
        # if(UB == Inf) UB=NULL
        # if(LB == -Inf) LB=NULL
         suppressWarnings(out <- Rsolnp::solnp(start,calc,LB=LB,UB=UB,
                                               control=list(trace=0,tol=1e-16)))#tol=1e-16
         #out <- optim(par=start,fn=calc,gr=grad)
         res$out <- out
-        res$optim_fit <- out$values[2]
+        #res$iterations <- out$nfunevals
         res$convergence = out$convergence
-        res$par.ret <- out$pars
-    }else if(rstarts=="yes"){
-      suppressWarnings(out <- Rsolnp::gosolnp(pars=start,fun=calc,n.restarts=3,n.sim=3,
-                                              LB=LB,UB=UB))
-        #out <- optim(par=start,fn=calc,gr=grad)
-        res$out <- out
-        res$convergence = out$convergence
-        res$par.ret <- out$pars
+        par.ret <- out$pars
 
-    }
 }else if(optMethod=="rgenoud"){
   dom = matrix(c(LB,UB),nrow=length(start),2)
   suppressWarnings(out <- rgenoud::genoud(calc,starting.values=start,Domains=dom,
@@ -623,7 +668,7 @@ if(optMethod=="nlminb"){
 
 
     pars.df <- data.frame(matrix(NA,1,max(max(A),max(S))))
-    pars.df[1,] <- res$par.ret
+    pars.df[1,] <- par.ret
 
     if(any(pars.df[diag(S[diag(S) != 0])] < 0)){
       warning("Some Variances are Negative!")
@@ -737,7 +782,7 @@ if(optMethod=="nlminb"){
                      log(det(SampCov))  - nvar)
     }
 
-    res$par.ests <- round(pars.df,3)
+    res$coefficients <- round(pars.df,3)
     res$nvar = nvar
     res$N = nobs
     res$nfac = nfac
@@ -754,5 +799,7 @@ if(optMethod=="nlminb"){
       warning("WARNING: Model did not converge! It is recommended to try multi_optim()")
     }
 
+    res$call <- match.call()
+    class(res) <- "regsem"
     return(res)
 }

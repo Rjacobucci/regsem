@@ -22,9 +22,9 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// rcpp_grad_timo
-arma::vec rcpp_grad_timo(arma::vec par, arma::mat ImpCov, arma::mat SampCov, arma::mat Areg, arma::mat Sreg, arma::mat A, arma::mat S, arma::mat F, double lambda, int type2, arma::vec pen_vec, arma::vec diff_par);
-RcppExport SEXP regsem_rcpp_grad_timo(SEXP parSEXP, SEXP ImpCovSEXP, SEXP SampCovSEXP, SEXP AregSEXP, SEXP SregSEXP, SEXP ASEXP, SEXP SSEXP, SEXP FSEXP, SEXP lambdaSEXP, SEXP type2SEXP, SEXP pen_vecSEXP, SEXP diff_parSEXP) {
+// rcpp_grad_ram
+arma::vec rcpp_grad_ram(arma::vec par, arma::mat ImpCov, arma::mat SampCov, arma::mat Areg, arma::mat Sreg, arma::mat A, arma::mat S, arma::mat F, double lambda, int type2, arma::vec pen_vec, arma::vec diff_par);
+RcppExport SEXP regsem_rcpp_grad_ram(SEXP parSEXP, SEXP ImpCovSEXP, SEXP SampCovSEXP, SEXP AregSEXP, SEXP SregSEXP, SEXP ASEXP, SEXP SSEXP, SEXP FSEXP, SEXP lambdaSEXP, SEXP type2SEXP, SEXP pen_vecSEXP, SEXP diff_parSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -40,7 +40,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type type2(type2SEXP);
     Rcpp::traits::input_parameter< arma::vec >::type pen_vec(pen_vecSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type diff_par(diff_parSEXP);
-    __result = Rcpp::wrap(rcpp_grad_timo(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par));
+    __result = Rcpp::wrap(rcpp_grad_ram(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par));
     return __result;
 END_RCPP
 }

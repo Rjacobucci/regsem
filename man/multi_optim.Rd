@@ -4,32 +4,69 @@
 \alias{multi_optim}
 \title{uses multiple starts to try and get convergence, running regsem.}
 \usage{
-multi_optim(lavObject, max.try = 10, lambda, lower = -Inf, upper = Inf,
-  type, optMethod = "nlminb", gradFun = "timo", pars_pen = NULL,
-  diff_par = NULL, hessFun = "timo")
+multi_optim(model, max.try = 10, lambda, LB = -Inf, UB = Inf, type,
+  optMethod = "nlminb", gradFun = "ram", pars_pen = NULL,
+  diff_par = NULL, hessFun = "none", verbose = TRUE, warm.start = FALSE,
+  tol = 1e-06, max.iter = 150)
 }
 \arguments{
-\item{lavObject}{lavaan output object.}
+\item{model}{Lavaan output object. This is a model that was previously
+run with any of the lavaan main functions: cfa(), lavaan(), sem(),
+or growth(). It also can be from the efaUnrotate() function from
+the semTools package. Currently, the parts of the model which cannot
+be handled in regsem is the use of multiple group models, missing
+other than listwise, thresholds from categorical variable models,
+the use of additional estimators other than
+ML, most notably WLSMV for categorical variables. Note: the model
+does not have to actually run (use do.fit=FALSE), converge etc...
+regsem() uses the lavaan object as more of a parser and to get
+sample covariance matrix.}
 
 \item{max.try}{number of starts to try before convergence.}
 
-\item{lambda}{shrinkage parameter.}
+\item{lambda}{Penalty value. Note: higher values will result in additional
+convergence issues.}
 
-\item{lower}{lower bound vector.}
+\item{LB}{lower bound vector. Note: This is very important to specify
+when using regularization. It greatly increases the chances of
+converging.}
 
-\item{upper}{upper bound vector.}
+\item{UB}{Upper bound vector}
 
-\item{type}{type of penalty to use.}
+\item{type}{Penalty type. Options include "none", "lasso", "ridge",
+and "diff_lasso". diff_lasso penalizes the discrepency between
+parameter estimates and some pre-specified values. The values
+to take the deviation from are specified in diff_par.}
 
-\item{optMethod}{solver to use.}
+\item{optMethod}{Solver to use. Recommended options include "nlminb" and
+"optimx". Note: for "optimx", the default method is to use nlminb.
+This can be changed in subOpt.}
 
-\item{gradFun}{gradient function to use.}
+\item{gradFun}{Gradient function to use. Recommended to use "ram",
+which refers to the method specified in von Oertzen & Brick (2014).
+The "norm" procedure uses the forward difference method for
+calculating the hessian. This is slower and less accurate.}
 
-\item{pars_pen}{parameter indicators to penalize.}
+\item{pars_pen}{Parameter indicators to penalize. If left NULL, by default,
+all parameters in the \emph{A} matrix outside of the intercepts are
+penalized when lambda > 0 and type != "none".}
 
-\item{diff_par}{parameter values to deviate from.}
+\item{diff_par}{Parameter values to deviate from. Only used when
+type="diff_lasso".}
 
-\item{hessFun}{hessian function to use.}
+\item{hessFun}{Hessian function to use. Recommended to use "ram",
+which refers to the method specified in von Oertzen & Brick (2014).
+The "norm" procedure uses the forward difference method for
+calculating the hessian. This is slower and less accurate.}
+
+\item{verbose}{Whether to print iteration number.}
+
+\item{warm.start}{Whether start values are based on previous iteration.
+This is not recommended.}
+
+\item{tol}{absolute tolerance for convergence.}
+
+\item{max.iter}{max iterations for optimization.}
 }
 \description{
 uses multiple starts to try and get convergence, running regsem.
@@ -45,7 +82,7 @@ outt = cfa(mod,HS)
 
 fit1 <- multi_optim(outt,max.try=40,
                    lambda=0.1,type="lasso",
-                   optMethod="nlminb", gradFun="timo")
+                   optMethod="nlminb", gradFun="ram")
 }
 }
 \keyword{multiple}

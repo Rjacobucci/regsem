@@ -1,6 +1,6 @@
 #'
 #'
-#' Calculates the fit function for Von Oertzen \& Brick, 2014
+#' Calculates the fit function for von Oertzen & Brick, 2014
 #' @param par vector with parameters.
 #' @param SampCov22 Sample covariance matrix with means added.
 #' @param A A matrix with parameter labels.
@@ -10,7 +10,7 @@
 
 
 
-timo_calc = function(par,SampCov22,A,S,F,SampMean){
+ram_calc = function(par,SampCov22,A,S,F,SampMean){
 
   #mult = extractMatrices(fit.growth)
   #A <- mult$A

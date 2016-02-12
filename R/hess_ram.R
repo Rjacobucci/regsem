@@ -1,6 +1,6 @@
 #'
 #'
-#' Calculates the hessian matrix from Von Oertzen \& Brick, 2014
+#' Calculates the hessian matrix from von Oertzen & Brick, 2014
 #' @param par vector with parameters.
 #' @param ImpCov expected covariance matrix.
 #' @param SampCov Sample covariance matrix.
@@ -14,7 +14,7 @@
 
 
 
-hess_timo = function(par,ImpCov,SampCov,Areg,Sreg,A,S,F){
+hess_ram = function(par,ImpCov,SampCov,Areg,Sreg,A,S,F){
 
 #?sfClusterApplyLB
 #sfClusterApplyLB(index, simulationIteration, n, rho, g, h, pv, het=F)

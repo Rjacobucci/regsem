@@ -23,7 +23,7 @@ using namespace arma;
 //'
 // [[Rcpp::export]]
 
-arma::vec rcpp_grad_timo(arma::vec par,
+arma::vec rcpp_grad_ram(arma::vec par,
                   arma::mat ImpCov,
                   arma::mat SampCov,
                   arma::mat Areg,

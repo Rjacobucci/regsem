@@ -33,15 +33,15 @@
         "definitions" : [
             {
                 "column" : 11,
-                "file" : "/Users/RJacobucci/Documents/Github/regsem/src/regsem_rcpp_grad_timo.cpp",
+                "file" : "/Users/RJacobucci/Documents/Github/regsem/src/regsem_rcpp_grad_ram.cpp",
                 "kind" : 6,
                 "line" : 26,
-                "name" : "rcpp_grad_timo(arma::vec, arma::mat, arma::mat, arma::mat, arma::mat, arma::mat, arma::mat, arma::mat, double, int, arma::vec, arma::vec)",
+                "name" : "rcpp_grad_ram(arma::vec, arma::mat, arma::mat, arma::mat, arma::mat, arma::mat, arma::mat, arma::mat, double, int, arma::vec, arma::vec)",
                 "parent_name" : "",
-                "usr" : "c:@F@rcpp_grad_timo#$@N@arma@C@Col>#d#$@N@arma@C@Mat>#d#S1_#S1_#S1_#S1_#S1_#S1_#d#I#S0_#S0_#"
+                "usr" : "c:@F@rcpp_grad_ram#$@N@arma@C@Col>#d#$@N@arma@C@Mat>#d#S1_#S1_#S1_#S1_#S1_#S1_#d#I#S0_#S0_#"
             }
         ],
-        "file" : "/Users/RJacobucci/Documents/Github/regsem/src/regsem_rcpp_grad_timo.cpp",
-        "file_last_write" : 1455155255
+        "file" : "/Users/RJacobucci/Documents/Github/regsem/src/regsem_rcpp_grad_ram.cpp",
+        "file_last_write" : 1455232488
     }
 ]
