@@ -67,7 +67,7 @@ multi_optim <- function(model,max.try=10,lambda,
                          LB=-Inf,UB=Inf,type,optMethod="nlminb",gradFun="ram",
                          pars_pen=NULL,diff_par=NULL,hessFun="none",
                         verbose=TRUE,warm.start=FALSE,
-                        tol=1e-6,max.iter=150){
+                        tol=1e-6,max.iter=300){
 
 
 
@@ -110,8 +110,8 @@ multi_optim <- function(model,max.try=10,lambda,
           mtt[n.optim,1] = NA
           mtt[n.optim,2] = NA
         }else{
-          mtt[n.optim,1] = fit1$optim_fit
-          mtt[n.optim,2] = fit1$convergence
+          mtt[n.optim,1] = fit1$out$objective
+          mtt[n.optim,2] = fit1$out$convergence
         }
       }
       mtt
@@ -138,7 +138,7 @@ multi_optim <- function(model,max.try=10,lambda,
         fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
                        Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
                        LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol))
-        fit1
+        return(fit1)
         break
         }else{
           return
@@ -147,21 +147,20 @@ multi_optim <- function(model,max.try=10,lambda,
         return
       }
     }
-    if(exists("fit1")==TRUE){
-      fit1
-    }else{
+   # if(exists("fit1")==FALSE){
       fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
                      Start="default",gradFun=gradFun,hessFun=hessFun,tol=tol,
                      LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))
-      fit1$convergence <- 99
-      fit1
-    }
+
+        fit1$convergence <- 99
+        return(fit1)
+   # }
 
 
 
-    if(fit1$convergence != 0){
+    #if(fit1$convergence != 0){
       warning("WARNING: Model did not converge! It is recommended to increase max.try")
-    }
+    #}
 
 }
 

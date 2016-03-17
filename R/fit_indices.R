@@ -109,9 +109,11 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
 
     lambda.l <- try(uniroot(f=lower.lambda, lower=0, upper=chisq)$root,
                     silent=TRUE)
-    if(inherits(lambda.l, "try-error")) { lambda.l <- 0 }
-
-    ret["rmsea.lower"] = sqrt( lambda.l/(N*df))
+    if(inherits(lambda.l, "try-error")) {
+      ret["rmsea.lower"] = NA
+    }else{
+      ret["rmsea.lower"] = sqrt( lambda.l/(N*df))
+      }
 
 
     upper.lambda <- function(lambda) {
@@ -120,9 +122,13 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
 
     lambda.u <- try(uniroot(f=upper.lambda, lower=0,upper=100)$root,
                     silent=TRUE)
-    if(inherits(lambda.u, "try-error")){ lambda.u <- 0 }
+    if(inherits(lambda.u, "try-error")){
+      ret["rmsea.upper"] = NA
+    }else{
+      ret["rmsea.upper"] = sqrt( lambda.u/(N*df))
+    }
 
-    ret["rmsea.upper"] = sqrt( lambda.u/(N*df))
+
 
     ret["rmsea.pval"] = 1 - pchisq(chisq, df=df, ncp=(N*df*0.05^2))
 

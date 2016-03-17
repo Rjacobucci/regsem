@@ -120,6 +120,11 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
 
 
 
+    parL = parTable(model)[,"label"]
+    if(sum(duplicated(parL[parL != ""])) > 0){
+      stop("regsem currently does not allow equality constraints")
+    }
+
     nvar = model@pta$nvar[[1]][1]
     nfac = model@pta$nfac[[1]][1]
 
