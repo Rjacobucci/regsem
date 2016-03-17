@@ -1,6 +1,8 @@
 #'
 #'
-#' uses multiple starts to try and get convergence, running regsem.
+#' Multiple starts for Regularized Structural Equation Modeling
+#'
+#'
 #' @param model Lavaan output object. This is a model that was previously
 #'        run with any of the lavaan main functions: cfa(), lavaan(), sem(),
 #'        or growth(). It also can be from the efaUnrotate() function from

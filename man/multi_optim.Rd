@@ -2,7 +2,7 @@
 % Please edit documentation in R/multi_optim.R
 \name{multi_optim}
 \alias{multi_optim}
-\title{uses multiple starts to try and get convergence, running regsem.}
+\title{Multiple starts for Regularized Structural Equation Modeling}
 \usage{
 multi_optim(model, max.try = 10, lambda, LB = -Inf, UB = Inf, type,
   optMethod = "nlminb", gradFun = "ram", pars_pen = NULL,
@@ -69,7 +69,7 @@ This is not recommended.}
 \item{max.iter}{max iterations for optimization.}
 }
 \description{
-uses multiple starts to try and get convergence, running regsem.
+Multiple starts for Regularized Structural Equation Modeling
 }
 \examples{
 \dontrun{
