@@ -220,27 +220,43 @@ if(any(S_fixed - diag(S_fixed) == 0 )){
 
 S_fixed[rownames(S_est) == "1",colnames(S_est) == "1"] <- TRUE
 
-pars <- rep(NA,max(max(A),max(S)))
+
+
+
+pars <- rep(NA,length(unique(c(A[A !=0],S[S !=0]))))
+#pars <- rep(NA,max(max(A),max(S)))
+count = 0
 for(tt in 1:max(max(A),max(S))){
   if(any(A == tt)==TRUE){
-    pars[tt] = A_est[A==tt][1]
+   count = count+1
+    pars[count] = A_est[A==tt][1]
   }
   else if(any(S == tt)==TRUE){
-    pars[tt] = S_est[S==tt][1]
+   count = count +1
+    pars[count] = S_est[S==tt][1]
   }
 }
 
-for(i in 1:length(pars)){
+count = 0
+for(i in 1:max(max(A),max(S))){
   if(any(A == i)){
+    count = count + 1
     pos = which(A == i,arr.ind=T)
-    one = colnames(A)[pos[2]]
-    two = rownames(A)[pos[1]]
-    names(pars)[i] = paste(one,"->",two)
+    one = colnames(A)[pos[1,2]]
+    two = rownames(A)[pos[1,1]]
+    names(pars)[count] = paste(one,"->",two)
   }else if(any(S==i)){
+   count = count + 1
     pos = which(S == i,arr.ind=T)
-    one = colnames(S)[pos[2]]
-    two = rownames(S)[pos[1]]
-    names(pars)[i] = paste(one,"~~",two)
+    
+#    if(nrow(pos) == 1){
+     one = colnames(S)[pos[1,2]]
+     two = rownames(S)[pos[1,1]]
+#    }else if(nrow(pos) > 1){
+#     one = colnames(S)[pos[1,2]]
+#     two = rownames(S)[pos[1,1]]
+#    }
+    names(pars)[count] = paste(one,"~~",two)
   }
 }
 
