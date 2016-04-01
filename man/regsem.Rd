@@ -2,7 +2,7 @@
 % Please edit documentation in R/regsem.R
 \name{regsem}
 \alias{regsem}
-\title{Regularized Structural Equation Modeling.}
+\title{Regularized Structural Equation Modeling}
 \usage{
 regsem(model, lambda = 0, alpha = 0, type = "none", data = NULL,
   optMethod = "nlminb", gradFun = "ram", hessFun = "none",
@@ -136,7 +136,7 @@ baseline.chisq Baseline chi-square.
 baseline.df Baseline degrees of freedom.
 }
 \description{
-Regularized Structural Equation Modeling.
+Regularized Structural Equation Modeling
 }
 \examples{
 library(lavaan)
