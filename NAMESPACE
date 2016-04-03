@@ -10,3 +10,6 @@ import(Rcpp)
 import(RcppArmadillo)
 import(lavaan)
 useDynLib(regsem)
+
+importFrom("stats", "cov", "na.omit", "nlminb", "pchisq", "rnorm",
+             "runif", "sd", "uniroot", "var")

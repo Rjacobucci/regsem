@@ -11,8 +11,7 @@ Description: Uses both ridge and lasso penalties (and extensions) to penalize
 License: GPL (>= 2)
 LazyData: TRUE
 Depends: lavaan,
-	  Rcpp,
-	  RcppArmadillo
+	  Rcpp
 Suggests: snowfall, GA, rgenoud, Rsolnp, numDeriv, optimx, semPlot
 LinkingTo: Rcpp,
 	   RcppArmadillo
