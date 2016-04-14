@@ -85,9 +85,9 @@
 #' @return baseline.df Baseline degrees of freedom.
 #' @keywords optim calc
 #' @useDynLib regsem
-#' @import RcppArmadillo
 #' @import Rcpp
 #' @import lavaan
+#' @importFrom stats cov na.omit nlminb pchisq rnorm runif sd uniroot var
 #' @export
 #' @examples
 #' library(lavaan)
@@ -482,7 +482,7 @@ if(optMethod=="nlminb"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
        out <- nlminb(start,calc,grad,lower=LB,upper=UB,
                      control=list(eval.max=max.iter,
-                     iter.max=max.iter)) #,x.tol=1.5e-6
+                     iter.max=max.iter,step.min=0.0000001)) #,x.tol=1.5e-6
         res$out <- out
         #res$optim_fit <- out$objective
         res$convergence = out$convergence
@@ -492,7 +492,8 @@ if(optMethod=="nlminb"){
     }else if(gradFun=="none"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
         out <- nlminb(start,calc,lower=LB,upper=UB,control=list(eval.max=max.iter,
-                                                                 iter.max=max.iter))
+                                                                 iter.max=max.iter,
+                                                                step.min=0.0000001))
         res$out <- out
         #res$optim_fit <- out$objective
         res$convergence = out$convergence
@@ -695,7 +696,7 @@ if(optMethod=="nlminb"){
 
     res$Imp_Cov <- Imp_Cov
 
-    res$grad <- grad(as.numeric(pars.df))
+    #res$grad <- grad(as.numeric(pars.df))
     #### KKT conditions #####
     if(gradFun=="none"){
       res$KKT1 = "grad not specified"
@@ -793,9 +794,14 @@ if(optMethod=="nlminb"){
     res$N = nobs
     res$nfac = nfac
 
+    if(lav.out@Fit@converged == FALSE){
+      res$baseline.chisq = NA
+      res$baseline.df = NA
+    }else{
+      res$baseline.chisq = fitMeasures(model)["baseline.chisq"]
+      res$baseline.df = fitMeasures(model)["baseline.df"]
+    }
 
-    res$baseline.chisq = fitMeasures(model)["baseline.chisq"]
-    res$baseline.df = fitMeasures(model)["baseline.df"]
     #res$grad <- grad(res$par.ret)
 
     #res$hess <- hess(res$par.ret)

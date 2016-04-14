@@ -27,7 +27,8 @@ matrices <-  list()
 pars <- lavaan::parameterestimates(model)
 parT <- lavaan::parTable(model)
 
-
+#parT = parT[parT$exo != 1,]
+#pars = pars[parT$exo != 1,]
 
 
 nfac.hold1 <- pars[pars$op == "=~",]
@@ -189,6 +190,14 @@ if(any(S[lower.tri(S)] != 0)){
   S <- S + t(S) - diag(diag(S))
 }
 
+ss= S[S != 0]
+for(i in 1:length(unique(ss))){
+  val = ss[ss == min(ss)]
+  S[S == val[1]] <- i
+  ss = ss[ss != val[1]]
+}
+
+
 if(sum(S >0 ) > 0){
 dec2 = max(A) - min(S[S != 0]) + 1
 S[S != 0] = S[S != 0] + dec2
@@ -237,6 +246,8 @@ for(tt in 1:max(max(A),max(S))){
   }
 }
 
+
+
 count = 0
 for(i in 1:max(max(A),max(S))){
   if(any(A == i)){
@@ -248,7 +259,7 @@ for(i in 1:max(max(A),max(S))){
   }else if(any(S==i)){
    count = count + 1
     pos = which(S == i,arr.ind=T)
-    
+
 #    if(nrow(pos) == 1){
      one = colnames(S)[pos[1,2]]
      two = rownames(S)[pos[1,1]]

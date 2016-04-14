@@ -44,6 +44,7 @@
 #' @param verbose Whether to print iteration number.
 #' @param warm.start Whether start values are based on previous iteration.
 #'        This is not recommended.
+#' @param Start2 Provided starting values. Not required
 #' @param tol absolute tolerance for convergence.
 #' @param max.iter max iterations for optimization.
 #' @keywords multiple optim
@@ -66,24 +67,32 @@
 multi_optim <- function(model,max.try=10,lambda,
                          LB=-Inf,UB=Inf,type,optMethod="nlminb",gradFun="ram",
                          pars_pen=NULL,diff_par=NULL,hessFun="none",
-                        verbose=TRUE,warm.start=FALSE,
+                        verbose=TRUE,warm.start=FALSE,Start2=NULL,
                         tol=1e-6,max.iter=300){
 
 
+if(warm.start==TRUE){
+  stop("warm start not currently functioning")
+}
+ #   if(warm.start==TRUE){
+ #     fit99 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
+  #                                     Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
+  #                                     LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol))
+ #     start.vals <- as.vector(fit99$coefficients)
+#
+ #     if(length(start.vals) != length(extractMatrices(model)$parameters)){
+ #       start.vals = rep(0.5,length(extractMatrices(model)$parameters)) +
+ #         rnorm(length(extractMatrices(model)$parameters),0,0.05)
+  #    }
 
-    if(warm.start==TRUE){
-      fit99 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
-                                      Start="default",gradFun=gradFun,hessFun=hessFun,tol=tol,
-                                      LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))
-      start.vals <- as.vector(fit99$coefficients)
-    }
+  #  }
 
   sss = seq(1,max.try)
 
     mult_run <- function(model,n.try=1,lambda,LB=-Inf,
                          UB=Inf,type,optMethod,
                          gradFun,n.optim,pars_pen,
-                         diff_par,hessFun){
+                         diff_par,hessFun,Start2){
       mtt = matrix(NA,n.try,3)
       mtt[,3] = round(runif(n.try,1,99999))
       start.optim=NULL
@@ -93,7 +102,14 @@ multi_optim <- function(model,max.try=10,lambda,
         set.seed(mtt[n.optim,3])
 
         if(warm.start==FALSE){
-          start.optim = runif(max(parTable(model)$free))
+          if(is.null(Start2)){
+            start.optim = rep(0.5,length(extractMatrices(model)$parameters)) +
+              rnorm(length(extractMatrices(model)$parameters),0,0.05)
+          }else{
+            start.optim = Start2 +
+              rnorm(length(Start2),0,0.05)
+          }
+
         }else if(warm.start==TRUE){
           start.optim <- rep(0,length(start.vals))
           for(i in 1:length(start.vals)){
@@ -103,8 +119,8 @@ multi_optim <- function(model,max.try=10,lambda,
 
 
         fit1 <- suppressWarnings(try(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
-                           Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
-                           LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol),silent=T))
+                                            Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
+                                            LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol),silent=T))
 
         if(inherits(fit1, "try-error")) {
           mtt[n.optim,1] = NA
@@ -122,7 +138,7 @@ multi_optim <- function(model,max.try=10,lambda,
     iter.optim = iter.optim + 1
 
     outt = mult_run(model,n.try=1,lambda=lambda,LB,UB,type,
-                    optMethod=optMethod,gradFun=gradFun,n.optim=iter.optim,
+                    optMethod=optMethod,gradFun=gradFun,n.optim=iter.optim,Start2=Start2,
                     pars_pen=pars_pen,diff_par=diff_par,hessFun=hessFun)
 
     if(verbose==TRUE) print(c(iter.optim,outt[,1],outt[,2]))
@@ -130,10 +146,16 @@ multi_optim <- function(model,max.try=10,lambda,
       if(all(is.na(outt[,2])==TRUE)){
         return
       }else if(any(na.omit(outt[,2]) == 0)){
-        if(any(is.na(outt[,1]) == FALSE & outt[,1] > 0)){
+        if(any(is.na(outt[,1]) == FALSE & outt[,1] < 9999999999 & outt[,1] > 0)){
         row = which(outt[,1] == min(outt[which(is.na(outt[,1]) == FALSE & outt[,1] > 0 & outt[,2] == 0)]))[1]
         set.seed(outt[row,3])
-        start.optim = runif(max(parTable(model)$free))
+        if(is.null(Start2)){
+          start.optim = rep(0.5,length(extractMatrices(model)$parameters)) +
+            rnorm(length(extractMatrices(model)$parameters),0,0.05)
+        }else{
+          start.optim = Start2 +
+            rnorm(length(Start2),0,0.05)
+        }
 
         fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
                        Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
