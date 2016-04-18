@@ -216,4 +216,5 @@ arma::vec rcpp_grad_ram(arma::vec par,
     //    Rcpp::Named("C")= C,
     //    Rcpp::Named("SampCov")= SampCov);
     return grad_out2;
+
 }

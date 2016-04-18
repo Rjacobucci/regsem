@@ -5,7 +5,7 @@
 #' @param n.lambda number of penalization values to test.
 #' @param mult.start Logical. Whether to use multi_optim() (TRUE) or
 #'         regsem() (FALSE).
-#' @param niter number of random starts for multi_optim
+#' @param multi.iter number of random starts for multi_optim
 #' @param jump Amount to increase penalization each iteration.
 #' @param type penalty type.
 #' @param fit.ret Fit indices to return.
@@ -35,15 +35,22 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' cv_regsem()
-#' }
+#' library(lavaan)
+#' HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
+#' mod <- '
+#' f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
+#' '
+#' outt = cfa(mod,HS)
+#'
+#' cv.out = cv_regsem(outt,type="ridge",gradFun="none",n.lambda=100)
+#'}
 
 
 
 cv_regsem = function(model,
                      n.lambda=100,
                      mult.start=TRUE,
-                     niter=100,
+                     multi.iter=100,
                      jump=0.002,
                      type="none",
                      fit.ret=c("rmsea","BIC"),
@@ -65,7 +72,7 @@ cv_regsem = function(model,
                     UB=Inf,
                     calc="normal",
                     tol=1e-10,
-                    max.iter=2000,
+                    max.iter=50000,
                     missing="listwise",
                     ...){
 
@@ -107,7 +114,7 @@ if(mult.start==FALSE){
 
 
   }else if(mult.start==TRUE){
-   out <- multi_optim(model=model,max.try=100,lambda=SHRINK,
+   out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
                       LB=LB,UB=UB,type=type,optMethod=optMethod,
                       gradFun=gradFun,hessFun=hessFun,
                       pars_pen=pars_pen,diff_par=NULL)

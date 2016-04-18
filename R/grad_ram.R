@@ -1,20 +1,3 @@
-#'
-#'
-#' Calculates the gradient vector based on von Oertzen & Brick, 2014
-#' @param par vector with parameters.
-#' @param ImpCov expected covariance matrix.
-#' @param SampCov Sample covariance matrix.
-#' @param Areg A matrix with current parameter estimates.
-#' @param Sreg S matrix with current parameter estimates.
-#' @param A A matrix with parameter labels.
-#' @param S S matrix with parameter labels.
-#' @param F F matrix.
-#' @param lambda penalty value.
-#' @param type penalty type.
-#' @param pars_pen parameter indicators to be penalized.
-#' @param diff_par parameter values to take deviations from.
-
-
 
 grad_ram = function(par,ImpCov,SampCov,Areg,Sreg,A,S,
                      F,lambda,type,pars_pen,diff_par){

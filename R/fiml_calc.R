@@ -1,22 +1,3 @@
-#'
-#'
-#' Calculates the FIML objective function
-#' @param ImpCov expected covariance matrix.
-#' @param data required dataset.
-#' @param Areg A matrix with current parameter estimates.
-#' @param lambda penalty value.
-#' @param alpha mixture for elastic net.
-#' @param type penalty type.
-#' @param pen_vec vector of penalized parameters.
-#' @param nvar number of variables.
-#' @keywords fit maximum likelihood regularization
-#'
-#' @examples
-#' \dontrun{
-#' fiml_calc()
-#' }
-
-
 
 fiml_calc = function(ImpCov,data,Areg,lambda,alpha,type,pen_vec,nvar){
 

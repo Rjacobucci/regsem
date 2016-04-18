@@ -1,15 +1,3 @@
-#'
-#'
-#' An attempt at optimization written by ross jacobucci
-#' @param start Starting values.
-#' @param func function to compute objective value.
-#' @param grad gradient vector.
-#' @param hess hessian matrix.
-#' @param tol absolute tolerance for convergence.
-#' @param max.iter number of iterations to allow for convergence.
-#' @keywords optim calc
-
-
 
 optim_rj <- function(start,func,grad,hess,tol,max.iter){
   count = 0

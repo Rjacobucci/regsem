@@ -7,7 +7,7 @@
 multi_optim(model, max.try = 10, lambda, LB = -Inf, UB = Inf, type,
   optMethod = "nlminb", gradFun = "ram", pars_pen = NULL,
   diff_par = NULL, hessFun = "none", verbose = TRUE, warm.start = FALSE,
-  tol = 1e-06, max.iter = 300)
+  Start2 = NULL, tol = 1e-06, max.iter = 300)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -63,6 +63,8 @@ calculating the hessian. This is slower and less accurate.}
 
 \item{warm.start}{Whether start values are based on previous iteration.
 This is not recommended.}
+
+\item{Start2}{Provided starting values. Not required}
 
 \item{tol}{absolute tolerance for convergence.}
 

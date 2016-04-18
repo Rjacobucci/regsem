@@ -1,14 +1,3 @@
-#'
-#'
-#' Calculates the objective function values.
-#' @param ImpCov expected covariance matrix.
-#' @param SampCov Sample covariance matrix.
-#' @param Areg A matrix with current parameter estimates.
-#' @param lambda penalty value.
-#' @param alpha mixture for elastic net.
-#' @param type penalty type.
-#' @param pen_vec vector of penalized parameters.
-
 
 fit_fun = function(ImpCov,SampCov,Areg,lambda,alpha,type,pen_vec){
 

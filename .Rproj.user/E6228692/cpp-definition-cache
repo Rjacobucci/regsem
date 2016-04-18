@@ -12,7 +12,7 @@
             }
         ],
         "file" : "/Users/RJacobucci/Documents/Github/regsem/src/regsem_rcpp_RAMmult.cpp",
-        "file_last_write" : 1455155279
+        "file_last_write" : 1460773544
     },
     {
         "definitions" : [
@@ -27,7 +27,7 @@
             }
         ],
         "file" : "/Users/RJacobucci/Documents/Github/regsem/src/regsem_rcpp_fit_fun.cpp",
-        "file_last_write" : 1455155287
+        "file_last_write" : 1460773544
     },
     {
         "definitions" : [
@@ -42,6 +42,6 @@
             }
         ],
         "file" : "/Users/RJacobucci/Documents/Github/regsem/src/regsem_rcpp_grad_ram.cpp",
-        "file_last_write" : 1455232488
+        "file_last_write" : 1460923358
     }
 ]

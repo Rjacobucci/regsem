@@ -68,7 +68,7 @@ multi_optim <- function(model,max.try=10,lambda,
                          LB=-Inf,UB=Inf,type,optMethod="nlminb",gradFun="ram",
                          pars_pen=NULL,diff_par=NULL,hessFun="none",
                         verbose=TRUE,warm.start=FALSE,Start2=NULL,
-                        tol=1e-6,max.iter=300){
+                        tol=1e-6,max.iter=50000){
 
 
 if(warm.start==TRUE){
@@ -118,16 +118,21 @@ if(warm.start==TRUE){
         }
 
 
-        fit1 <- suppressWarnings(try(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
+        fit1 <- try(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
                                             Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
-                                            LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol),silent=T))
+                                            LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol),silent=T)
 
         if(inherits(fit1, "try-error")) {
           mtt[n.optim,1] = NA
           mtt[n.optim,2] = NA
         }else{
-          mtt[n.optim,1] = fit1$out$objective
-          mtt[n.optim,2] = fit1$out$convergence
+          if(optMethod=="nlminb"){
+            mtt[n.optim,1] = fit1$out$objective
+            mtt[n.optim,2] = fit1$out$convergence
+          }else{
+            mtt[n.optim,1] = fit1$out$value
+            mtt[n.optim,2] = fit1$out$convcode
+          }
         }
       }
       mtt
@@ -157,9 +162,9 @@ if(warm.start==TRUE){
             rnorm(length(Start2),0,0.05)
         }
 
-        fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
+        fit1 <- regsem(model,lambda=lambda,type=type,optMethod=optMethod,
                        Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
-                       LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol))
+                       LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol)
         return(fit1)
         break
         }else{
@@ -170,9 +175,9 @@ if(warm.start==TRUE){
       }
     }
    # if(exists("fit1")==FALSE){
-      fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
+      fit1 <- regsem(model,lambda=lambda,type=type,optMethod=optMethod,
                      Start="default",gradFun=gradFun,hessFun=hessFun,tol=tol,
-                     LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))
+                     LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par)
 
         fit1$convergence <- 99
         return(fit1)

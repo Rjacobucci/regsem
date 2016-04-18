@@ -1,24 +1,3 @@
-#'
-#'
-#' Calculates the gradient, accounting for means, Von Oertzen \& Brick, 2014
-#' @param par vector with parameters.
-#' @param ImpCov expected covariance matrix.
-#' @param SampCov22 Sample covariance matrix with means added.
-#' @param Areg A matrix with current parameter estimates.
-#' @param Sreg S matrix with current parameter estimates.
-#' @param A A matrix with parameter labels.
-#' @param S S matrix with parameter labels.
-#' @param F F matrix.
-#' @param SampMean sample mean vector.
-#' @param lambda penalty value.
-#' @param type penalty type.
-#' @param m not sure.
-#' @param mu not sure.
-#' @param m.pars which parameters to penalize
-
-
-
-
 
 grad_ram_wMean = function(par,ImpCov,SampCov22,Areg,Sreg,
                            A,S,F,SampMean,lambda,type,m,mu,m.pars){

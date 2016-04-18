@@ -1,14 +1,3 @@
-#'
-#'
-#' Calculates the fit function for von Oertzen & Brick, 2014
-#' @param par vector with parameters.
-#' @param SampCov22 Sample covariance matrix with means added.
-#' @param A A matrix with parameter labels.
-#' @param S S matrix with parameter labels.
-#' @param F F matrix.
-#' @param SampMean sample mean vector.
-
-
 
 ram_calc = function(par,SampCov22,A,S,F,SampMean){
 
