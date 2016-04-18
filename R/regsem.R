@@ -697,16 +697,16 @@ if(optMethod=="nlminb"){
     #res$ftt = rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)
       # get Implied Covariance matrix
 
-    Imp_Cov <- rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)$ImpCov
+    Imp_Cov1 <- rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)$ImpCov
     #Imp_Cov <- RAMmult(par=as.numeric(pars.df),A,S,F,A_fixed,A_est,S_fixed,S_est)$ImpCov
 
 
 
     if(length(model@ParTable$op[model@ParTable$op == "~1"]) > 0 & missing=="listwise"){
-      Imp_Cov = Imp_Cov[1:(nrow(Imp_Cov)-1),1:(ncol(Imp_Cov)-1)] - SampMean %*% t(SampMean)
+      Imp_Cov2 = Imp_Cov1[1:(nrow(Imp_Cov1)-1),1:(ncol(Imp_Cov1)-1)] - SampMean %*% t(SampMean)
     }
 
-    res$Imp_Cov <- Imp_Cov
+    res$Imp_Cov <- Imp_Cov2
 
     #res$grad <- grad(as.numeric(pars.df))
     #### KKT conditions #####
@@ -795,11 +795,15 @@ if(optMethod=="nlminb"){
 
     }
     if(missing == "listwise"){
-      SampCov <- model@SampleStats@cov[][[1]]
-      res$SampCov = SampCov
-      res$fit = 0.5*(log(det(Imp_Cov)) + trace(SampCov %*% solve(Imp_Cov)) -
-                     log(det(SampCov))  - nvar)
+     # SampCov <- model@SampleStats@cov[][[1]]
+    #  res$SampCov = SampCov
+      #res$fit = 0.5*(log(det(Imp_Cov1)) + trace(SampCov %*% solve(Imp_Cov1)) -
+       #              log(det(SampCov))  - nvar)
+      res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,pen_diff=0)
     }
+
+    SampCov <- model@SampleStats@cov[][[1]]
+    res$SampCov = SampCov
 
     res$coefficients <- round(pars.df,3)
     res$nvar = nvar

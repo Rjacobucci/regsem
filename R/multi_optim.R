@@ -60,7 +60,18 @@
 #'
 #' fit1 <- multi_optim(outt,max.try=40,
 #'                    lambda=0.1,type="lasso",
-#'                    optMethod="nlminb", gradFun="ram")
+#'                    gradFun="ram")
+#'
+#'
+#'# growth model
+#'model <- ' i =~ 1*t1 + 1*t2 + 1*t3 + 1*t4
+#'           s =~ 0*t1 + s1*t2 + s2*t3 + 3*t4 '
+#'fit <- growth(model, data=Demo.growth)
+#'summary(fit)
+#'fitmeasures(fit)
+
+#'fit3 <- multi_optim(fit,lambda=0.2,type="ridge",gradFun="none")
+#'summary(fit3)
 #'}
 
 
