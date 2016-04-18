@@ -51,12 +51,13 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' library(lavaan)
+#'
+#' library(regsem)
 #' HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
 #' mod <- '
 #' f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 #' '
-#' outt = cfa(mod,HS)
+#' outt = cfa(mod,HS,meanstructure=TRUE)
 #'
 #' fit1 <- multi_optim(outt,max.try=40,
 #'                    lambda=0.1,type="lasso",
@@ -80,6 +81,20 @@ multi_optim <- function(model,max.try=10,lambda,
                          pars_pen=NULL,diff_par=NULL,hessFun="none",
                         verbose=TRUE,warm.start=FALSE,Start2=NULL,
                         tol=1e-6,max.iter=50000){
+
+
+
+  if(gradFun=="norm"){
+    stop("Only recommended grad function is ram or none at this time")
+  }
+
+  if(type=="ridge" & gradFun != "none"){
+    warning("At this time, only gradFun=none recommended with ridge penalties")
+  }
+
+  if(type=="lasso" & gradFun != "ram"){
+    warning("At this time, only gradFun=ram recommended with lasso penalties")
+  }
 
 
 if(warm.start==TRUE){
@@ -129,9 +144,9 @@ if(warm.start==TRUE){
         }
 
 
-        fit1 <- try(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
+        fit1 <- suppressWarnings(try(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
                                             Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
-                                            LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol),silent=T)
+                                            LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol),silent=T))
 
         if(inherits(fit1, "try-error")) {
           mtt[n.optim,1] = NA
@@ -173,9 +188,9 @@ if(warm.start==TRUE){
             rnorm(length(Start2),0,0.05)
         }
 
-        fit1 <- regsem(model,lambda=lambda,type=type,optMethod=optMethod,
+        fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
                        Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
-                       LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol)
+                       LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol))
         return(fit1)
         break
         }else{
@@ -186,9 +201,9 @@ if(warm.start==TRUE){
       }
     }
    # if(exists("fit1")==FALSE){
-      fit1 <- regsem(model,lambda=lambda,type=type,optMethod=optMethod,
+      fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
                      Start="default",gradFun=gradFun,hessFun=hessFun,tol=tol,
-                     LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par)
+                     LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))
 
         fit1$convergence <- 99
         return(fit1)

@@ -4,14 +4,14 @@
 \alias{cv_regsem}
 \title{The main function that ties together and runs the models.}
 \usage{
-cv_regsem(model, n.lambda = 100, mult.start = TRUE, niter = 100,
+cv_regsem(model, n.lambda = 100, mult.start = TRUE, multi.iter = 100,
   jump = 0.002, type = "none", fit.ret = c("rmsea", "BIC"),
   fit.ret2 = c("train", "test"), data = NULL, optMethod = "nlminb",
   gradFun = "ram", hessFun = "none", parallel = "no", Start = "default",
   subOpt = "nlminb", longMod = F, optNL = "NLOPT_LN_NEWUOA_BOUND",
   fac.type = "cfa", matrices = "extractMatrices", pars_pen = NULL,
   diff_par = NULL, LB = -Inf, UB = Inf, calc = "normal", tol = 1e-10,
-  max.iter = 2000, missing = "listwise", ...)
+  max.iter = 50000, missing = "listwise", ...)
 }
 \arguments{
 \item{model}{lavaan output object.}
@@ -21,7 +21,7 @@ cv_regsem(model, n.lambda = 100, mult.start = TRUE, niter = 100,
 \item{mult.start}{Logical. Whether to use multi_optim() (TRUE) or
 regsem() (FALSE).}
 
-\item{niter}{number of random starts for multi_optim}
+\item{multi.iter}{number of random starts for multi_optim}
 
 \item{jump}{Amount to increase penalization each iteration.}
 
@@ -77,7 +77,14 @@ The main function that ties together and runs the models.
 }
 \examples{
 \dontrun{
-cv_regsem()
+library(lavaan)
+HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
+mod <- '
+f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
+'
+outt = cfa(mod,HS)
+
+cv.out = cv_regsem(outt,type="ridge",gradFun="none",n.lambda=100)
 }
 }
 \keyword{calc}

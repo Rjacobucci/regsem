@@ -7,7 +7,7 @@
 multi_optim(model, max.try = 10, lambda, LB = -Inf, UB = Inf, type,
   optMethod = "nlminb", gradFun = "ram", pars_pen = NULL,
   diff_par = NULL, hessFun = "none", verbose = TRUE, warm.start = FALSE,
-  Start2 = NULL, tol = 1e-06, max.iter = 300)
+  Start2 = NULL, tol = 1e-06, max.iter = 50000)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -75,16 +75,27 @@ Multiple starts for Regularized Structural Equation Modeling
 }
 \examples{
 \dontrun{
-library(lavaan)
+
+library(regsem)
 HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
 mod <- '
 f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 '
-outt = cfa(mod,HS)
+outt = cfa(mod,HS,meanstructure=TRUE)
 
 fit1 <- multi_optim(outt,max.try=40,
                    lambda=0.1,type="lasso",
-                   optMethod="nlminb", gradFun="ram")
+                   gradFun="ram")
+
+
+# growth model
+model <- ' i =~ 1*t1 + 1*t2 + 1*t3 + 1*t4
+          s =~ 0*t1 + s1*t2 + s2*t3 + 3*t4 '
+fit <- growth(model, data=Demo.growth)
+summary(fit)
+fitmeasures(fit)
+fit3 <- multi_optim(fit,lambda=0.2,type="ridge",gradFun="none")
+summary(fit3)
 }
 }
 \keyword{multiple}

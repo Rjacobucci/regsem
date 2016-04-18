@@ -144,10 +144,10 @@ HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
 mod <- '
 f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 '
-outt = cfa(mod,HS)
+# Recommended to specify meanstructure in lavaan
+outt = cfa(mod,HS,meanstructure=TRUE)
 
-fit1 <- regsem(outt,lambda=0.1,type="lasso",optMethod="nlminb",
-               gradFun="ram")
+fit1 <- regsem(outt,lambda=0.1,type="lasso",gradFun="ram")
 }
 \keyword{calc}
 \keyword{optim}
