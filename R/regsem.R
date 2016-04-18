@@ -812,7 +812,7 @@ if(optMethod=="nlminb"){
     res$N = nobs
     res$nfac = nfac
 
-    if(lav.out@Fit@converged == FALSE){
+    if(model@Fit@converged == FALSE){
       res$baseline.chisq = NA
       res$baseline.df = NA
     }else{

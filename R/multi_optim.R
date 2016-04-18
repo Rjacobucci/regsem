@@ -136,12 +136,12 @@ if(warm.start==TRUE){
               rnorm(length(Start2),0,0.05)
           }
 
-        }else if(warm.start==TRUE){
-          start.optim <- rep(0,length(start.vals))
-          for(i in 1:length(start.vals)){
-            start.optim[i] <- as.numeric(start.vals[i]) + rnorm(1,0,0.02)
-          }
-        }
+        }#else if(warm.start==TRUE){
+         # start.optim <- rep(0,length(start.vals))
+         # for(i in 1:length(start.vals)){
+         #   start.optim[i] <- as.numeric(start.vals[i]) + rnorm(1,0,0.02)
+         # }
+       # }
 
 
         fit1 <- suppressWarnings(try(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
