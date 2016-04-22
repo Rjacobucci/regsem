@@ -142,9 +142,20 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
     if(missing=="listwise"){
       calc_fit = "cov"
       nobs = model@SampleStats@nobs[[1]][1]
-      SampMean <- model@SampleStats@mean[][[1]]
+
+
+
+
+
+
 
       if(length(model@ParTable$op[model@ParTable$op == "~1"]) > 0){
+        mm = extractMatrices(model)$A[,"1"]
+
+        SampMean <- model@SampleStats@mean[][[1]]
+        ss = match(names(mm[mm > 0]),model@Data@ov$name)
+        SampMean[-c(ss)] = 0
+
         SampCov1 <- model@SampleStats@cov[][[1]]
         SampCov2 <- SampCov1 + SampMean%*%t(SampMean)
         # try changing size of SampCov
