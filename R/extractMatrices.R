@@ -295,6 +295,7 @@ matrices$S_est <- S_est
 matrices$S_fixed <- S_fixed
 matrices$F <- F
 matrices$parameters <- round(pars,3)
+matrices$mean <- mean
 
 matrices
 

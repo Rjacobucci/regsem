@@ -123,6 +123,12 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
   if(gradFun != "none" & missing=="fiml"){
     stop("only gradFun = none is supported with missing data")
   }
+
+  if(model@Data@nobs[[1]] != model@Data@norig[[1]]){
+    warning("regsem is currently not working well in the presence of missing data")
+  }
+
+
     if(gradFun=="norm"){
       stop("Only recommended grad function is ram or none at this time")
     }
@@ -141,7 +147,9 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
     }
 
 
-
+  if(model@SampleStats@ngroups > 1){
+    stop("regsem currently does not work with multiple group models")
+  }
 
 
 
@@ -161,7 +169,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
 
 
 
-      if(length(model@ParTable$op[model@ParTable$op == "~1"]) > 0){
+      if(extractMatrices(model)$mean == TRUE){
         mm = extractMatrices(model)$A[,"1"]
 
         SampMean <- model@SampleStats@mean[][[1]]
@@ -173,7 +181,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
         # try changing size of SampCov
         SampCov3 = cbind(SampCov2,SampMean)
         SampCov = rbind(SampCov3,append(SampMean,1))
-      }else if(length(model@ParTable$op[model@ParTable$op == "~1"]) == 0){
+      }else if(extractMatrices(model)$mean == FALSE){
         SampCov <- model@SampleStats@cov[][[1]]
         SampMean = NULL
       }
@@ -184,6 +192,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
     }else if(missing=="fiml"){
       #stop("FIML is currently not supported at this time")
       calc_fit = "ind"
+      SampCov <- model@SampleStats@cov[][[1]]
      # if(is.null(data)==TRUE){
      #   stop("Dataset needs to be provided for missing==fiml")
      # }
@@ -730,7 +739,7 @@ if(optMethod=="nlminb"){
 
 
 
-    if(length(model@ParTable$op[model@ParTable$op == "~1"]) > 0 & missing=="listwise"){
+    if(extractMatrices(model)$mean==TRUE & missing=="listwise"){
       Imp_Cov = Imp_Cov1[1:(nrow(Imp_Cov1)-1),1:(ncol(Imp_Cov1)-1)] - SampMean %*% t(SampMean)
     }else{
       Imp_Cov = Imp_Cov1
