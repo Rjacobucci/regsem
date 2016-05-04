@@ -5,12 +5,21 @@ Version: 0.1.2
 Author: Ross Jacobucci[aut,cre]
 Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
 Description: Uses both ridge and lasso penalties (and extensions) to penalize
-    specific parameters in structural equation models. The package offers additional cost functions, cross validation, and other extensions beyond traditional SEM.
+    specific parameters in structural equation models. The package offers additional
+    cost functions, cross validation, and other extensions beyond traditional SEM.
 License: GPL (>= 2)
 LazyData: TRUE
-Depends: lavaan,
-	  Rcpp
-Suggests: snowfall, GA, rgenoud, Rsolnp, numDeriv, optimx, semPlot
+Depends:
+    lavaan,
+    Rcpp
+Suggests:
+    snowfall,
+    GA,
+    rgenoud,
+    Rsolnp,
+    numDeriv,
+    optimx,
+    semPlot
 LinkingTo: Rcpp,
-	   RcppArmadillo
-
+    RcppArmadillo
+RoxygenNote: 5.0.1

@@ -119,6 +119,10 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
                  missing="listwise"){
 
 
+
+  if(gradFun != "none" & missing=="fiml"){
+    stop("only gradFun = none is supported with missing data")
+  }
     if(gradFun=="norm"){
       stop("Only recommended grad function is ram or none at this time")
     }
@@ -135,6 +139,14 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
     if(sum(duplicated(parL[parL != ""])) > 0){
       stop("regsem currently does not allow equality constraints")
     }
+
+
+
+
+
+
+
+
 
     nvar = model@pta$nvar[[1]][1]
     nfac = model@pta$nfac[[1]][1]
@@ -163,6 +175,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
         SampCov = rbind(SampCov3,append(SampMean,1))
       }else if(length(model@ParTable$op[model@ParTable$op == "~1"]) == 0){
         SampCov <- model@SampleStats@cov[][[1]]
+        SampMean = NULL
       }
 
       #for grad ram with mean
@@ -171,14 +184,14 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
     }else if(missing=="fiml"){
       #stop("FIML is currently not supported at this time")
       calc_fit = "ind"
-      if(is.null(data)==TRUE){
-        stop("Dataset needs to be provided for missing==fiml")
-      }
+     # if(is.null(data)==TRUE){
+     #   stop("Dataset needs to be provided for missing==fiml")
+     # }
 
 
-      if(length(model@ParTable$op[model@ParTable$op == "~1"]) == 0){
-        stop("meanstructure needs to be equal to TRUE for FIML")
-      }
+     # if(length(model@ParTable$op[model@ParTable$op == "~1"]) == 0){
+     #   stop("meanstructure needs to be equal to TRUE for FIML")
+     # }
 
     }
     #SampCov <- fitted(model)$cov
@@ -311,7 +324,9 @@ if(fac.type=="cfa"){
   if(calc == "normal"){
     calc = function(start){
          mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
-         #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
+         #print(mult)
+         #mult2 = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
+         #print(mult2)
          pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
          if(type=="diff_lasso"){
            pen_diff = pen_vec - diff_par
@@ -324,8 +339,10 @@ if(fac.type=="cfa"){
            fit
          }else if(calc_fit=="ind"){
            #stop("Not currently supported")
-           fit = fiml_calc(ImpCov=mult$ImpCov,data=data,
-                           Areg=mult$A_est22,lambda,alpha,type,pen_vec,nvar)
+           fit = fiml_calc(ImpCov=mult$ImpCov,mu.hat=model@SampleStats@missing.h1[[1]]$mu,
+                           h1=model@SampleStats@missing.h1[[1]]$h1,
+                           Areg=mult$A_est22,lambda,alpha,type,pen_vec,nvar,
+                           lav.miss=model@SampleStats@missing[[1]])
          }
 
     }

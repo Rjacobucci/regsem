@@ -33,7 +33,20 @@ parT <- lavaan::parTable(model)
 
 nfac.hold1 <- pars[pars$op == "=~",]
 nfac1 <- length(unique(nfac.hold1$lhs))
-nfac2 = nfac1 + ifelse(any(pars$op == "~1"),1,0)
+
+mean =FALSE
+
+if(any(parT$op == "~1")){
+  parTT = parT[parT$op == "~1",]
+  if(any(parTT$free > 0)){
+    mean = TRUE
+  }
+}
+
+
+
+nfac2 = nfac1 + ifelse(mean==TRUE,1,0)
+
 
 
 # check for groups
@@ -51,7 +64,7 @@ name.vars <- model@pta$vnames$ov[[1]]
 name.factors <- model@pta$vnames$lv[[1]]
 
 if(length(name.factors)!=0){
-  if(any(pars$op == "~1")){
+  if(mean==TRUE){
     colnames(A_init) <- c(name.vars,"1",name.factors)
     rownames(A_init) <- c(name.vars,"1",name.factors)
   }else{
@@ -59,7 +72,7 @@ if(length(name.factors)!=0){
     rownames(A_init) <- c(name.vars,name.factors)
   }
 }else{
-  if(any(pars$op == "~1")){
+  if(mean==TRUE){
     colnames(A_init) <- c(name.vars,"1")
     rownames(A_init) <- c(name.vars,"1")
   }else{
@@ -123,10 +136,10 @@ for(i in 1:nrow(A.pars)){
   A_est = A_est
 }
 # create F
-F <- A_init[1:(nvar + ifelse(any(pars$op == "~1"),1,0)),]
+F <- A_init[1:(nvar + ifelse(mean==TRUE,1,0)),]
 
 varNames <- model@pta$vnames$ov.model[[1]]
-f.names <- colnames(A)[1:(length(varNames) + ifelse(any(pars$op == "~1"),1,0))]
+f.names <- colnames(A)[1:(length(varNames) + ifelse(mean==TRUE,1,0))]
 
 for(ii in 1:length(f.names)){
   #Numm = which(colnames(F)[ii] == f.names[ii])
