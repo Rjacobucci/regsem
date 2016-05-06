@@ -83,9 +83,10 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
   ret["baseline.df"] = baseline.df
 
 
-  c <- N*p/2 * log(2 * pi)
-  logl_sat = -c -(N/2) * log(det(SampCov)) - (N/2)*p
+#  c <- N*p/2 * log(2 * pi)
+  logl_sat = model$logl_sat# -c -(N/2) * log(det(SampCov)) - (N/2)*p
   logl = -N * (fit- logl_sat/N)
+  print(logl_sat)
   ret["logl"] = logl
 
 

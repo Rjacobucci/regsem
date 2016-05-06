@@ -52,7 +52,7 @@ fiml_calc = function(ImpCov,mu.hat,h1,Areg,lambda,alpha,type,pen_vec,nvar,lav.mi
 
         #cat("FIML: pattern ", p, "\n")
         #print(Sigma.hat[var.idx, var.idx])
-
+        #print(Sigma.hat[var.idx,var.idx])
 
         Sigma.inv <- inv.chol(Sigma.hat[var.idx, var.idx], logdet=TRUE)
         #Sigma.inv <- chol2inv(chol(Sigma.hat[var.idx, var.idx]))

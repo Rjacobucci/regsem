@@ -119,6 +119,9 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
                  missing="listwise"){
 
 
+  if(missing=="fiml" & is.null(model@SampleStats@missing[[1]])){
+    stop("need to change missing=fiml in lavaan")
+  }
 
   if(gradFun != "none" & missing=="fiml"){
     stop("only gradFun = none is supported with missing data")
@@ -193,6 +196,8 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
       #stop("FIML is currently not supported at this time")
       calc_fit = "ind"
       SampCov <- model@SampleStats@cov[][[1]]
+
+      nobs = model@SampleStats@nobs[[1]][1]
      # if(is.null(data)==TRUE){
      #   stop("Dataset needs to be provided for missing==fiml")
      # }
@@ -204,7 +209,6 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
 
     }
     #SampCov <- fitted(model)$cov
-
     #SampMean <- rep(0,nvar)
 
     type2 = 0
@@ -348,6 +352,7 @@ if(fac.type=="cfa"){
            fit
          }else if(calc_fit=="ind"){
            #stop("Not currently supported")
+           #print(mult$ImpCov)
            fit = fiml_calc(ImpCov=mult$ImpCov,mu.hat=model@SampleStats@missing.h1[[1]]$mu,
                            h1=model@SampleStats@missing.h1[[1]]$h1,
                            Areg=mult$A_est22,lambda,alpha,type,pen_vec,nvar,
@@ -747,6 +752,8 @@ if(optMethod=="nlminb"){
 
     res$Imp_Cov <- Imp_Cov
 
+    res$logl_sat <- as.numeric(fitmeasures(model)["unrestricted.logl"])
+
     #res$grad <- grad(as.numeric(pars.df))
     #### KKT conditions #####
     if(gradFun=="none"){
@@ -839,6 +846,8 @@ if(optMethod=="nlminb"){
       #res$fit = 0.5*(log(det(Imp_Cov1)) + trace(SampCov %*% solve(Imp_Cov1)) -
        #              log(det(SampCov))  - nvar)
       res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,pen_diff=0)
+    }else if(missing == "fiml" & type == "none"){
+      res$fit = res$out$objective
     }
 
     SampCov <- model@SampleStats@cov[][[1]]
@@ -859,7 +868,7 @@ if(optMethod=="nlminb"){
 
     #res$grad <- grad(res$par.ret)
 
-    #res$hess <- hess(res$par.ret)
+   # res$hess <- hess(as.numeric(res$par.ret))
 
 
     if(res$convergence != 0){
