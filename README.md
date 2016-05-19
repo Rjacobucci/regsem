@@ -53,6 +53,8 @@ summary(fit1)
 #> [1] "summary.regsem"
 ```
 
+regsem uses the lavaan package for model specification and grabbing specific objects. Actual model computation is all done in regsem, with most of the heavy computation is done in C++. Different arguments used in any of lavaan's main functions (cfa,sem,lavaan,growth) will influence the model run in regsem. If you are familiar with RAM notation, you can check the matrix specification using extractMatrices(lavaan model name). This will give you detail to what the A and S matrices look like when used by regsem.
+
 By default, regsem penalizes only the factor loadings (all) unless otherwise specified. If specific factor loadings, or other parameters are desired for regularization, use pars\_pen().
 
 ### Example 2: Penalizing specific parameters
