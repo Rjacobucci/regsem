@@ -9,7 +9,7 @@
 #' @param jump Amount to increase penalization each iteration.
 #' @param type penalty type.
 #' @param fit.ret Fit indices to return.
-#' @param fit.ret2 Return fits from just train sample?
+#' @param fit.ret2 Return fits from train or test sample?
 #' @param data Optional dataframe. Only required for missing="fiml".
 #' @param optMethod solver to use.
 #' @param gradFun gradient function to use.
@@ -54,7 +54,7 @@ cv_regsem = function(model,
                      jump=0.002,
                      type="none",
                      fit.ret=c("rmsea","BIC"),
-                     fit.ret2 = c("train","test"),
+                     fit.ret2 = "train",
                      data=NULL,
                      optMethod="nlminb",
                     gradFun="ram",
@@ -124,7 +124,7 @@ if(mult.start==FALSE){
   #if(any(fit.ret2 == "test")==TRUE){
   #  fits[[count]]$test = NA #fit_indices(out,CV=TRUE)[fit.ret]
   #}else
-  if(any(fit.ret2 == "train")==TRUE){
+  if(fit.ret2 == "train"){
     fitt = try(fit_indices(out,CV=FALSE)$fits[fit.ret],silent=T)
     if(inherits(fitt, "try-error")) {
       fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)
@@ -132,6 +132,20 @@ if(mult.start==FALSE){
       fits[count,3:ncol(fits)] = fitt
     }
 
+  }else if(fit.ret2 == "test"){
+    fitt = try(fit_indices(out,CV=TRUE)$fits[fit.ret],silent=T)
+    if(inherits(fitt, "try-error")) {
+      fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)
+    }else{
+      fits[count,3:ncol(fits)] = fitt
+    }
+  }else if(fit.ret2 == "boot"){
+    fitt = try(fit_indices(out,CV="boot")$fits[fit.ret],silent=T)
+    if(inherits(fitt, "try-error")) {
+      fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)
+    }else{
+      fits[count,3:ncol(fits)] = fitt
+    }
   }
   fits[count,1] <- SHRINK
   fits[count,2] <- out$out$convergence

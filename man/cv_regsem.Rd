@@ -6,7 +6,7 @@
 \usage{
 cv_regsem(model, n.lambda = 100, mult.start = TRUE, multi.iter = 100,
   jump = 0.002, type = "none", fit.ret = c("rmsea", "BIC"),
-  fit.ret2 = c("train", "test"), data = NULL, optMethod = "nlminb",
+  fit.ret2 = "train", data = NULL, optMethod = "nlminb",
   gradFun = "ram", hessFun = "none", parallel = "no", Start = "default",
   subOpt = "nlminb", longMod = F, optNL = "NLOPT_LN_NEWUOA_BOUND",
   fac.type = "cfa", matrices = "extractMatrices", pars_pen = NULL,
@@ -29,7 +29,7 @@ regsem() (FALSE).}
 
 \item{fit.ret}{Fit indices to return.}
 
-\item{fit.ret2}{Return fits from just train sample?}
+\item{fit.ret2}{Return fits from train or test sample?}
 
 \item{data}{Optional dataframe. Only required for missing="fiml".}
 

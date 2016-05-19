@@ -853,6 +853,8 @@ if(optMethod=="nlminb"){
     SampCov <- model@SampleStats@cov[][[1]]
     res$SampCov = SampCov
 
+    res$data <- as.data.frame(model@Data@X)
+
     res$coefficients <- round(pars.df,3)
     res$nvar = nvar
     res$N = nobs

@@ -51,6 +51,7 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
     fit.rep <- rep(NA,n.boot)
     ImpCov = model$Imp_Cov
     SampCov = model$SampCov
+    data <- model$data
     #data = model@Data@X[[1]]
       for(i in 1:n.boot){
 
@@ -86,7 +87,6 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
 #  c <- N*p/2 * log(2 * pi)
   logl_sat = model$logl_sat# -c -(N/2) * log(det(SampCov)) - (N/2)*p
   logl = -N * (fit- logl_sat/N)
-  print(logl_sat)
   ret["logl"] = logl
 
 
