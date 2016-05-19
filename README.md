@@ -96,6 +96,8 @@ This isn't a perfect solution to the convergence difficulties and will be furthe
 cv.out = cv_regsem(outt,type="ridge",gradFun="none",fit.ret2="boot",
                    n.lambda=40,mult.start=TRUE)
 
+# see the parameter estimates for each value of lambda
+cv.out[[1]]
 # see rmsea and BIC for each value of lambda
 cv.out[[2]]
 
@@ -105,6 +107,8 @@ min.bic <- min(cv.out[[2]][,"BIC"])
 loc <- which(cv.out[[2]][,"BIC"] ==  min.bic)
 cv.out[[2]][1,]
 ```
+
+A plotting function to visualize the changes in fit and parameter estimates across values of lambda will be added in the future.
 
 ### Things that regsem does not currently support
 
