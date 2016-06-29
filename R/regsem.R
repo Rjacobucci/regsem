@@ -931,6 +931,7 @@ if(optMethod=="nlminb"){
    }
 
    res$mediation <- ppars
+   res$mediation_vals <- return.vals
 
 
     }
