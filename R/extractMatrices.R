@@ -285,6 +285,47 @@ for(i in 1:max(max(A),max(S))){
 }
 
 
+# get mediation parameters
+# only record arguments
+
+if(any(parT$op == ":=")){
+
+med.pars <- parT[parT$op == ":=",]
+args <- med.pars$rhs
+args.labs <- med.pars$lhs
+
+sub09 = (parT$label != "")
+labels <- parT$label[sub09]
+labs.inds <- labels %in% args.labs
+pars.labels <- labels[labs.inds]
+
+# now need parameter numbers
+
+labs.single <- labels[labs.inds==FALSE]
+
+par.extra <- rep(NA,length(labs.single))
+for(i in 1:length(labs.single)){
+  par.extra[i] <- parT[parT$label == labs.single[i],]$free
+}
+
+# now match parameter numbers with labels
+# for each in args
+
+#for(i in 1:length(args)){
+#  for(j in 1:length(labs.single)){
+#    args[i] <- gsub(labs.single[j],par.extra[j],args[i])
+#  }
+#}
+
+
+mediation <- list()
+
+mediation$pars.mult <- args
+mediation$pars.labs <- args.labs
+
+}else{
+  mediation <- NA
+}
 
 # return Matrices
 matrices$A <- A
@@ -296,6 +337,7 @@ matrices$S_fixed <- S_fixed
 matrices$F <- F
 matrices$parameters <- round(pars,3)
 matrices$mean <- mean
+matrices$mediation <- mediation
 
 matrices
 

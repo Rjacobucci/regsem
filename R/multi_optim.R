@@ -79,7 +79,7 @@
 multi_optim <- function(model,max.try=10,lambda,
                          LB=-Inf,UB=Inf,type,optMethod="nlminb",gradFun="ram",
                          pars_pen=NULL,diff_par=NULL,hessFun="none",
-                        verbose=TRUE,warm.start=FALSE,Start2=NULL,
+                        verbose=FALSE,warm.start=FALSE,Start2=NULL,
                         tol=1e-6,max.iter=50000){
 
 
@@ -157,7 +157,7 @@ multi_optim <- function(model,max.try=10,lambda,
           start.vals = NULL
 
           if(warm.start == TRUE){
-            start.vals <- rep(0.5,length(extractMatrices(model)$parameters)) +
+            start.vals <- extractMatrices(model)$parameters +
               rnorm(length(extractMatrices(model)$parameters),0,0.05)
           }
         }else{
@@ -233,9 +233,9 @@ iter.optim = iter.optim + 1
 
 
 
-    #if(fit1$convergence != 0){
+    if(fit1$convergence != 0){
       warning("WARNING: Model did not converge! It is recommended to increase max.try")
-    #}
+    }
 
 }
 

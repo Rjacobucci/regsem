@@ -87,7 +87,7 @@
 #' @useDynLib regsem
 #' @import Rcpp
 #' @import lavaan
-#' @importFrom stats cov na.omit nlminb pchisq rnorm runif sd uniroot var
+#' @importFrom stats cov na.omit nlminb pchisq rnorm runif sd uniroot var weighted.mean
 #' @export
 #' @examples
 #' library(lavaan)
@@ -168,6 +168,12 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
 
 
 
+      # get mediation parameters
+      if(any(is.na(extractMatrices(model)$mediation))==FALSE){
+        mediation_vals <- extractMatrices(model)$mediation
+      }else{
+        mediation_vals <- NA
+      }
 
 
 
@@ -219,6 +225,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
     }else if(type=="diff_lasso"){
       type2=3
     }
+
 
 
 
@@ -871,6 +878,63 @@ if(optMethod=="nlminb"){
     #res$grad <- grad(res$par.ret)
 
    # res$hess <- hess(as.numeric(res$par.ret))
+    if(any(is.na(mediation_vals))==FALSE){
+
+      rettt = rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+       A_est <- rettt$A_est22
+       S_est <- rettt$S_est22
+       #A_new <- A
+
+       #S_new <- S
+
+     ppars <- mediation_vals$pars.mult
+
+     #mediation_vals
+
+
+
+    parT <- lavaan::parTable(model)
+
+    par.labels <- parT$free > 0 & parT$label != ""
+    val <- rep(NA,nrow(parT[par.labels,]))
+
+    for(i in 1:nrow(parT[par.labels,])){
+      par <- parT$label[i]
+      par.num <- parT$free[i]
+
+
+        if(any(A==par.num)){
+        val[i] <- round(A_est[A==par.num],3)
+        }else if(any(S==par.num)){
+        val[i] <- round(S_est[S==par.num],3)
+        }
+    }
+
+    labs <- parT$label[par.labels]
+    for(i in 1:length(labs)){
+      for(j in 1:length(ppars)){
+        ppars[j] <- gsub(labs[i],val[i],ppars[j])
+      }
+    }
+
+   return.vals <- rep(NA,length(ppars))
+   for(i in 1:length(ppars)){
+     return.vals[i] <- eval(parse(text=ppars[i]))
+   }
+
+
+   ppars <- mediation_vals$pars.mult
+
+   for(i in 1:length(ppars)){
+     first <- paste("=",return.vals[i])
+     ppars[i] <- paste(ppars[i],first)
+   }
+
+   res$mediation <- ppars
+
+
+    }
+
 
 
     if(res$convergence != 0){

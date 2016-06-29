@@ -5,7 +5,7 @@
 #' @param n.lambda number of penalization values to test.
 #' @param mult.start Logical. Whether to use multi_optim() (TRUE) or
 #'         regsem() (FALSE).
-#' @param multi.iter number of random starts for multi_optim
+#' @param multi.iter maximum number of random starts for multi_optim
 #' @param jump Amount to increase penalization each iteration.
 #' @param type penalty type.
 #' @param fit.ret Fit indices to return.
@@ -91,6 +91,7 @@ counts=n.lambda
 while(count < counts){
 
   count = count + 1
+  print(count)
   SHRINK <- jump*(count-1) # 0.01 works well & 0.007 as well with 150 iterations
 
 if(mult.start==FALSE){
