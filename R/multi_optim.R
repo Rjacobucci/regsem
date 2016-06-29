@@ -112,7 +112,12 @@ multi_optim <- function(model,max.try=10,lambda,
  #         rnorm(length(extractMatrices(model)$parameters),0,0.05)
   #    }
 
-  }
+    }
+
+  mats <- extractMatrices(model)
+
+  val1 = max(mats$A)
+  val2 = max(mats$S) - max(mats$A)
 
   sss = seq(1,max.try)
 
@@ -130,8 +135,12 @@ multi_optim <- function(model,max.try=10,lambda,
 
         if(warm.start==FALSE){
           if(is.null(Start2)){
-            start.optim = rep(0.5,length(extractMatrices(model)$parameters)) +
-              rnorm(length(extractMatrices(model)$parameters),0,0.05)
+
+
+
+            start.optim = c(rep(0,val1) + rnorm(val1,0,0.1),abs(rep(0.5,val2) + rnorm(val2,0,0.1)))
+
+
           }else{
             start.optim = Start2
           }
