@@ -9,11 +9,13 @@
 #' @param jump Amount to increase penalization each iteration.
 #' @param type penalty type.
 #' @param fit.ret Fit indices to return.
-#' @param fit.ret2 Return fits from train or test sample?
+#' @param fit.ret2 Return fits using only dataset "train" or bootstrap "boot"? Have to
+#'        do 2 sample CV manually.
 #' @param data Optional dataframe. Only required for missing="fiml".
 #' @param optMethod solver to use.
 #' @param gradFun gradient function to use.
 #' @param hessFun hessian function to use.
+#' @param test.cov Covariance matrix from test dataset. Necessary for CV=T
 #' @param parallel whether to parallelize the processes?
 #' @param Start type of starting values to use.
 #' @param subOpt type of optimization to use in the optimx package.
@@ -59,6 +61,7 @@ cv_regsem = function(model,
                      optMethod="nlminb",
                     gradFun="ram",
                     hessFun="none",
+                    test.cov=NULL,
                     parallel="no",
                     Start="default",
                     subOpt="nlminb",
@@ -77,7 +80,11 @@ cv_regsem = function(model,
                     ...){
 
 
-
+#if(fit.ret2 == "test"){
+#  ids <-  sample(nrow(dat),nrow(dat)/2)
+#  dat.train <- dat[ids,]
+#  dat.test <- dat[-ids,]
+#}
 
 
 par.matrix <- matrix(0,n.lambda,model@Fit@npar)
@@ -134,7 +141,8 @@ if(mult.start==FALSE){
     }
 
   }else if(fit.ret2 == "test"){
-    fitt = try(fit_indices(out,CV=TRUE)$fits[fit.ret],silent=T)
+   # stop("fit.ret2=test is currently not implemented")
+    fitt = try(fit_indices(out,CovMat=test.cov,CV=TRUE)$fits[fit.ret],silent=T)
     if(inherits(fitt, "try-error")) {
       fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)
     }else{

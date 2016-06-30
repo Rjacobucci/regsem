@@ -22,7 +22,7 @@
 #'        parameter estimates and some pre-specified values. The values
 #'        to take the deviation from are specified in diff_par.
 #' @param data Optional dataframe. Only required for missing="fiml" which
-#'        is not currently working well.
+#'        is not currently working.
 #' @param optMethod Solver to use. Recommended options include "nlminb" and
 #'        "optimx". Note: for "optimx", the default method is to use nlminb.
 #'        This can be changed in subOpt.

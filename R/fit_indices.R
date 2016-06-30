@@ -3,7 +3,8 @@
 #' Calculates the fit indices
 #' @param model regsem model object.
 #' @param CV cross-validation.
-#' @param CovMat supply covariance matrix?
+#' @param CovMat If CV=T then test covariance matrix must be supplied. Note
+#'        That this should be done before running the lavaan model.
 #' @param data supply the dataset?
 #' @param n.boot number of bootstrap samples to take.
 #' @keywords fit chisq ncp rmsea
@@ -44,8 +45,13 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
       stop("Need to Provide Test CovMat")
     }
     res$Data_Type = "Test"
+
+    dat <- model$data
+  # ids <-  sample(nrow(dat),nrow(dat)/2)
+
+
     ImpCov = model$Imp_Cov
-    SampCov=CovMat
+   # SampCov=CovMat
     fit = 0.5*(log(det(ImpCov)) + trace(SampCov %*% solve(ImpCov)) - log(det(SampCov))  - p)
   }else if(CV=="boot"){
     fit.rep <- rep(NA,n.boot)
