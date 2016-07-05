@@ -16,9 +16,9 @@
 #' @param gradFun gradient function to use.
 #' @param hessFun hessian function to use.
 #' @param test.cov Covariance matrix from test dataset. Necessary for CV=T
-#' @param parallel whether to parallelize the processes for multi_optim. Not currently
-#'        working.
-#' @param ncore Number of cores to use when parallel=yes
+#' @param parallel Logical. whether to parallelize the processes running models for all
+#'        values of lambda.
+#' @param ncore Number of cores to use when parallel=TRUE
 #' @param Start type of starting values to use.
 #' @param subOpt type of optimization to use in the optimx package.
 #' @param longMod longitudinal model?
@@ -64,7 +64,7 @@ cv_regsem = function(model,
                     gradFun="ram",
                     hessFun="none",
                     test.cov=NULL,
-                    parallel="no",
+                    parallel=FALSE,
                     ncore=2,
                     Start="default",
                     subOpt="nlminb",
@@ -91,7 +91,7 @@ cv_regsem = function(model,
 
 
 
-if(parallel=="no"){
+if(parallel==FALSE){
 par.matrix <- matrix(0,n.lambda,model@Fit@npar)
 fits <- matrix(NA,n.lambda,length(fit.ret)+2)
 SHRINK = 0
@@ -175,7 +175,7 @@ if(mult.start==FALSE){
  # ret
 
 }
-}else if(parallel=="yes"){
+}else if(parallel==TRUE){
 
 
 
