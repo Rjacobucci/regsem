@@ -16,7 +16,8 @@
 #' @param gradFun gradient function to use.
 #' @param hessFun hessian function to use.
 #' @param test.cov Covariance matrix from test dataset. Necessary for CV=T
-#' @param parallel whether to parallelize the processes?
+#' @param parallel whether to parallelize the processes for multi_optim. Not currently
+#'        working.
 #' @param Start type of starting values to use.
 #' @param subOpt type of optimization to use in the optimx package.
 #' @param longMod longitudinal model?
@@ -87,6 +88,8 @@ cv_regsem = function(model,
 #}
 
 
+
+if(parallel=="no"){
 par.matrix <- matrix(0,n.lambda,model@Fit@npar)
 fits <- matrix(NA,n.lambda,length(fit.ret)+2)
 SHRINK = 0
@@ -164,10 +167,129 @@ if(mult.start==FALSE){
   }
   par.matrix[count,] = as.matrix(out$coefficients)
 
+  colnames(par.matrix) = names(out$coefficients)
+  colnames(fits) <- c("lambda","conv",fit.ret)
+  out <- list(par.matrix,fits)
+ # ret
+
+}
+}else if(parallel=="yes"){
+
+
+
+  par.matrix <- matrix(0,n.lambda,model@Fit@npar)
+  fits <- matrix(NA,n.lambda,length(fit.ret)+2)
+  SHRINK = 0
+  count = 0
+  counts=n.lambda
+  #res2 <- data.frame(matrix(NA,counts,3))
+  #coefs = rep(1,14)
+
+  library(snowfall)
+
+  cv_parallel <- function(SHRINK){
+
+    if(mult.start==FALSE){
+      out <- regsem(model=model,lambda=SHRINK,type=type,data=data,
+                    optMethod=optMethod,
+                    gradFun=gradFun,hessFun=hessFun,
+                    parallel=parallel,Start=Start,
+                    subOpt=subOpt,
+                    longMod=longMod,
+                    optNL=optNL,
+                    fac.type=fac.type,
+                    matrices=matrices,
+                    pars_pen=pars_pen,
+                    diff_par=diff_par,
+                    LB=LB,
+                    UB=UB,
+                    calc=calc,
+                    tol=tol,
+                    max.iter=max.iter,
+                    missing=missing)
+
+
+    }else if(mult.start==TRUE){
+      out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
+                         LB=LB,UB=UB,type=type,optMethod=optMethod,
+                         gradFun=gradFun,hessFun=hessFun,
+                         pars_pen=pars_pen,diff_par=NULL)
+    }
+
+
+    #if(any(fit.ret2 == "test")==TRUE){
+    #  fits[[count]]$test = NA #fit_indices(out,CV=TRUE)[fit.ret]
+    #}else
+    if(fit.ret2 == "train"){
+      fitt = try(fit_indices(out,CV=FALSE)$fits[fit.ret],silent=T)
+      if(inherits(fitt, "try-error")) {
+        fitss = rep(NA,ncol(fits)-2)
+      }else{
+        fitss = fitt
+      }
+
+    }else if(fit.ret2 == "test"){
+      # stop("fit.ret2=test is currently not implemented")
+      fitt = try(fit_indices(out,CovMat=test.cov,CV=TRUE)$fits[fit.ret],silent=T)
+      if(inherits(fitt, "try-error")) {
+        fitss = rep(NA,ncol(fits)-2)
+      }else{
+        fitss = fitt
+      }
+    }else if(fit.ret2 == "boot"){
+      fitt = try(fit_indices(out,CV="boot")$fits[fit.ret],silent=T)
+      if(inherits(fitt, "try-error")) {
+        fitss = rep(NA,ncol(fits)-2)
+      }else{
+        fitss = fitt
+      }
+    }
+    fitss <- matrix(fitss,1,length(fit.ret))
+    return(data.frame(SHRINK,conv=out$out$convergence,fitss,out$coefficients))
+  }
+
+
+
+  snowfall::sfLibrary(regsem)
+  snowfall::sfInit(parallel=TRUE, cpus=4)
+  snowfall::sfExport("model","type","data",
+                     "optMethod",
+                     "gradFun","hessFun",
+                     "parallel","Start",
+                     "subOpt",
+                     "longMod",
+                     "optNL",
+                     "fac.type",
+                     "matrices",
+                     "pars_pen",
+                     "diff_par",
+                     "LB",
+                     "UB",
+                     "calc",
+                     "tol",
+                     "max.iter",
+                     "missing")
+
+
+
+
+  lambdas <- seq(0,by=jump,length.out=n.lambda)
+  ret = sfLapply(lambdas,cv_parallel)
+  snowfall::sfStop()
+
+  #out
+
+  out <- unlist(ret)
+  out <- matrix(out,nrow=n.lambda,ncol=length(ret[[1]]),byrow=T)
+  nam <- names(extractMatrices(model)$parameters)
+  colnames(out) <- c("lambda","conv",fit.ret,nam)
+  out
+
+
+
 }
 #fits = fit_indices(out,CV=FALSE)
-colnames(par.matrix) = names(out$coefficients)
-colnames(fits) <- c("lambda","conv",fit.ret)
-ret <- list(par.matrix,fits)
+
+out
 
 }
