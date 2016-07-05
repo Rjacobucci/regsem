@@ -18,6 +18,7 @@
 #' @param test.cov Covariance matrix from test dataset. Necessary for CV=T
 #' @param parallel whether to parallelize the processes for multi_optim. Not currently
 #'        working.
+#' @param ncore Number of cores to use when parallel=yes
 #' @param Start type of starting values to use.
 #' @param subOpt type of optimization to use in the optimx package.
 #' @param longMod longitudinal model?
@@ -64,6 +65,7 @@ cv_regsem = function(model,
                     hessFun="none",
                     test.cov=NULL,
                     parallel="no",
+                    ncore=2,
                     Start="default",
                     subOpt="nlminb",
                     longMod=F,
@@ -185,7 +187,7 @@ if(mult.start==FALSE){
   #res2 <- data.frame(matrix(NA,counts,3))
   #coefs = rep(1,14)
 
-  library(snowfall)
+  #library(snowfall)
 
   cv_parallel <- function(SHRINK){
 
@@ -251,7 +253,7 @@ if(mult.start==FALSE){
 
 
   snowfall::sfLibrary(regsem)
-  snowfall::sfInit(parallel=TRUE, cpus=4)
+  snowfall::sfInit(parallel=TRUE, cpus=ncore)
   snowfall::sfExport("model","type","data",
                      "optMethod",
                      "gradFun","hessFun",
