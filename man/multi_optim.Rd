@@ -6,8 +6,8 @@
 \usage{
 multi_optim(model, max.try = 10, lambda, LB = -Inf, UB = Inf, type,
   optMethod = "nlminb", gradFun = "ram", pars_pen = NULL,
-  diff_par = NULL, hessFun = "none", verbose = TRUE, warm.start = FALSE,
-  Start2 = NULL, tol = 1e-06, max.iter = 50000)
+  diff_par = NULL, hessFun = "none", verbose = FALSE,
+  warm.start = FALSE, Start2 = NULL, nlminb.control = NULL)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -66,9 +66,7 @@ This is not recommended.}
 
 \item{Start2}{Provided starting values. Not required}
 
-\item{tol}{absolute tolerance for convergence.}
-
-\item{max.iter}{max iterations for optimization.}
+\item{nlminb.control}{list of control values to pass to nlminb}
 }
 \description{
 Multiple starts for Regularized Structural Equation Modeling

@@ -11,7 +11,8 @@ fit_indices(model, CV = F, CovMat = NULL, data = NULL, n.boot = 100)
 
 \item{CV}{cross-validation.}
 
-\item{CovMat}{supply covariance matrix?}
+\item{CovMat}{If CV=T then test covariance matrix must be supplied. Note
+That this should be done before running the lavaan model.}
 
 \item{data}{supply the dataset?}
 

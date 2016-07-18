@@ -9,8 +9,8 @@ regsem(model, lambda = 0, alpha = 0, type = "none", data = NULL,
   parallel = "no", Start = "default", subOpt = "nlminb", longMod = F,
   optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
   matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
-  LB = -Inf, UB = Inf, calc = "normal", tol = 1e-06, max.iter = 150,
-  missing = "listwise")
+  LB = -Inf, UB = Inf, calc = "normal", nlminb.control = list(),
+  max.iter = 150, missing = "listwise")
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -37,7 +37,7 @@ parameter estimates and some pre-specified values. The values
 to take the deviation from are specified in diff_par.}
 
 \item{data}{Optional dataframe. Only required for missing="fiml" which
-is not currently working well.}
+is not currently working.}
 
 \item{optMethod}{Solver to use. Recommended options include "nlminb" and
 "optimx". Note: for "optimx", the default method is to use nlminb.
@@ -90,9 +90,7 @@ converging.}
 \item{calc}{Type of calc function to use with means or not. Not recommended
 for use.}
 
-\item{tol}{Absolute tolerance for convergence.}
-
-\item{max.iter}{Max iterations for optimization.}
+\item{nlminb.control}{list of control values to pass to nlminb}
 
 \item{missing}{How to handle missing data. Current options are "listwise"
 and "fiml". "fiml" is not currently working well.}
