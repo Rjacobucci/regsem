@@ -30,8 +30,9 @@
 #' @param LB lower bound vector.
 #' @param UB upper bound vector
 #' @param calc type of calc function to use with means or not.
-#' @param tol absolute tolerance for convergence.
-#' @param max.iter max iterations for optimization.
+#' @param nlminb.control list of control values to pass to nlminb
+#' @param warm.start Whether start values are based on previous iteration.
+#'        This is not recommended.
 #' @param missing How to handle missing data. Current options are "listwise"
 #'        and "fiml".
 #' @param ... Any additional arguments to pass to regsem() or multi_optim().
@@ -77,8 +78,8 @@ cv_regsem = function(model,
                     LB=-Inf,
                     UB=Inf,
                     calc="normal",
-                    tol=1e-10,
-                    max.iter=50000,
+                    nlminb.control=list(),
+                    warm.start=FALSE,
                     missing="listwise",
                     ...){
 
@@ -121,16 +122,15 @@ if(mult.start==FALSE){
                    LB=LB,
                    UB=UB,
                    calc=calc,
-                   tol=tol,
-                   max.iter=max.iter,
+                   nlminb.control=nlminb.control,
                    missing=missing)
 
 
   }else if(mult.start==TRUE){
    out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
                       LB=LB,UB=UB,type=type,optMethod=optMethod,
-                      gradFun=gradFun,hessFun=hessFun,
-                      pars_pen=pars_pen,diff_par=NULL)
+                      gradFun=gradFun,hessFun=hessFun,nlminb.control=nlminb.control,
+                      pars_pen=pars_pen,diff_par=NULL,warm.start=warm.start)
   }
 
 
@@ -206,16 +206,15 @@ if(mult.start==FALSE){
                     LB=LB,
                     UB=UB,
                     calc=calc,
-                    tol=tol,
-                    max.iter=max.iter,
+                    nlminb.control=nlminb.control,
                     missing=missing)
 
 
     }else if(mult.start==TRUE){
       out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
                          LB=LB,UB=UB,type=type,optMethod=optMethod,
-                         gradFun=gradFun,hessFun=hessFun,
-                         pars_pen=pars_pen,diff_par=NULL)
+                         gradFun=gradFun,hessFun=hessFun,nlminb.control=nlminb.control,
+                         pars_pen=pars_pen,diff_par=NULL,warm.start=warm.start)
     }
 
 
@@ -268,8 +267,8 @@ if(mult.start==FALSE){
                      "LB",
                      "UB",
                      "calc",
-                     "tol",
-                     "max.iter",
+                     "nlminb.control",
+                     "warm.start",
                      "missing")
 
 

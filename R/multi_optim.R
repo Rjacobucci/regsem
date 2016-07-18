@@ -45,8 +45,7 @@
 #' @param warm.start Whether start values are based on previous iteration.
 #'        This is not recommended.
 #' @param Start2 Provided starting values. Not required
-#' @param tol absolute tolerance for convergence.
-#' @param max.iter max iterations for optimization.
+#' @param nlminb.control list of control values to pass to nlminb
 #' @keywords multiple optim
 #' @export
 #' @examples
@@ -80,7 +79,7 @@ multi_optim <- function(model,max.try=10,lambda,
                          LB=-Inf,UB=Inf,type,optMethod="nlminb",gradFun="ram",
                          pars_pen=NULL,diff_par=NULL,hessFun="none",
                         verbose=FALSE,warm.start=FALSE,Start2=NULL,
-                        tol=1e-6,max.iter=50000){
+                        nlminb.control=NULL){
 
 
 
@@ -123,7 +122,7 @@ multi_optim <- function(model,max.try=10,lambda,
 
     mult_run <- function(model,n.try=1,lambda,LB=-Inf,
                          UB=Inf,type,optMethod,warm.start,
-                         gradFun,n.optim,pars_pen,
+                         gradFun,n.optim,pars_pen,nlminb.control,
                          diff_par,hessFun,Start2){
       mtt = matrix(NA,n.try,3)
       mtt[,3] = round(runif(n.try,1,99999))
@@ -157,8 +156,9 @@ multi_optim <- function(model,max.try=10,lambda,
 
 
         fit1 <- suppressWarnings(try(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
-                                            Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
-                                            LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol),silent=T))
+                                            Start=start.optim,gradFun=gradFun,hessFun=hessFun,
+                                            nlminb.control=nlminb.control,
+                                            LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par),silent=T))
 
         if(inherits(fit1, "try-error")) {
           mtt[n.optim,1] = NA
@@ -197,11 +197,15 @@ iter.optim = iter.optim + 1
 
 
     ret.mult = mult_run(model,n.try=1,lambda=lambda,LB,UB,type,warm.start=warm.start,
+                        nlminb.control=nlminb.control,
                     optMethod=optMethod,gradFun=gradFun,n.optim=iter.optim,Start2=Start2,
                     pars_pen=pars_pen,diff_par=diff_par,hessFun=hessFun)
 
-    if(ret.mult$mtt[1,1] > 0){
-      Start2 = ret.mult$start.vals
+
+
+    if(warm.start == TRUE & ret.mult$mtt[1,1] > 0){
+      Start2 = ret.mult$start.vals +
+        c(rep(0,val1) + rnorm(val1,0,0.01),abs(rep(0,val2) + rnorm(val2,0,0.001)))
     }else{
       Start2 = c(rep(0,val1) + rnorm(val1,0,0.1),abs(rep(0.5,val2) + rnorm(val2,0,0.1)))
     }
@@ -237,8 +241,15 @@ iter.optim = iter.optim + 1
       }
     }
    # if(exists("fit1")==FALSE){
+
+      if(warm.start==TRUE){
+        Start=Start2
+      }else{
+        Start="default"
+      }
       fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
-                     Start="default",gradFun=gradFun,hessFun=hessFun,tol=tol,
+                     Start=Start,gradFun=gradFun,hessFun=hessFun,
+                     nlminb.control=nlminb.control,
                      LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))
 
         fit1$convergence <- 99

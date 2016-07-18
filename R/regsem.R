@@ -59,8 +59,7 @@
 #' @param UB Upper bound vector
 #' @param calc Type of calc function to use with means or not. Not recommended
 #'        for use.
-#' @param tol Absolute tolerance for convergence.
-#' @param max.iter Max iterations for optimization.
+#' @param nlminb.control list of control values to pass to nlminb
 #' @param missing How to handle missing data. Current options are "listwise"
 #'        and "fiml". "fiml" is not currently working well.
 #' @return out List of return values from optimization program
@@ -114,9 +113,22 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
                  LB=-Inf,
                  UB=Inf,
                  calc="normal",
-                 tol=1e-6,
+                 nlminb.control=list(),
                  max.iter=150,
                  missing="listwise"){
+
+  if(optMethod=="nlminb"){
+    warning("only optmethod==nlminb is currently supported well")
+  }
+
+  if(length(nlminb.control)==0){
+    nlminb.control <- list(abs.tol=1e-4,
+                    iter.max=60000,
+                    eval.max=60000,
+                    rel.tol=1e-4,
+                    x.tol=1e-4,xf.tol=1e-4,
+                    xf.tol=1e-4)
+  }
 
 
   if(missing=="fiml" & is.null(model@SampleStats@missing[[1]])){
@@ -541,8 +553,7 @@ if(optMethod=="nlminb"){
       }else if(hessFun=="none"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
        out <- nlminb(start,calc,grad,lower=LB,upper=UB,
-                     control=list(eval.max=max.iter,
-                     iter.max=max.iter,x.tol=tol)) #,x.tol=1.5e-6
+                     control=nlminb.control) #,x.tol=1.5e-6
         res$out <- out
         #res$optim_fit <- out$objective
         res$convergence = out$convergence

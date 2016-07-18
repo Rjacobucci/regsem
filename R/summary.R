@@ -8,7 +8,7 @@
 summary.regsem <- function(object,...){
   fits = fit_indices(object,CV=FALSE)
 
-  if(any(is.na(object$mediation))==FALSE){
+  if(any(is.null(object$mediation))==FALSE){
     TAB <- cbind(convergence = object$convergence,
                  df = object$df,
                  fit=object$fit,
