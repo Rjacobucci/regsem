@@ -200,7 +200,12 @@ iter.optim = iter.optim + 1
                     optMethod=optMethod,gradFun=gradFun,n.optim=iter.optim,Start2=Start2,
                     pars_pen=pars_pen,diff_par=diff_par,hessFun=hessFun)
 
-    Start2 = ret.mult$start.vals
+    if(ret.mult$mtt[1,1] > 0){
+      Start2 = ret.mult$start.vals
+    }else{
+      Start2 = c(rep(0,val1) + rnorm(val1,0,0.1),abs(rep(0.5,val2) + rnorm(val2,0,0.1)))
+    }
+
     outt = ret.mult$mtt
 
 

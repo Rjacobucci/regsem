@@ -542,7 +542,7 @@ if(optMethod=="nlminb"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
        out <- nlminb(start,calc,grad,lower=LB,upper=UB,
                      control=list(eval.max=max.iter,
-                     iter.max=max.iter,step.min=0.0000001)) #,x.tol=1.5e-6
+                     iter.max=max.iter,x.tol=tol)) #,x.tol=1.5e-6
         res$out <- out
         #res$optim_fit <- out$objective
         res$convergence = out$convergence
