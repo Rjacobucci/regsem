@@ -114,7 +114,6 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
                  UB=Inf,
                  calc="normal",
                  nlminb.control=list(),
-                 max.iter=150,
                  missing="listwise"){
 
   if(optMethod=="nlminb"){

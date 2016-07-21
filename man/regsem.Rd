@@ -10,7 +10,7 @@ regsem(model, lambda = 0, alpha = 0, type = "none", data = NULL,
   optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
   matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
   LB = -Inf, UB = Inf, calc = "normal", nlminb.control = list(),
-  max.iter = 150, missing = "listwise")
+  missing = "listwise")
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
