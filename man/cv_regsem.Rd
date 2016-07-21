@@ -7,11 +7,12 @@
 cv_regsem(model, n.lambda = 100, mult.start = TRUE, multi.iter = 100,
   jump = 0.002, type = "none", fit.ret = c("rmsea", "BIC"),
   fit.ret2 = "train", data = NULL, optMethod = "nlminb",
-  gradFun = "ram", hessFun = "none", parallel = "no", Start = "default",
-  subOpt = "nlminb", longMod = F, optNL = "NLOPT_LN_NEWUOA_BOUND",
-  fac.type = "cfa", matrices = "extractMatrices", pars_pen = NULL,
-  diff_par = NULL, LB = -Inf, UB = Inf, calc = "normal", tol = 1e-10,
-  max.iter = 50000, missing = "listwise", ...)
+  gradFun = "ram", hessFun = "none", test.cov = NULL, parallel = FALSE,
+  ncore = 2, Start = "default", subOpt = "nlminb", longMod = F,
+  optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
+  matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
+  LB = -Inf, UB = Inf, calc = "normal", nlminb.control = list(),
+  warm.start = FALSE, missing = "listwise", ...)
 }
 \arguments{
 \item{model}{lavaan output object.}
@@ -21,7 +22,7 @@ cv_regsem(model, n.lambda = 100, mult.start = TRUE, multi.iter = 100,
 \item{mult.start}{Logical. Whether to use multi_optim() (TRUE) or
 regsem() (FALSE).}
 
-\item{multi.iter}{number of random starts for multi_optim}
+\item{multi.iter}{maximum number of random starts for multi_optim}
 
 \item{jump}{Amount to increase penalization each iteration.}
 
@@ -29,7 +30,8 @@ regsem() (FALSE).}
 
 \item{fit.ret}{Fit indices to return.}
 
-\item{fit.ret2}{Return fits from train or test sample?}
+\item{fit.ret2}{Return fits using only dataset "train" or bootstrap "boot"? Have to
+do 2 sample CV manually.}
 
 \item{data}{Optional dataframe. Only required for missing="fiml".}
 
@@ -39,7 +41,12 @@ regsem() (FALSE).}
 
 \item{hessFun}{hessian function to use.}
 
-\item{parallel}{whether to parallelize the processes?}
+\item{test.cov}{Covariance matrix from test dataset. Necessary for CV=T}
+
+\item{parallel}{Logical. whether to parallelize the processes running models for all
+values of lambda.}
+
+\item{ncore}{Number of cores to use when parallel=TRUE}
 
 \item{Start}{type of starting values to use.}
 
@@ -63,9 +70,10 @@ regsem() (FALSE).}
 
 \item{calc}{type of calc function to use with means or not.}
 
-\item{tol}{absolute tolerance for convergence.}
+\item{nlminb.control}{list of control values to pass to nlminb}
 
-\item{max.iter}{max iterations for optimization.}
+\item{warm.start}{Whether start values are based on previous iteration.
+This is not recommended.}
 
 \item{missing}{How to handle missing data. Current options are "listwise"
 and "fiml".}
