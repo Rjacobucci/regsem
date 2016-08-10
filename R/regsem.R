@@ -187,7 +187,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
       }
 
 
-
+      mats = extractMatrices(model)
 
       if(extractMatrices(model)$mean == TRUE){
         mm = extractMatrices(model)$A[,"1"]
@@ -432,13 +432,19 @@ if(fac.type=="cfa"){
 
       mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
       #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
-     #   ret = grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
-     #                  Sreg=mult$S_est22,A,S,
-      #                  F,lambda,type,pars_pen,diff_par)
-      #pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
-       ret = rcpp_grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+
+      if(optMethod=="coord_desc"){
+        ret = grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
                        Sreg=mult$S_est22,A,S,
-                         F,lambda,type2=type2,pars_pen,diff_par=0)
+                       F,lambda,type,pars_pen,diff_par)
+      }else{
+        pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
+           ret = rcpp_grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+                           Sreg=mult$S_est22,A,S,
+                             F,lambda,type2=type2,pars_pen,diff_par=0)
+        }
+
+
       ret
     }
 
@@ -718,8 +724,8 @@ if(optMethod=="nlminb"){
   res$optim_fit <- 10 - summary(out)$fitness
   res$convergence = 0
   res$par.ret <- summary(out)$solution
-}else if(optMethod=="optim_rj"){
-  out = optim_rj(start=start,func=calc,grad=grad,hess=hess,pars_pen=pars_pen,model=model,lambda=lambda)
+}else if(optMethod=="coord_desc"){
+  out = coord_desc(start=start,func=calc,grad=grad,hess=hess,pars_pen=pars_pen,model=model,lambda=lambda,mats=mats)
   res$out <- out
   res$optim_fit <- out$value
   res$convergence = out$convergence

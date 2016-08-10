@@ -1,14 +1,14 @@
 
-optim_rj <- function(start,func,grad,hess,pars_pen,model,lambda){
+coord_desc <- function(start,func,grad,hess,pars_pen,model,lambda,mats){
   count = 0
   ret <- list()
   max.iter = 200
-  tol=1e-4
+  tol=1e-6
   type2=TRUE # experimental
   dif <- 0.5
 
   # mats
-  mats <- extractMatrices(model)
+ # mats <- extractMatrices(model)
 
 
   convergence = 1
@@ -21,14 +21,14 @@ optim_rj <- function(start,func,grad,hess,pars_pen,model,lambda){
   while(count < max.iter){
     count=count+1
 
-    if(count < 10){
+    if(count < 5){
       alpha <- .5
-    }else if(count < 50 & count >= 10 ){
-      alpha <- .1
+    }else if(count < 50 & count >= 5 ){
+      alpha <- .5
     }else{
-      alpha <- .01
+      alpha <- .1
     }
-   # alpha <- 1
+    alpha <- .5
 
 
     if(is.null(hess)==TRUE & type2==FALSE){
@@ -42,12 +42,23 @@ optim_rj <- function(start,func,grad,hess,pars_pen,model,lambda){
     }else if(type2 == TRUE){
 
       update.pars <- new.pars[count,]
-     gg <- grad(new.pars[count,])
-      for(j in 1:max(mats$A)){ # update A
-
-        update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha*grad(update.pars)[1:max(mats$A)]*update.pars[1:max(mats$A)]
+      #a.pars <- update.pars[1:max(mats$A)]
+      #s.pars <- update.pars[min(mats$S != 0):max(mats$S)]
+    # gg <- grad(new.pars[count,])
+      for(j in 1:length(update.pars)){ # update A
+#print(lambda)
+        gg <- grad(update.pars)
+        nn.par <- update.pars[j] - alpha*gg[j]#*update.pars[1:max(mats$A)]
+        if(any(j == pars_pen) & lambda > 0){
+          update.pars[j] <- sign(nn.par)*max(abs(nn.par)-lambda,0)
+        }else{
+          update.pars[j] <- nn.par
+        }
+       # update.pars[j] <- sign(nn.par)*max(nn.par-lambda,0)
+        #if(abs(nn.par) < lambda) update.pars[j] = 0
 
       }
+    # print(update.pars)
 
    # for(j in 1:length(update.pars)){
     #  gg <- grad(update.pars)
@@ -64,9 +75,9 @@ optim_rj <- function(start,func,grad,hess,pars_pen,model,lambda){
      # print(ind)
     #  update.pars[ind] <- update.pars[ind] - .5*gg[ind]
 
-     for(j in min(mats$S):max(mats$S)){
-        update.pars[min(mats$S):max(mats$S)] <- update.pars[min(mats$S):max(mats$S)] - alpha*grad(update.pars)[min(mats$S):max(mats$S)]*update.pars[min(mats$S):max(mats$S)]
-      }
+    # for(j in min(mats$S):max(mats$S)){
+   #     update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <- update.pars[min(mats$S[mats$S !=0]):max(mats$S)] - .5*grad(update.pars)[min(mats$S[mats$S !=0]):max(mats$S)]#*update.pars[min(mats$S):max(mats$S)]
+   #   }
 
       #  new.pars[count+1,] <- update.pars
 
@@ -77,6 +88,8 @@ optim_rj <- function(start,func,grad,hess,pars_pen,model,lambda){
        # }
 
     new.pars[count+1,] <- update.pars
+   # print(update.pars)
+    #print(update.pars)
 
    #   new.pars[count+1,pars_pen] <- new.pars[count,pars_pen]
 
@@ -113,9 +126,12 @@ optim_rj <- function(start,func,grad,hess,pars_pen,model,lambda){
 
     st.crit2 <- all(abs(gg) < .01)
     dif <- abs(vals[count+1] - vals[count])
+
+    #print(round(dif,5))
+   # print(as.vector(round(gg,3)))
     #print(dif)
-   # print(round(gg,3))
-    print(convergence)
+  #  print(round(gg,3))
+  #  print(convergence)
 
     if(inherits(st.crit, "try-error")){
       convergence=99

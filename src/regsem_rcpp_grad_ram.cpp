@@ -94,7 +94,8 @@ arma::vec rcpp_grad_ram(arma::vec par,
             A2[j] = 1;
 
             if(any((i+1)==pen_vec)==true) {
-             add = lambda * ((Areg[j] > 0) - (Areg[j] < 0));
+            add = lambda * ((Areg[j] > 0) - (Areg[j] < 0));
+           //add = ((Areg[j]- lambda > 0) - (Areg[j] - lambda < 0));
             }
           //  else{
           //    add = 0;
@@ -115,7 +116,7 @@ arma::vec rcpp_grad_ram(arma::vec par,
 
 
         grad_out[i]  = trace(pinv(ImpCov) * deriv15 * C)  + add;
-        add = 0;
+       // add = 0;
 
       }
 

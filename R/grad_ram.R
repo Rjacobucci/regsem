@@ -41,8 +41,25 @@ grad_ram = function(par,ImpCov,SampCov,Areg,Sreg,A,S,
 
       deriv15 <- F %*% B %*% A2 %*% E %*% t(F) + F %*% B %*% S2 %*% t(B) %*% t(F)
       # left out mean part
-      grad.out[i]  <- trace(solve(ImpCov) %*% deriv15 %*% C) + if(any(i==pars_pen)) lambda*sign(Areg[A==i]) else(0)# just penalize when A
+     # grad.out[i]  <- trace(solve(ImpCov) %*% deriv15 %*% C) + if(any(i==pars_pen)) lambda*sign(Areg[A==i]) else(0)# just penalize when A
+      #add <- 0
+      # soft threshold
+    #  if(any(i==pars_pen)){
+     #   if(Areg[A==i] >0 & abs(Areg[A==i]) < lambda){
+     #     add <- Areg[A==i] - lambda
+     #   }else if(Areg[A==i] < 0 & abs(Areg[A==i]) < lambda){
+     #     add <- Areg[A==i] + lambda
+      #  }else if(abs(Areg[A==i]) <= lambda){
+      #    add <- 0
+      #  }
+     # }
+     # if(any(i==pars_pen)){
+     #   add = sign(Areg[A==i]) * max(abs(Areg[A==i])-lambda,0)
+     # }else{
+     #   add <- 0
+     # }
 
+      grad.out[i]  <- trace(solve(ImpCov) %*% deriv15 %*% C) #+ add
 
     }
 
