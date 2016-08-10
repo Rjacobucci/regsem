@@ -114,7 +114,8 @@ optim_rj <- function(start,func,grad,hess,pars_pen,model,lambda){
     st.crit2 <- all(abs(gg) < .01)
     dif <- abs(vals[count+1] - vals[count])
     #print(dif)
-    print(round(gg,3))
+   # print(round(gg,3))
+    print(convergence)
 
     if(inherits(st.crit, "try-error")){
       convergence=99
@@ -123,7 +124,8 @@ optim_rj <- function(start,func,grad,hess,pars_pen,model,lambda){
     }else{
       if(st.crit==TRUE){
         convergence = 0
-        print(round(gg,3))
+        print(convergence)
+       # print(round(gg,3))
         break
 
       }
