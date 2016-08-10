@@ -140,7 +140,7 @@ coord_desc <- function(start,func,grad,hess,pars_pen,model,lambda,mats){
     }else{
       if(st.crit==TRUE){
         convergence = 0
-        print(convergence)
+        #print(convergence)
        # print(round(gg,3))
         break
 
