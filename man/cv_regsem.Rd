@@ -4,15 +4,16 @@
 \alias{cv_regsem}
 \title{The main function that ties together and runs the models.}
 \usage{
-cv_regsem(model, n.lambda = 100, mult.start = TRUE, multi.iter = 100,
+cv_regsem(model, n.lambda = 100, mult.start = FALSE, multi.iter = 100,
   jump = 0.002, type = "none", fit.ret = c("rmsea", "BIC"),
-  fit.ret2 = "train", data = NULL, optMethod = "nlminb",
+  fit.ret2 = "train", data = NULL, optMethod = "default",
   gradFun = "ram", hessFun = "none", test.cov = NULL, parallel = FALSE,
   ncore = 2, Start = "default", subOpt = "nlminb", longMod = F,
   optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
   matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
-  LB = -Inf, UB = Inf, calc = "normal", nlminb.control = list(),
-  warm.start = FALSE, missing = "listwise", ...)
+  LB = -Inf, UB = Inf, block = TRUE, calc = "normal", max.iter = 200,
+  tol = 1e-05, nlminb.control = list(), warm.start = FALSE,
+  missing = "listwise", ...)
 }
 \arguments{
 \item{model}{lavaan output object.}
@@ -68,7 +69,14 @@ values of lambda.}
 
 \item{UB}{upper bound vector}
 
-\item{calc}{type of calc function to use with means or not.}
+\item{block}{Whether to use block coordinate descent}
+
+\item{calc}{Type of calc function to use with means or not. Not recommended
+for use.}
+
+\item{max.iter}{Number of iterations for coordinate descent}
+
+\item{tol}{Tolerance for coordinate descent}
 
 \item{nlminb.control}{list of control values to pass to nlminb}
 

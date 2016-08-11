@@ -5,12 +5,12 @@
 \title{Regularized Structural Equation Modeling}
 \usage{
 regsem(model, lambda = 0, alpha = 0, type = "none", data = NULL,
-  optMethod = "nlminb", gradFun = "ram", hessFun = "none",
+  optMethod = "default", gradFun = "ram", hessFun = "none",
   parallel = "no", Start = "default", subOpt = "nlminb", longMod = F,
   optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
   matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
-  LB = -Inf, UB = Inf, calc = "normal", nlminb.control = list(),
-  missing = "listwise")
+  LB = -Inf, UB = Inf, block = TRUE, calc = "normal", max.iter = 200,
+  tol = 1e-05, nlminb.control = list(), missing = "listwise")
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -87,8 +87,14 @@ converging.}
 
 \item{UB}{Upper bound vector}
 
+\item{block}{Whether to use block coordinate descent}
+
 \item{calc}{Type of calc function to use with means or not. Not recommended
 for use.}
+
+\item{max.iter}{Number of iterations for coordinate descent}
+
+\item{tol}{Tolerance for coordinate descent}
 
 \item{nlminb.control}{list of control values to pass to nlminb}
 
@@ -145,7 +151,7 @@ f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 # Recommended to specify meanstructure in lavaan
 outt = cfa(mod,HS,meanstructure=TRUE)
 
-fit1 <- regsem(outt,lambda=0.1,type="lasso",gradFun="ram")
+fit1 <- regsem(outt,lambda=0.1,type="lasso",Start=extractMatrices(outt)$parameters)
 }
 \keyword{calc}
 \keyword{optim}

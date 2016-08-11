@@ -5,7 +5,7 @@
 \title{Multiple starts for Regularized Structural Equation Modeling}
 \usage{
 multi_optim(model, max.try = 10, lambda, LB = -Inf, UB = Inf, type,
-  optMethod = "nlminb", gradFun = "ram", pars_pen = NULL,
+  optMethod = "default", gradFun = "ram", pars_pen = NULL,
   diff_par = NULL, hessFun = "none", verbose = FALSE,
   warm.start = FALSE, Start2 = NULL, nlminb.control = NULL)
 }
@@ -73,7 +73,7 @@ Multiple starts for Regularized Structural Equation Modeling
 }
 \examples{
 \dontrun{
-
+# Note that this is not currently recommend. Use regsem() instead
 library(regsem)
 HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
 mod <- '
