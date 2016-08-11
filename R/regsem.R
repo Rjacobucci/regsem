@@ -57,9 +57,12 @@
 #'        when using regularization. It greatly increases the chances of
 #'        converging.
 #' @param UB Upper bound vector
+#' @param block Whether to use block coordinate descent
 #' @param calc Type of calc function to use with means or not. Not recommended
 #'        for use.
 #' @param nlminb.control list of control values to pass to nlminb
+#' @param max.iter Number of iterations for coordinate descent
+#' @param tol Tolerance for coordinate descent
 #' @param missing How to handle missing data. Current options are "listwise"
 #'        and "fiml". "fiml" is not currently working well.
 #' @return out List of return values from optimization program
@@ -97,13 +100,13 @@
 #' # Recommended to specify meanstructure in lavaan
 #' outt = cfa(mod,HS,meanstructure=TRUE)
 #'
-#' fit1 <- regsem(outt,lambda=0.1,type="lasso",gradFun="ram")
+#' fit1 <- regsem(outt,lambda=0.1,type="lasso",Start=extractMatrices(outt)$parameters)
 
 
 
 
 
-regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb",
+regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="default",
                  gradFun="ram",hessFun="none",parallel="no",Start="default",
                  subOpt="nlminb",longMod=F,
                  optNL="NLOPT_LN_NEWUOA_BOUND",fac.type="cfa",
@@ -112,12 +115,27 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
                  diff_par=NULL,
                  LB=-Inf,
                  UB=Inf,
+                 block=TRUE,
                  calc="normal",
+                 max.iter=200,
+                 tol=1e-5,
                  nlminb.control=list(),
                  missing="listwise"){
 
-  if(optMethod=="nlminb"){
-    warning("only optmethod==nlminb is currently supported well")
+  if(optMethod=="default" & type=="lasso"){
+      optMethod<-"coord_desc"
+  }
+
+  if(optMethod=="default" & type!="lasso"){
+    optMethod <- "nlminb"
+  }
+
+  if(optMethod!="nlminb" & optMethod !="coord_desc"){
+    stop("only optmethod==nlminb or coord_desc is currently supported well")
+  }
+
+  if(optMethod=="nlminb"& type=="lasso"){
+    warning("ONly optMethod=coord_desc is recommended for use with lasso")
   }
 
   if(length(nlminb.control)==0){
@@ -149,6 +167,10 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="nlminb
 
   if(type=="ridge" & gradFun != "none"){
     warning("At this time, only gradFun=none recommended with ridge penalties")
+  }
+
+  if(type=="ridge" & optMethod != "nlminb"){
+    stop("For ridge, only use optMethod=nlminb and gradFun=none")
   }
 
   if(type=="lasso" & gradFun != "ram"){
@@ -725,7 +747,9 @@ if(optMethod=="nlminb"){
   res$convergence = 0
   res$par.ret <- summary(out)$solution
 }else if(optMethod=="coord_desc"){
-  out = coord_desc(start=start,func=calc,grad=grad,hess=hess,pars_pen=pars_pen,model=model,lambda=lambda,mats=mats)
+  out = coord_desc(start=start,func=calc,grad=grad,hess=hess,
+                   pars_pen=pars_pen,model=model,max.iter=max.iter,
+                   lambda=lambda,mats=mats,block=block,tol=tol)
   res$out <- out
   res$optim_fit <- out$value
   res$convergence = out$convergence

@@ -29,8 +29,12 @@
 #' @param diff_par parameter values to deviate from.
 #' @param LB lower bound vector.
 #' @param UB upper bound vector
-#' @param calc type of calc function to use with means or not.
+#' @param block Whether to use block coordinate descent
+#' @param calc Type of calc function to use with means or not. Not recommended
+#'        for use.
 #' @param nlminb.control list of control values to pass to nlminb
+#' @param max.iter Number of iterations for coordinate descent
+#' @param tol Tolerance for coordinate descent
 #' @param warm.start Whether start values are based on previous iteration.
 #'        This is not recommended.
 #' @param missing How to handle missing data. Current options are "listwise"
@@ -54,14 +58,14 @@
 
 cv_regsem = function(model,
                      n.lambda=100,
-                     mult.start=TRUE,
+                     mult.start=FALSE,
                      multi.iter=100,
                      jump=0.002,
                      type="none",
                      fit.ret=c("rmsea","BIC"),
                      fit.ret2 = "train",
                      data=NULL,
-                     optMethod="nlminb",
+                     optMethod="default",
                     gradFun="ram",
                     hessFun="none",
                     test.cov=NULL,
@@ -77,7 +81,10 @@ cv_regsem = function(model,
                     diff_par=NULL,
                     LB=-Inf,
                     UB=Inf,
+                    block=TRUE,
                     calc="normal",
+                    max.iter=200,
+                    tol=1e-5,
                     nlminb.control=list(),
                     warm.start=FALSE,
                     missing="listwise",
@@ -89,6 +96,8 @@ cv_regsem = function(model,
 #  dat.train <- dat[ids,]
 #  dat.test <- dat[-ids,]
 #}
+
+
 
 
 
@@ -275,7 +284,7 @@ if(mult.start==FALSE){
 
 
   lambdas <- seq(0,by=jump,length.out=n.lambda)
-  ret = sfLapply(lambdas,cv_parallel)
+  ret = snowfall::sfLapply(lambdas,cv_parallel)
   snowfall::sfStop()
 
   #out

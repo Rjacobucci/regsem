@@ -50,7 +50,7 @@
 #' @export
 #' @examples
 #' \dontrun{
-#'
+#' # Note that this is not currently recommend. Use regsem() instead
 #' library(regsem)
 #' HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
 #' mod <- '
@@ -76,12 +76,12 @@
 
 
 multi_optim <- function(model,max.try=10,lambda,
-                         LB=-Inf,UB=Inf,type,optMethod="nlminb",gradFun="ram",
+                         LB=-Inf,UB=Inf,type,optMethod="default",gradFun="ram",
                          pars_pen=NULL,diff_par=NULL,hessFun="none",
                         verbose=FALSE,warm.start=FALSE,Start2=NULL,
                         nlminb.control=NULL){
 
-
+  warning("Note it is not currently recommended to use multi_optim")
 
   if(gradFun=="norm"){
     stop("Only recommended grad function is ram or none at this time")
