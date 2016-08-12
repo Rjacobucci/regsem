@@ -78,22 +78,31 @@
 multi_optim <- function(model,max.try=10,lambda,
                          LB=-Inf,UB=Inf,type,optMethod="default",gradFun="ram",
                          pars_pen=NULL,diff_par=NULL,hessFun="none",
-                        verbose=FALSE,warm.start=FALSE,Start2=NULL,
+                        verbose=FALSE,warm.start=TRUE,Start2=NULL,
                         nlminb.control=NULL){
 
-  warning("Note it is not currently recommended to use multi_optim")
 
-  if(gradFun=="norm"){
-    stop("Only recommended grad function is ram or none at this time")
+  if(optMethod=="default" & type=="lasso"){
+    optMethod<-"coord_desc"
   }
 
-  if(type=="ridge" & gradFun != "none"){
-    warning("At this time, only gradFun=none recommended with ridge penalties")
+  if(optMethod=="default" & type!="lasso"){
+    optMethod <- "nlminb"
   }
 
-  if(type=="lasso" & gradFun != "ram"){
-    warning("At this time, only gradFun=ram recommended with lasso penalties")
-  }
+ # warning("Note it is not currently recommended to use multi_optim")
+
+#  if(gradFun=="norm"){
+#    stop("Only recommended grad function is ram or none at this time")
+#  }
+
+#  if(type=="ridge" & gradFun != "none"){
+#    warning("At this time, only gradFun=none recommended with ridge penalties")
+#  }
+
+#  if(type=="lasso" & gradFun != "ram"){
+#    warning("At this time, only gradFun=ram recommended with lasso penalties")
+#  }
 
 
 #if(warm.start==TRUE){
@@ -160,6 +169,8 @@ multi_optim <- function(model,max.try=10,lambda,
                                             nlminb.control=nlminb.control,
                                             LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par),silent=T))
 
+
+
         if(inherits(fit1, "try-error")) {
           mtt[n.optim,1] = NA
           mtt[n.optim,2] = NA
@@ -181,7 +192,7 @@ multi_optim <- function(model,max.try=10,lambda,
             mtt[n.optim,2] = fit1$out$convergence
           }else{
             mtt[n.optim,1] = fit1$out$value
-            mtt[n.optim,2] = fit1$out$convcode
+            mtt[n.optim,2] = fit1$out$convergence
           }
         }
     }
