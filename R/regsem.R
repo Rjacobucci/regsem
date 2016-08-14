@@ -90,6 +90,7 @@
 #' @import Rcpp
 #' @import lavaan
 #' @importFrom stats cov na.omit nlminb pchisq rnorm runif sd uniroot var weighted.mean
+#' @importFrom graphics abline lines plot
 #' @export
 #' @examples
 #' library(lavaan)
@@ -986,6 +987,14 @@ if(optMethod=="nlminb"){
 
 
     }
+
+
+    if(lambda > 0){
+      res$pars_pen <- pars_pen
+    }else{
+      res$pars_pen <- NULL
+    }
+
 
 
 

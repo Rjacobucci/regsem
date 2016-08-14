@@ -53,7 +53,7 @@ coord_desc <- function(start,func,grad,hess,pars_pen,model,lambda,mats,block,max
 
         if(lambda > 0){
           for(j in pars_pen){
-            update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-lambda,0)
+            update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha*lambda,0)
           }
         }
 

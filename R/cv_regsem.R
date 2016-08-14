@@ -142,7 +142,7 @@ if(mult.start==FALSE){
                       pars_pen=pars_pen,diff_par=NULL,warm.start=warm.start)
   }
 
-
+  pars_pen <- out$pars_pen
   #if(any(fit.ret2 == "test")==TRUE){
   #  fits[[count]]$test = NA #fit_indices(out,CV=TRUE)[fit.ret]
   #}else
@@ -180,7 +180,7 @@ if(mult.start==FALSE){
 
   colnames(par.matrix) = names(out$coefficients)
   colnames(fits) <- c("lambda","conv",fit.ret)
-  out <- list(par.matrix,fits)
+  out <- list(par.matrix,fits,pars_pen)
  # ret
 
 }
@@ -288,6 +288,7 @@ if(mult.start==FALSE){
   snowfall::sfStop()
 
   #out
+  pars_pen <- out$pars_pen
 
   out <- unlist(ret)
   out <- matrix(out,nrow=n.lambda,ncol=length(ret[[1]]),byrow=T)

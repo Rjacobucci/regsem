@@ -6,8 +6,8 @@
 \usage{
 multi_optim(model, max.try = 10, lambda, LB = -Inf, UB = Inf, type,
   optMethod = "default", gradFun = "ram", pars_pen = NULL,
-  diff_par = NULL, hessFun = "none", verbose = FALSE,
-  warm.start = FALSE, Start2 = NULL, nlminb.control = NULL)
+  diff_par = NULL, hessFun = "none", verbose = FALSE, warm.start = TRUE,
+  Start2 = NULL, nlminb.control = NULL)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
