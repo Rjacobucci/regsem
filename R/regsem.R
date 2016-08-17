@@ -58,6 +58,7 @@
 #'        converging.
 #' @param UB Upper bound vector
 #' @param block Whether to use block coordinate descent
+#' @param full Whether to do full gradient descent or block
 #' @param calc Type of calc function to use with means or not. Not recommended
 #'        for use.
 #' @param nlminb.control list of control values to pass to nlminb
@@ -117,6 +118,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
                  LB=-Inf,
                  UB=Inf,
                  block=TRUE,
+                 full=FALSE,
                  calc="normal",
                  max.iter=200,
                  tol=1e-5,
@@ -170,9 +172,9 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
     warning("At this time, only gradFun=none recommended with ridge penalties")
   }
 
-  if(type=="ridge" & optMethod != "nlminb"){
-    stop("For ridge, only use optMethod=nlminb and gradFun=none")
-  }
+ # if(type=="ridge" & optMethod != "nlminb"){
+ #   stop("For ridge, only use optMethod=nlminb and gradFun=none")
+ # }
 
   if(type=="lasso" & gradFun != "ram"){
     warning("At this time, only gradFun=ram recommended with lasso penalties")
@@ -190,7 +192,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
 
 
 
-
+    sat.lik <- as.numeric(fitmeasures(model)["unrestricted.logl"])
 
 
     nvar = model@pta$nvar[[1]][1]
@@ -236,6 +238,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
       #stop("FIML is currently not supported at this time")
       calc_fit = "ind"
       SampCov <- model@SampleStats@cov[][[1]]
+      mediation_vals <- NA
 
       nobs = model@SampleStats@nobs[[1]][1]
      # if(is.null(data)==TRUE){
@@ -379,6 +382,7 @@ if(fac.type=="cfa"){
     calc = function(start){
          mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
          #print(mult)
+
          #mult2 = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
          #print(mult2)
          pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
@@ -394,10 +398,14 @@ if(fac.type=="cfa"){
          }else if(calc_fit=="ind"){
            #stop("Not currently supported")
            #print(mult$ImpCov)
-           fit = fiml_calc(ImpCov=mult$ImpCov,mu.hat=model@SampleStats@missing.h1[[1]]$mu,
-                           h1=model@SampleStats@missing.h1[[1]]$h1,
-                           Areg=mult$A_est22,lambda,alpha,type,pen_vec,nvar,
-                           lav.miss=model@SampleStats@missing[[1]])
+
+           #fit = fiml_calc(ImpCov=mult$ImpCov,mu.hat=model@SampleStats@missing.h1[[1]]$mu,
+           #                h1=model@SampleStats@missing.h1[[1]]$h1,
+           #                Areg=mult$A_est22,lambda,alpha,type,pen_vec,nvar,
+           #                lav.miss=model@SampleStats@missing[[1]])
+           fit = fiml_calc2(ImpCov=mult$ImpCov,F,mats=mult,
+                           type=type,
+                           model=model,sat.lik=sat.lik)
          }
 
     }
@@ -456,7 +464,7 @@ if(fac.type=="cfa"){
       mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
       #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
 
-      if(optMethod=="coord_desc"){
+      if(optMethod=="coord_desc" | optMethod=="nlminb"){
         ret = grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
                        Sreg=mult$S_est22,A,S,
                        F,lambda,type,pars_pen,diff_par)
@@ -748,17 +756,16 @@ if(optMethod=="nlminb"){
   res$convergence = 0
   res$par.ret <- summary(out)$solution
 }else if(optMethod=="coord_desc"){
-  out = coord_desc(start=start,func=calc,grad=grad,hess=hess,
+  out = coord_desc(start=start,func=calc,type=type,grad=grad,
+                   hess=hess,hessFun=hessFun,
                    pars_pen=pars_pen,model=model,max.iter=max.iter,
-                   lambda=lambda,mats=mats,block=block,tol=tol)
+                   lambda=lambda,mats=mats,block=block,tol=tol,full=full)
   res$out <- out
   res$optim_fit <- out$value
   res$convergence = out$convergence
   par.ret <- out$pars
   res$iterations <- out$iterations
 }
-
-
 
 
 
@@ -785,6 +792,7 @@ if(optMethod=="nlminb"){
 
     if(any(pars.df[diag(S[diag(S) != 0])] < 0)){
       warning("Some Variances are Negative!")
+      res$convergence <- 2
     }
 
 
@@ -905,7 +913,9 @@ if(optMethod=="nlminb"){
        #              log(det(SampCov))  - nvar)
       res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,pen_diff=0)
     }else if(missing == "fiml" & type == "none"){
-      res$fit = res$out$objective
+      res$fit = (res$optim_fit/model@SampleStats@nobs[[1]][1])*.5
+      #SampCov <- model@implied$cov[[i]]
+      #res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,pen_diff=0)
     }
 
     SampCov <- model@SampleStats@cov[][[1]]

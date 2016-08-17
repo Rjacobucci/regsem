@@ -1,9 +1,11 @@
 
-coord_desc <- function(start,func,grad,hess,pars_pen,model,lambda,mats,block,max.iter,tol){
+coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,mats,block,max.iter,tol,full){
   count = 0
   ret <- list()
   max.iter = max.iter
   tol=tol
+
+
 
   # mats
  # mats <- extractMatrices(model)
@@ -34,38 +36,72 @@ coord_desc <- function(start,func,grad,hess,pars_pen,model,lambda,mats,block,max
       #s.pars <- update.pars[min(mats$S != 0):max(mats$S)]
     # gg <- grad(new.pars[count,])
 
+    if(hessFun=="none"){
       if(block == FALSE){
         for(j in 1:length(update.pars)){ # update A
 
           gg <- grad(update.pars)
           nn.par <- update.pars[j] - alpha*gg[j]
 
-          if(any(j == pars_pen) & lambda > 0){
+          if(any(j == pars_pen) & type=="lasso" & lambda > 0){
               update.pars[j] <- sign(nn.par)*max(abs(nn.par)-lambda,0)
           }else{
               update.pars[j] <- nn.par
           }
         }
       }else if(block==TRUE){
-        # A
-        gg <- grad(new.pars[count,])
-        update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha*gg[1:max(mats$A)]
 
-        if(lambda > 0){
-          for(j in pars_pen){
-            update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha*lambda,0)
+        if(full==TRUE){
+          gg <- grad(new.pars[count,])
+          update.pars <- update.pars - alpha*gg
+
+          if(type=="lasso" & lambda > 0){
+            for(j in pars_pen){
+              update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha*lambda,0)
+            }
           }
+        }else if(full==FALSE){
+          # A
+          gg <- grad(new.pars[count,])
+          update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha*gg[1:max(mats$A)]
+
+          if(type=="lasso" & lambda > 0){
+            for(j in pars_pen){
+              update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha*lambda,0)
+            }
+          }
+
+
+          # S
+          gg2 <- grad(update.pars)
+
+          update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <-
+            update.pars[min(mats$S[mats$S !=0]):max(mats$S)] - alpha*gg2[min(mats$S[mats$S !=0]):max(mats$S)]
+
         }
+      }
+    }else if(hessFun=="ram"){
+      alpha=1
+      # A
+      gg <- grad(new.pars[count,])
+      hh <- hess(new.pars[count,])
+      update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha*solve(hh[1:max(mats$A),1:max(mats$A)]) %*% gg[1:max(mats$A)]
 
-
-        # S
-        gg2 <- grad(update.pars)
-
-        update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <-
-                 update.pars[min(mats$S[mats$S !=0]):max(mats$S)] - alpha*gg2[min(mats$S[mats$S !=0]):max(mats$S)]
-
+      if(lambda > 0){
+        for(j in pars_pen){
+          update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha*lambda,0)
+        }
       }
 
+
+      # S
+      gg2 <- grad(update.pars)
+      hh2 <- hess(update.pars)
+
+      update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <-
+        update.pars[min(mats$S[mats$S !=0]):max(mats$S)] -
+        alpha*gg2[min(mats$S[mats$S !=0]):max(mats$S)]*solve(hh2[min(mats$S[mats$S !=0]):max(mats$S),min(mats$S[mats$S !=0]):max(mats$S)])
+    }
 
     new.pars[count+1,] <- update.pars
 

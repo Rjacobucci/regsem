@@ -141,8 +141,8 @@ if(mult.start==FALSE){
                       gradFun=gradFun,hessFun=hessFun,nlminb.control=nlminb.control,
                       pars_pen=pars_pen,diff_par=NULL,warm.start=warm.start)
   }
-
-  pars_pen <- out$pars_pen
+  #print(pars_pen)
+ # pars_pen <- out$pars_pen
   #if(any(fit.ret2 == "test")==TRUE){
   #  fits[[count]]$test = NA #fit_indices(out,CV=TRUE)[fit.ret]
   #}else
@@ -180,7 +180,7 @@ if(mult.start==FALSE){
 
   colnames(par.matrix) = names(out$coefficients)
   colnames(fits) <- c("lambda","conv",fit.ret)
-  out <- list(par.matrix,fits,pars_pen)
+  out2 <- list(par.matrix,fits,pars_pen)
  # ret
 
 }
@@ -290,17 +290,17 @@ if(mult.start==FALSE){
   #out
   pars_pen <- out$pars_pen
 
-  out <- unlist(ret)
-  out <- matrix(out,nrow=n.lambda,ncol=length(ret[[1]]),byrow=T)
+  out2 <- unlist(ret)
+  out2 <- matrix(out,nrow=n.lambda,ncol=length(ret[[1]]),byrow=T)
   nam <- names(extractMatrices(model)$parameters)
-  colnames(out) <- c("lambda","conv",fit.ret,nam)
-  out
+  colnames(out2) <- c("lambda","conv",fit.ret,nam)
+  out2
 
 
 
 }
 #fits = fit_indices(out,CV=FALSE)
-
-out
+out2$pars_pen <- pars_pen
+out2
 
 }

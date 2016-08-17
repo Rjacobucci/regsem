@@ -93,16 +93,16 @@ arma::vec rcpp_grad_ram(arma::vec par,
           if (A[j]==i+1) {
             A2[j] = 1;
 
-            if(any((i+1)==pen_vec)==true) {
-            add = lambda * ((Areg[j] > 0) - (Areg[j] < 0));
+           // if(any((i+1)==pen_vec)==true) {
+          //  add = lambda * ((Areg[j] > 0) - (Areg[j] < 0));
            //add = ((Areg[j]- lambda > 0) - (Areg[j] - lambda < 0));
             }
           //  else{
-          //    add = 0;
+              add = 0;
            // }
 
 
-          }
+        //  }
         }
         for (double j = 0; j < Ssize; j++) {
           if (S[j]==i+1) {

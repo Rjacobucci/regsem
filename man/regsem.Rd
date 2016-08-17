@@ -9,8 +9,9 @@ regsem(model, lambda = 0, alpha = 0, type = "none", data = NULL,
   parallel = "no", Start = "default", subOpt = "nlminb", longMod = F,
   optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
   matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
-  LB = -Inf, UB = Inf, block = TRUE, calc = "normal", max.iter = 200,
-  tol = 1e-05, nlminb.control = list(), missing = "listwise")
+  LB = -Inf, UB = Inf, block = TRUE, full = FALSE, calc = "normal",
+  max.iter = 200, tol = 1e-05, nlminb.control = list(),
+  missing = "listwise")
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -88,6 +89,8 @@ converging.}
 \item{UB}{Upper bound vector}
 
 \item{block}{Whether to use block coordinate descent}
+
+\item{full}{Whether to do full gradient descent or block}
 
 \item{calc}{Type of calc function to use with means or not. Not recommended
 for use.}
