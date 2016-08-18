@@ -146,7 +146,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
                     iter.max=60000,
                     eval.max=60000,
                     rel.tol=1e-4,
-                    x.tol=1e-4,xf.tol=1e-4,
+                    x.tol=1e-4,
                     xf.tol=1e-4)
   }
 
@@ -155,13 +155,13 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
     stop("need to change missing=fiml in lavaan")
   }
 
-  if(gradFun != "none" & missing=="fiml"){
-    stop("only gradFun = none is supported with missing data")
-  }
+#  if(gradFun != "none" & missing=="fiml"){
+#    stop("only gradFun = none is supported with missing data")
+#  }
 
-  if(model@Data@nobs[[1]] != model@Data@norig[[1]]){
-    warning("regsem is currently not working well in the presence of missing data")
-  }
+#  if(model@Data@nobs[[1]] != model@Data@norig[[1]]){
+#    warning("regsem is currently not working well in the presence of missing data")
+#  }
 
 
   #  if(gradFun=="norm"){
@@ -194,7 +194,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
 
     sat.lik <- as.numeric(fitmeasures(model)["unrestricted.logl"])
 
-
+    mats = extractMatrices(model)
     nvar = model@pta$nvar[[1]][1]
     nfac = model@pta$nfac[[1]][1]
 
@@ -211,8 +211,12 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
         mediation_vals <- NA
       }
 
+      if(missing=="listwise"){
+        SampCov <- model@SampleStats@cov[][[1]]
+      }else{
+        SampCov <- model@implied$cov[[1]]
+      }
 
-      mats = extractMatrices(model)
 
       if(extractMatrices(model)$mean == TRUE){
         mm = extractMatrices(model)$A[,"1"]
@@ -221,13 +225,13 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
         ss = match(names(mm[mm > 0]),model@Data@ov$name)
         SampMean[-c(ss)] = 0
 
-        SampCov1 <- model@SampleStats@cov[][[1]]
-        SampCov2 <- SampCov1 + SampMean%*%t(SampMean)
+
+        SampCov2 <- SampCov + SampMean%*%t(SampMean)
         # try changing size of SampCov
         SampCov3 = cbind(SampCov2,SampMean)
         SampCov = rbind(SampCov3,append(SampMean,1))
       }else if(extractMatrices(model)$mean == FALSE){
-        SampCov <- model@SampleStats@cov[][[1]]
+       # SampCov <- model@SampleStats@cov[][[1]]
         SampMean = NULL
       }
 
@@ -403,9 +407,10 @@ if(fac.type=="cfa"){
            #                h1=model@SampleStats@missing.h1[[1]]$h1,
            #                Areg=mult$A_est22,lambda,alpha,type,pen_vec,nvar,
            #                lav.miss=model@SampleStats@missing[[1]])
-           fit = fiml_calc2(ImpCov=mult$ImpCov,F,mats=mult,
-                           type=type,
-                           model=model,sat.lik=sat.lik)
+           fit = fiml_calc2(ImpCov=mult$ImpCov,F,mats2=mult,
+                           type=type,lambda=lambda,
+                           model=model,sat.lik=sat.lik,
+                           pen_vec=pen_vec)
          }
 
     }
@@ -596,8 +601,8 @@ if(optMethod=="nlminb"){
         #res$iterations <- out$iterations
       }else if(hessFun=="none"){
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
-       out <- nlminb(start,calc,grad,lower=LB,upper=UB,
-                     control=nlminb.control) #,x.tol=1.5e-6
+       suppressWarnings(out <- nlminb(start,calc,grad,lower=LB,upper=UB,
+                     control=nlminb.control)) #,x.tol=1.5e-6
         res$out <- out
         res$iteration = out$iterations
         #res$optim_fit <- out$objective
@@ -654,7 +659,7 @@ if(optMethod=="nlminb"){
       }else if(hessFun=="none"){
         warning("numDeriv does not seem to be accurate at this time")
         #LB = c(rep(-6,max(A)),rep(1e-6,max(diag(S))-max(A)),rep(-10,max(S)-max(diag(S))))
-        out <- nlminb(start,calc,lower=LB,upper=UB,gradient=grad,,control=nlminb.control)
+        out <- nlminb(start,calc,lower=LB,upper=UB,gradient=grad,control=nlminb.control)
         res$out <- out
         #res$optim_fit <- out$objective
         res$convergence = out$convergence
@@ -799,10 +804,11 @@ if(optMethod=="nlminb"){
     #res$ftt = rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)
       # get Implied Covariance matrix
 
-    Imp_Cov1 <- rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)$ImpCov
+    mult.out <- rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+    Imp_Cov1 <- mult.out$ImpCov
     #Imp_Cov <- RAMmult(par=as.numeric(pars.df),A,S,F,A_fixed,A_est,S_fixed,S_est)$ImpCov
 
-
+    pen_vec = c(mult.out$A_est22[A %in% pars_pen],mult.out$S_est22[S %in% pars_pen])
 
     if(extractMatrices(model)$mean==TRUE & missing=="listwise"){
       Imp_Cov = Imp_Cov1[1:(nrow(Imp_Cov1)-1),1:(ncol(Imp_Cov1)-1)] - SampMean %*% t(SampMean)
@@ -906,6 +912,15 @@ if(optMethod=="nlminb"){
       res$npar = npar - sum(pars_l2 < 0.001)
 
     }
+
+
+      if(optMethod=="nlminb"){
+        optFit <- out$objective
+      }else{
+        optFit <- res$optim_fit
+      }
+
+
     if(missing == "listwise"){
      # SampCov <- model@SampleStats@cov[][[1]]
     #  res$SampCov = SampCov
@@ -913,9 +928,16 @@ if(optMethod=="nlminb"){
        #              log(det(SampCov))  - nvar)
       res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,pen_diff=0)
     }else if(missing == "fiml" & type == "none"){
-      res$fit = (res$optim_fit/model@SampleStats@nobs[[1]][1])*.5
+      #print(res$optim_fit)
+      res$fit = (optFit/nobs)*.5
+     # res$fit = rcpp_fit_fun(ImpCov=Imp_Cov,SampCov,
+     #                        type2,lambda,pen_vec=0,pen_diff=0)
       #SampCov <- model@implied$cov[[i]]
       #res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,pen_diff=0)
+    }else if(missing=="fiml" & type != "none"){
+      res$fit = rcpp_fit_fun(ImpCov=Imp_Cov,SampCov,
+                             type2,lambda,pen_vec=0,pen_diff=0)
+
     }
 
     SampCov <- model@SampleStats@cov[][[1]]

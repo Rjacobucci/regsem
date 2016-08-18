@@ -1,5 +1,5 @@
 
-fiml_calc2 = function(ImpCov,F,mats,type,model,sat.lik){
+fiml_calc2 = function(ImpCov,F,mats2,type,lambda,model,sat.lik,pen_vec){
 
 # look at lav_objective.R from lavaan
   m = dim(ImpCov)[1]
@@ -7,12 +7,12 @@ fiml_calc2 = function(ImpCov,F,mats,type,model,sat.lik){
  # IntCol2 = colnames(Areg[,1:nvar])
  # fit = 0
   lav.miss <-  model@SampleStats@missing[[1]]
-  A_est <- mats$A_est22
-  S_est <- mats$S_est22
+  A_est <- mats2$A_est22
+  S_est <- mats2$S_est22
 
 
-  if(type=="none"){
-
+#  if(type=="none"){
+    nobs <- model@Data@nobs[[1]]
     npatterns <- length(lav.miss)
     lav.miss <- model@SampleStats@missing[[1]]
 
@@ -53,12 +53,27 @@ fiml_calc2 = function(ImpCov,F,mats,type,model,sat.lik){
 
       for (j in 1:samps[i]){
         ll_part2[j] = ((t(as.matrix(X[j,])) - rep(0,nvar)) %*% solve(ImpCov)  %*% (as.matrix(X[j,]) - rep(0,nvar)))*.5
+
+
       }
 
       ll_part2a = colSums(ll_part2)
 
       ll = - (samps[i] * nvar)/2 * log(2 * pi) - samps[i]/2 * log(det(ImpCov)) - ll_part2a
-      fit[i] <- ll
+
+      add <- 0
+
+
+      if(type=="lasso"){
+        #print(pen_vec)
+        add <- 2*lambda * sum(abs(pen_vec))
+      }
+      #print(add * samps[i]/nobs)
+      #print(samps[i]/nobs)
+      #print(nobs)
+      #print(samps[i])
+      #print(add * samps[i]/nobs)
+      fit[i] <- ll - (add * samps[i]/nobs)
 
     #  TT <- Scov + tcrossprod(mean - rep(0,nvar))
     #  Sigma.inv <- log(det(ImpCov))
@@ -69,17 +84,19 @@ fiml_calc2 = function(ImpCov,F,mats,type,model,sat.lik){
     }
 
 
-  }else{
-    stop("Only type==none is currently supported")
-  }
+ # }else{
+ #   stop("Only type==none is currently supported")
+ # }
 
 
   fit = sum(fit)
+ # print(fit)
   fit2 = -2 * fit
   diff <- fit2 - (-2*sat.lik)
  # print(diff)
  # fit.ret <- diff/301
  # print(fit.ret)
  # fit.ret
+ # print(diff)
   diff
 }
