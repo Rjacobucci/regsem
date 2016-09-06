@@ -11,7 +11,7 @@ regsem(model, lambda = 0, alpha = 0, type = "none", data = NULL,
   matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
   LB = -Inf, UB = Inf, block = TRUE, full = FALSE, calc = "normal",
   max.iter = 500, tol = 1e-05, solver = FALSE, solver.maxit = 5,
-  alpha.inc = TRUE, step = 0.5, momentum = FALSE,
+  alpha.inc = TRUE, step = 0.5, momentum = FALSE, step.ratio = FALSE,
   nlminb.control = list(), missing = "listwise")
 }
 \arguments{
@@ -109,6 +109,8 @@ for use.}
 \item{step}{Step size}
 
 \item{momentum}{Logical for coord_desc}
+
+\item{step.ratio}{Ratio of step size between A and S. Logical}
 
 \item{nlminb.control}{list of control values to pass to nlminb}
 

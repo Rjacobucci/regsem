@@ -35,6 +35,12 @@
 #' @param nlminb.control list of control values to pass to nlminb
 #' @param max.iter Number of iterations for coordinate descent
 #' @param tol Tolerance for coordinate descent
+#' @param solver Whether to use solver for coord_desc
+#' @param solver.maxit Max iterations for solver in coord_desc
+#' @param alpha.inc Whether alpha should increase for coord_desc
+#' @param step Step size
+#' @param momentum Logical for coord_desc
+#' @param step.ratio Ratio of step size between A and S. Logical
 #' @param warm.start Whether start values are based on previous iteration.
 #'        This is not recommended.
 #' @param missing How to handle missing data. Current options are "listwise"
@@ -85,6 +91,12 @@ cv_regsem = function(model,
                     calc="normal",
                     max.iter=200,
                     tol=1e-5,
+                    solver=FALSE,
+                    solver.maxit=5,
+                    alpha.inc=TRUE,
+                    step=.5,
+                    momentum=FALSE,
+                    step.ratio=FALSE,
                     nlminb.control=list(),
                     warm.start=FALSE,
                     missing="listwise",
@@ -131,6 +143,13 @@ if(mult.start==FALSE){
                    LB=LB,
                    UB=UB,
                    calc=calc,
+                   tol=tol,
+                    solver=solver,
+                  solver.maxit=solver.maxit,
+                  alpha.inc=alpha.inc,
+                  step=step,
+                  momentum=momentum,
+                  step.ratio=step.ratio,
                    nlminb.control=nlminb.control,
                    missing=missing)
 
@@ -138,7 +157,14 @@ if(mult.start==FALSE){
   }else if(mult.start==TRUE){
    out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
                       LB=LB,UB=UB,type=type,optMethod=optMethod,
-                      gradFun=gradFun,hessFun=hessFun,nlminb.control=nlminb.control,
+                      gradFun=gradFun,hessFun=hessFun,
+                      tol=tol,
+                      solver=solver,
+                      solver.maxit=solver.maxit,
+                      alpha.inc=alpha.inc,
+                      step=step,
+                      momentum=momentum,
+                      step.ratio=step.ratio,nlminb.control=nlminb.control,
                       pars_pen=pars_pen,diff_par=NULL,warm.start=warm.start)
   }
   #print(pars_pen)
@@ -216,6 +242,13 @@ if(mult.start==FALSE){
                     UB=UB,
                     calc=calc,
                     nlminb.control=nlminb.control,
+                    tol=tol,
+                    solver=solver,
+                    solver.maxit=solver.maxit,
+                    alpha.inc=alpha.inc,
+                    step=step,
+                    momentum=momentum,
+                    step.ratio=step.ratio,
                     missing=missing)
 
 
@@ -223,6 +256,13 @@ if(mult.start==FALSE){
       out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
                          LB=LB,UB=UB,type=type,optMethod=optMethod,
                          gradFun=gradFun,hessFun=hessFun,nlminb.control=nlminb.control,
+                         tol=tol,
+                         solver=solver,
+                         solver.maxit=solver.maxit,
+                         alpha.inc=alpha.inc,
+                         step=step,
+                         momentum=momentum,
+                         step.ratio=step.ratio,
                          pars_pen=pars_pen,diff_par=NULL,warm.start=warm.start)
     }
 

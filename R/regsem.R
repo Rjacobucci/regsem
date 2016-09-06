@@ -69,6 +69,7 @@
 #' @param alpha.inc Whether alpha should increase for coord_desc
 #' @param step Step size
 #' @param momentum Logical for coord_desc
+#' @param step.ratio Ratio of step size between A and S. Logical
 #' @param missing How to handle missing data. Current options are "listwise"
 #'        and "fiml". "fiml" is not currently working well.
 #' @return out List of return values from optimization program
@@ -132,6 +133,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
                  alpha.inc=TRUE,
                  step=.5,
                  momentum=FALSE,
+                 step.ratio=FALSE,
                  nlminb.control=list(),
                  missing="listwise"){
 
@@ -753,7 +755,8 @@ if(optMethod=="nlminb"){
                    pars_pen=pars_pen,model=model,max.iter=max.iter,
                    lambda=lambda,mats=mats,block=block,tol=tol,full=full,
                    solver=solver,solver.maxit=solver.maxit,
-                   alpha.inc=alpha.inc,momentum=momentum,step=step)
+                   alpha.inc=alpha.inc,momentum=momentum,step=step,
+                   step.ratio=step.ratio)
   res$out <- out
   res$optim_fit <- out$value
   res$convergence = out$convergence
@@ -788,6 +791,23 @@ if(optMethod=="nlminb"){
 #      warning("Some Variances are Negative!")
 #      res$convergence <- 2
  #   }
+
+
+
+
+
+    if(type=="ridge"){
+      hess = function(start){
+
+        mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+        #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
+        ret = hess_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+                       Sreg=mult$S_est22,A,S,F)
+        ret
+      }
+      hess.mat = hess(as.numeric(pars.df))
+      res$hess <- hess.mat
+    }
 
 
     #res$ftt = rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)

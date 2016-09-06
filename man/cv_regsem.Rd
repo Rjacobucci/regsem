@@ -12,8 +12,9 @@ cv_regsem(model, n.lambda = 100, mult.start = FALSE, multi.iter = 100,
   optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
   matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
   LB = -Inf, UB = Inf, block = TRUE, calc = "normal", max.iter = 200,
-  tol = 1e-05, nlminb.control = list(), warm.start = FALSE,
-  missing = "listwise", ...)
+  tol = 1e-05, solver = FALSE, solver.maxit = 5, alpha.inc = TRUE,
+  step = 0.5, momentum = FALSE, step.ratio = FALSE,
+  nlminb.control = list(), warm.start = FALSE, missing = "listwise", ...)
 }
 \arguments{
 \item{model}{lavaan output object.}
@@ -77,6 +78,18 @@ for use.}
 \item{max.iter}{Number of iterations for coordinate descent}
 
 \item{tol}{Tolerance for coordinate descent}
+
+\item{solver}{Whether to use solver for coord_desc}
+
+\item{solver.maxit}{Max iterations for solver in coord_desc}
+
+\item{alpha.inc}{Whether alpha should increase for coord_desc}
+
+\item{step}{Step size}
+
+\item{momentum}{Logical for coord_desc}
+
+\item{step.ratio}{Ratio of step size between A and S. Logical}
 
 \item{nlminb.control}{list of control values to pass to nlminb}
 

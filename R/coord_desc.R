@@ -1,6 +1,7 @@
 
 coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,mats,
-                       block,max.iter,tol,full,solver,solver.maxit,alpha.inc,momentum,step){
+                       block,max.iter,tol,full,solver,solver.maxit,alpha.inc,momentum,step,
+                       step.ratio){
   count = 0
   ret <- list()
   max.iter = max.iter
@@ -8,7 +9,12 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
   #solver=TRUE
 
 
-
+  if(step.ratio == TRUE){
+    alpha1 <- .01*step
+    alpha2 <- step
+  }else if(step.ratio == FALSE){
+    alpha <- alpha1 <- alpha2 <- step
+  }
 
   # mats
  # mats <- extractMatrices(model)
@@ -52,7 +58,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
         }
       }else if(block==TRUE){
 
-        if(full==TRUE){
+        if(full==TRUE & solver == FALSE){
           gg <- grad(new.pars[count,])
 
           update.pars <- update.pars - alpha*gg
@@ -62,15 +68,26 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
               update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha*lambda,0)
             }
           }
-        }else if(full==FALSE){
-          # A
-          gg <- grad(new.pars[count,])
-          update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha*t(gg[1:max(mats$A)])
-
+        }else if(full==TRUE & solver == TRUE){
+          out <- nlminb(new.pars[count,],func,grad,control=list(iter.max=solver.maxit))
+          print(out$objective)
+          update.pars <- out$par
 
           if(type=="lasso" & lambda > 0){
             for(j in pars_pen){
               update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha*lambda,0)
+            }
+          }
+
+        }else if(full==FALSE){
+          # A
+          gg <- grad(new.pars[count,])
+          update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha1*t(gg[1:max(mats$A)])
+
+
+          if(type=="lasso" & lambda > 0){
+            for(j in pars_pen){
+              update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha1*lambda,0)
             }
           }
 
@@ -85,10 +102,10 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           # S
           gg2 <- grad(update.pars)
-          print(rbind(t(gg),t(gg2)))
+          #print(rbind(t(gg),t(gg2)))
 
           update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <-
-            update.pars[min(mats$S[mats$S !=0]):max(mats$S)] - 1*gg2[min(mats$S[mats$S !=0]):max(mats$S)]
+            update.pars[min(mats$S[mats$S !=0]):max(mats$S)] - alpha2*gg2[min(mats$S[mats$S !=0]):max(mats$S)]
 
         }
       }
