@@ -1,9 +1,12 @@
 
-coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,mats,block,max.iter,tol,full){
+coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,mats,
+                       block,max.iter,tol,full,solver,solver.maxit,alpha.inc,momentum,step){
   count = 0
   ret <- list()
   max.iter = max.iter
   tol=tol
+  #solver=TRUE
+
 
 
 
@@ -16,18 +19,16 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
   vals[1] <- 0
   new.pars <- matrix(NA,max.iter+1,length(start))
   new.pars[1,] <- start
-
+ # print(new.pars[1,])
 
   while(count < max.iter){
     count=count+1
 
-    if(count < 50){
-      alpha <- .5
-    }else{
-      alpha=.5
+    if(alpha.inc==FALSE){
+      alpha <- step
+    }else if(alpha.inc==TRUE){
+      alpha <- 0.01 + 0.01*count
     }
-
-
 
 
 
@@ -36,7 +37,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       #s.pars <- update.pars[min(mats$S != 0):max(mats$S)]
     # gg <- grad(new.pars[count,])
 
-    if(hessFun=="none"){
+    if(hessFun=="none" & solver==FALSE){
       if(block == FALSE){
         for(j in 1:length(update.pars)){ # update A
 
@@ -53,6 +54,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
         if(full==TRUE){
           gg <- grad(new.pars[count,])
+
           update.pars <- update.pars - alpha*gg
 
           if(type=="lasso" & lambda > 0){
@@ -63,7 +65,8 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
         }else if(full==FALSE){
           # A
           gg <- grad(new.pars[count,])
-          update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha*gg[1:max(mats$A)]
+          update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha*t(gg[1:max(mats$A)])
+
 
           if(type=="lasso" & lambda > 0){
             for(j in pars_pen){
@@ -72,15 +75,24 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           }
 
 
+          ####################################################
+          ####################################################
+
+          # one problem with convergence seems to be going to far with A
+          # parameters. This is why it seems to work well to set alpha=1
+          # for S, but use small step sizes for A
+
+
           # S
           gg2 <- grad(update.pars)
+          print(rbind(t(gg),t(gg2)))
 
           update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <-
-            update.pars[min(mats$S[mats$S !=0]):max(mats$S)] - alpha*gg2[min(mats$S[mats$S !=0]):max(mats$S)]
+            update.pars[min(mats$S[mats$S !=0]):max(mats$S)] - 1*gg2[min(mats$S[mats$S !=0]):max(mats$S)]
 
         }
       }
-    }else if(hessFun=="ram"){
+    }else if(hessFun=="ram" & solver==FALSE){
       alpha=1
       # A
       gg <- grad(new.pars[count,])
@@ -101,9 +113,34 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <-
         update.pars[min(mats$S[mats$S !=0]):max(mats$S)] -
         alpha*gg2[min(mats$S[mats$S !=0]):max(mats$S)]*solve(hh2[min(mats$S[mats$S !=0]):max(mats$S),min(mats$S[mats$S !=0]):max(mats$S)])
+    }else if(solver==TRUE){
+
+
+      out <- nlminb(new.pars[count,],func,grad,control=list(iter.max=solver.maxit))
+      print(out$objective)
+      update.pars <- out$par
+
+      if(type=="lasso" & lambda > 0){
+        for(j in pars_pen){
+          update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha*lambda,0)
+        }
+      }
+
+      # S
+      out <- nlminb(update.pars,func,grad,control=list(iter.max=solver.maxit))
+      pp.pars <- out$par
+
+      update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <- pp.pars[min(mats$S[mats$S !=0]):max(mats$S)]
+
+
     }
 
-    new.pars[count+1,] <- update.pars
+    if(momentum==FALSE){
+      new.pars[count+1,] <- update.pars
+    }else if(momentum==TRUE){
+      new.pars[count+1,] <- update.pars + (count/(count+3))*(update.pars-new.pars[count,])
+    }
+
 
 
 
@@ -111,10 +148,10 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
 
     st.crit = try(abs(vals[count+1] - vals[count])<tol)
-
-    st.crit2 <- all(abs(gg) < .01)
+  #  st.crit2 <- all(abs(gg) < .01)
     dif <- abs(vals[count+1] - vals[count])
 
+   # print(rbind(update.pars,t(gg2)))
     #print(round(dif,5))
    # print(as.vector(round(gg,3)))
    # print(dif)

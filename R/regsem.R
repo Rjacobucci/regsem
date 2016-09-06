@@ -64,6 +64,11 @@
 #' @param nlminb.control list of control values to pass to nlminb
 #' @param max.iter Number of iterations for coordinate descent
 #' @param tol Tolerance for coordinate descent
+#' @param solver Whether to use solver for coord_desc
+#' @param solver.maxit Max iterations for solver in coord_desc
+#' @param alpha.inc Whether alpha should increase for coord_desc
+#' @param step Step size
+#' @param momentum Logical for coord_desc
 #' @param missing How to handle missing data. Current options are "listwise"
 #'        and "fiml". "fiml" is not currently working well.
 #' @return out List of return values from optimization program
@@ -109,7 +114,7 @@
 
 
 regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="default",
-                 gradFun="ram",hessFun="none",parallel="no",Start="default",
+                 gradFun="ram",hessFun="none",parallel="no",Start="lavaan",
                  subOpt="nlminb",longMod=F,
                  optNL="NLOPT_LN_NEWUOA_BOUND",fac.type="cfa",
                  matrices="extractMatrices",
@@ -120,8 +125,13 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
                  block=TRUE,
                  full=FALSE,
                  calc="normal",
-                 max.iter=200,
+                 max.iter=500,
                  tol=1e-5,
+                 solver=FALSE,
+                 solver.maxit=5,
+                 alpha.inc=TRUE,
+                 step=.5,
+                 momentum=FALSE,
                  nlminb.control=list(),
                  missing="listwise"){
 
@@ -180,10 +190,10 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
     warning("At this time, only gradFun=ram recommended with lasso penalties")
   }
 
-    parL = parTable(model)[,"label"]
-    if(sum(duplicated(parL[parL != ""])) > 0){
-      stop("regsem currently does not allow equality constraints")
-    }
+ #   parL = parTable(model)[,"label"]
+  #  if(sum(duplicated(parL[parL != ""])) > 0){
+ #     stop("regsem currently does not allow equality constraints")
+ #   }
 
 
   if(model@SampleStats@ngroups > 1){
@@ -346,38 +356,12 @@ if(fac.type=="cfa"){
    }else if(class(Start) != "numeric"){
      if(Start=="lavaan"){
        # get starting values
-       lambda.start = lavaan::inspect(model,"start")$lambda
-       psi.start = lavaan::inspect(model,"start")$psi  # tricky to get ordering
-       theta.start = diag(lavaan::inspect(model,"start")$theta) # only diagonal elements of theta
-       nu.start = lavaan::inspect(model,"start")$nu
-       alpha.start = lavaan::inspect(model,"start")$alpha
-       # put into vector
-       #par.start = as.vector(c(lambda.start[lambda.start != 0],psi.start[!upper.tri(psi.start)],theta.start),mode="numeric")
-       par.start = as.vector(c(lambda.start,theta.start,psi.start[!upper.tri(psi.start)]),mode="numeric")
-       # assign which values in parTable have a number assigned !=0 in free column
-       free <- lavaan::parTable(model)$free
-       # pull only free parameters
-       start = par.start[free > 0]
-       st <- is.na(start)
-       start <- start[!st]
+       start <- mats$parameters
 
      } else if(Start == "default"){
        nstart <- max(max(A),max(S))
        start <- rep(0.5,nstart)
 
-     }
-   }else if(Start=="prev"){
-     nstart <- max(max(A),max(S))
-     start.seq <- seq(1:nstart)
-     start <- rep(0.5,nstart)
-
-     for(i in 1:nstart){
-       if(sum(A == i) > 0) {
-         start[i] = A.est[A == i]
-       }
-       else if(sum(S== i)>0){
-         start[i] = S.est[S==i][1]
-       }
      }
    }
 
@@ -469,10 +453,13 @@ if(fac.type=="cfa"){
       mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
       #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
 
-      if(optMethod=="coord_desc" | optMethod=="nlminb"){
-        ret = grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
-                       Sreg=mult$S_est22,A,S,
-                       F,lambda,type,pars_pen,diff_par)
+      if(optMethod=="coord_desc"){
+        if(type2==1) type2=0
+
+        pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
+        ret = rcpp_grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+                            Sreg=mult$S_est22,A,S,
+                            F,lambda,type2=type2,pars_pen,diff_par=0)
       }else{
         pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
            ret = rcpp_grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
@@ -764,7 +751,9 @@ if(optMethod=="nlminb"){
   out = coord_desc(start=start,func=calc,type=type,grad=grad,
                    hess=hess,hessFun=hessFun,
                    pars_pen=pars_pen,model=model,max.iter=max.iter,
-                   lambda=lambda,mats=mats,block=block,tol=tol,full=full)
+                   lambda=lambda,mats=mats,block=block,tol=tol,full=full,
+                   solver=solver,solver.maxit=solver.maxit,
+                   alpha.inc=alpha.inc,momentum=momentum,step=step)
   res$out <- out
   res$optim_fit <- out$value
   res$convergence = out$convergence
@@ -795,10 +784,10 @@ if(optMethod=="nlminb"){
     pars.df <- data.frame(matrix(NA,1,max(max(A),max(S))))
     pars.df[1,] <- par.ret
 
-    if(any(pars.df[diag(S[diag(S) != 0])] < 0)){
-      warning("Some Variances are Negative!")
-      res$convergence <- 2
-    }
+#    if(any(pars.df[diag(S[diag(S) != 0])] < 0)){
+#      warning("Some Variances are Negative!")
+#      res$convergence <- 2
+ #   }
 
 
     #res$ftt = rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)

@@ -88,32 +88,88 @@ A.pars = pars[parT$op == "=~" | parT$op == "~1" | parT$op == "~",]
 
 A.parFree <- A.parT[A.parT$free > 0,]
 
-if(nrow(A.parFree) > 0){
-for(i in 1:nrow(A.parFree)){
-  if(A.parFree$op[i] == "=~"){
-  colNum <- which(A.parFree$lhs[i] == colnames(A))
-  rowNum <- which(A.parFree$rhs[i] == rownames(A))
-  A[rowNum,colNum] = i
-  }else if(A.parFree$op[i] == "~1"){
-    A[which(rownames(A)==A.parFree$lhs[i]),which(colnames(A) == "1")] = i
-  }else if(A.parFree$op[i] == "~"){
-    colNum <- which(A.parFree$rhs[i] == colnames(A))
-    rowNum <- which(A.parFree$lhs[i] == rownames(A))
-    A[rowNum,colNum] = i
+
+uniq <- unique(A.parFree[,"label"])
+
+uniq2 <- uniq[table(A.parFree[,"label"]) == 1]
+
+
+
+if(length(uniq2)>0){
+  for(i in 1:length(uniq2)){
+    A.parFree[A.parFree[,"label"] == uniq2[i],"label"] <- ""
+  }
+}
+
+
+
+# any equality?
+if(any(duplicated(A.parFree$label[A.parFree$label != ""]) == T)){
+  labels = unique(A.parFree$label[A.parFree$label != ""])
+  for(i in 1:length(labels)){
+    equals = A.parFree$free[A.parFree$label == labels[i]]
+    min.equal = min(equals)
+    max.equal = max(equals)
+    A.parFree$free[A.parFree$label == labels[i]] <- min.equal
+
+  #  dec = max.equal - min.equal
+   # A.parFree$free[A.parFree$label == labels[i]] <- A.parFree$free[A.parFree$label == labels[i]] - dec
+  }
+  #equals = A.parFree$free[A.parFree$label == labels]
+
+}
+
+
+A.parFree[,"free"] <- rank(A.parFree[,"free"],ties.method="min")
+
+
+A.parFree2 <- A.parFree
+
+if(nrow(A.parFree2) > 0){
+for(i in 1:nrow(A.parFree2)){
+  if(A.parFree2$op[i] == "=~"){
+  colNum <- which(A.parFree2$lhs[i] == colnames(A))
+  rowNum <- which(A.parFree2$rhs[i] == rownames(A))
+  A[rowNum,colNum] = A.parFree2[i,"free"]
+  }else if(A.parFree2$op[i] == "~1"){
+    A[which(rownames(A)==A.parFree2$lhs[i]),which(colnames(A) == "1")] = A.parFree2[i,"free"]
+  }else if(A.parFree2$op[i] == "~"){
+    colNum <- which(A.parFree2$rhs[i] == colnames(A))
+    rowNum <- which(A.parFree2$lhs[i] == rownames(A))
+    A[rowNum,colNum] = A.parFree2[i,"free"]
   }
 }
 }else{
   A = A
 }
+
+
+
+
+
+
 # A of free parameters
 A_fixed <- A > 10000
 
 parA_fixed = A.parT[A.parT$free == 0,]
-for(gg in 1:nrow(parA_fixed)){
-  coll = which(parA_fixed$lhs[gg] == colnames(A_fixed))
-  roww = which(parA_fixed$rhs[gg] == rownames(A_fixed))
-  A_fixed[roww,coll] = T
+
+if(nrow(parA_fixed) > 0){
+  for(gg in 1:nrow(parA_fixed)){
+    if(parA_fixed[gg,"op"]=="=~"){
+      coll = which(parA_fixed$lhs[gg] == colnames(A_fixed))
+      roww = which(parA_fixed$rhs[gg] == rownames(A_fixed))
+    }else if(parA_fixed[gg,"op"]=="~"){
+      coll = which(parA_fixed$rhs[gg] == colnames(A_fixed))
+      roww = which(parA_fixed$lhs[gg] == rownames(A_fixed))
+    }else if(parA_fixed[gg,"op"]=="~1"){
+      coll = which("1" == colnames(A_fixed))
+      roww = which(parA_fixed$lhs[gg] == rownames(A_fixed))
+    }
+    A_fixed[roww,coll] = T
+  }
 }
+
+
 
 
 # A_est
@@ -182,14 +238,15 @@ covarT.free <- covarT[covarT$free > 0, ]
 # any equality?
 if(any(duplicated(covarT.free$label[covarT.free$label != ""]) == T)){
   labels = unique(covarT.free$label[covarT.free$label != ""])
-  equals = covarT.free$free[covarT.free$label == labels]
-  min.equal = min(equals)
-  max.equal = max(equals)
-  covarT.free$free[covarT.free$label == labels] <- min.equal
+  for(i in 1:length(labels)){
+    equals = covarT.free$free[covarT.free$label == labels[i]]
+    min.equal = min(equals)
+    max.equal = max(equals)
+    covarT.free$free[covarT.free$label == labels[i]] <- min.equal
 
-  dec = max.equal - min.equal
-  covarT.free$free[covarT.free$label != labels] <- covarT.free$free[covarT.free$label != labels] - dec
-
+    dec = max.equal - min.equal
+    #covarT.free$free[covarT.free$label != labels[i]] <- covarT.free$free[covarT.free$label != labels[i]] - dec
+  }
 }
 
 
@@ -285,6 +342,31 @@ for(i in 1:max(max(A),max(S))){
 }
 
 
+# add parameter labels
+
+#var.labs <- unique(parT[parT[,"label"] != "","label"])
+
+#if(length(var.labs)>0){
+#  for(i in 1:length(var.labs)){
+
+
+
+#    pars
+#  }
+#}
+
+
+for(i in 1:length(unique(A[A>0]))){
+  ord <- sort(unique(A[A>0]))
+  A[A==ord[i]] <- i
+}
+
+for(i in 1:length(unique(S[S>0]))){
+  ord <- sort(unique(S[S>0]))
+  S[S==ord[i]] <- max(A) + i
+}
+
+
 # get mediation parameters
 # only record arguments
 
@@ -316,6 +398,7 @@ for(i in 1:length(labs.single)){
 #    args[i] <- gsub(labs.single[j],par.extra[j],args[i])
 #  }
 #}
+
 
 
 mediation <- list()

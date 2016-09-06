@@ -41,6 +41,7 @@
 #'        which refers to the method specified in von Oertzen & Brick (2014).
 #'        The "norm" procedure uses the forward difference method for
 #'        calculating the hessian. This is slower and less accurate.
+#' @param tol Tolerance for coordinate descent
 #' @param verbose Whether to print iteration number.
 #' @param warm.start Whether start values are based on previous iteration.
 #'        This is not recommended.
@@ -77,8 +78,8 @@
 
 multi_optim <- function(model,max.try=10,lambda,
                          LB=-Inf,UB=Inf,type,optMethod="default",gradFun="ram",
-                         pars_pen=NULL,diff_par=NULL,hessFun="none",
-                        verbose=FALSE,warm.start=TRUE,Start2=NULL,
+                         pars_pen=NULL,diff_par=NULL,hessFun="none",tol=1e-5,
+                        verbose=FALSE,warm.start=FALSE,Start2=NULL,
                         nlminb.control=NULL){
 
 
@@ -129,7 +130,7 @@ multi_optim <- function(model,max.try=10,lambda,
 
   sss = seq(1,max.try)
 
-    mult_run <- function(model,n.try=1,lambda,LB=-Inf,
+    mult_run <- function(model,n.try=1,lambda,LB=-Inf,tol,
                          UB=Inf,type,optMethod,warm.start,
                          gradFun,n.optim,pars_pen,nlminb.control,
                          diff_par,hessFun,Start2){
@@ -166,7 +167,7 @@ multi_optim <- function(model,max.try=10,lambda,
 
         fit1 <- suppressWarnings(try(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
                                             Start=start.optim,gradFun=gradFun,hessFun=hessFun,
-                                            nlminb.control=nlminb.control,
+                                            nlminb.control=nlminb.control,tol=tol,
                                             LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par),silent=T))
 
 
@@ -191,6 +192,7 @@ multi_optim <- function(model,max.try=10,lambda,
             mtt[n.optim,1] = fit1$out$objective
             mtt[n.optim,2] = fit1$out$convergence
           }else{
+            #print(fit1$out$value)
             mtt[n.optim,1] = fit1$out$value
             mtt[n.optim,2] = fit1$out$convergence
           }
@@ -208,7 +210,7 @@ iter.optim = iter.optim + 1
 
 
     ret.mult = mult_run(model,n.try=1,lambda=lambda,LB,UB,type,warm.start=warm.start,
-                        nlminb.control=nlminb.control,
+                        nlminb.control=nlminb.control,tol=tol,
                     optMethod=optMethod,gradFun=gradFun,n.optim=iter.optim,Start2=Start2,
                     pars_pen=pars_pen,diff_par=diff_par,hessFun=hessFun)
 
@@ -260,7 +262,7 @@ iter.optim = iter.optim + 1
       }
       fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
                      Start=Start,gradFun=gradFun,hessFun=hessFun,
-                     nlminb.control=nlminb.control,
+                     nlminb.control=nlminb.control,tol=tol,
                      LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))
 
         fit1$convergence <- 99

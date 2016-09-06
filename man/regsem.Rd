@@ -6,12 +6,13 @@
 \usage{
 regsem(model, lambda = 0, alpha = 0, type = "none", data = NULL,
   optMethod = "default", gradFun = "ram", hessFun = "none",
-  parallel = "no", Start = "default", subOpt = "nlminb", longMod = F,
+  parallel = "no", Start = "lavaan", subOpt = "nlminb", longMod = F,
   optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
   matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
   LB = -Inf, UB = Inf, block = TRUE, full = FALSE, calc = "normal",
-  max.iter = 200, tol = 1e-05, nlminb.control = list(),
-  missing = "listwise")
+  max.iter = 500, tol = 1e-05, solver = FALSE, solver.maxit = 5,
+  alpha.inc = TRUE, step = 0.5, momentum = FALSE,
+  nlminb.control = list(), missing = "listwise")
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -98,6 +99,16 @@ for use.}
 \item{max.iter}{Number of iterations for coordinate descent}
 
 \item{tol}{Tolerance for coordinate descent}
+
+\item{solver}{Whether to use solver for coord_desc}
+
+\item{solver.maxit}{Max iterations for solver in coord_desc}
+
+\item{alpha.inc}{Whether alpha should increase for coord_desc}
+
+\item{step}{Step size}
+
+\item{momentum}{Logical for coord_desc}
 
 \item{nlminb.control}{list of control values to pass to nlminb}
 
