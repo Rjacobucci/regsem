@@ -7,6 +7,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
   max.iter = max.iter
   tol=tol
   #solver=TRUE
+  line.search=FALSE
 
 
   if(step.ratio == TRUE){
@@ -61,6 +62,9 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
         if(full==TRUE & solver == FALSE){
           gg <- grad(new.pars[count,])
 
+          print(func(new.pars[count,]))
+
+
           update.pars <- update.pars - alpha*gg
 
           if(type=="lasso" & lambda > 0){
@@ -79,7 +83,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
             }
           }
 
-        }else if(full==FALSE){
+        }else if(full==FALSE & line.search==FALSE){
           # A
           gg <- grad(new.pars[count,])
           update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha1*t(gg[1:max(mats$A)])
@@ -107,6 +111,60 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <-
             update.pars[min(mats$S[mats$S !=0]):max(mats$S)] - alpha2*gg2[min(mats$S[mats$S !=0]):max(mats$S)]
 
+        }else if(full == FALSE & line.search==TRUE){
+          gg <- grad(new.pars[count,])
+
+         # print(new.pars[count,])
+         # print(round(gg,3))
+        #  print(func(new.pars[count,]-.001*gg))
+          delta1 <- function(step){
+            func(new.pars[count,]-step*gg)
+          }
+
+        #  s <- try(uniroot(f=delta1, c(0,1),f.lower=0),silent=TRUE)
+
+        #  if(inherits(s, "try-error")) {
+        #    s <- 0.01
+        #  }else{
+        #    s <- s$root
+        #  }
+
+          s <- 0.1
+
+
+          update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - s*t(gg[1:max(mats$A)])
+
+
+          if(type=="lasso" & lambda > 0){
+            for(j in pars_pen){
+              update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-s*lambda,0)
+            }
+          }
+
+
+
+
+
+          # S
+          gg2 <- grad(update.pars)
+          #print(rbind(t(gg),t(gg2)))
+
+          delta2 <- function(step){
+            func(new.pars[count,]-step*gg2)
+          }
+
+
+          s <- try(uniroot(f=delta2, c(0,1),f.lower=0),silent=TRUE)
+
+        if(inherits(s, "try-error")) {
+            s <- 0.01
+        }else{
+            s <- s$root
+        }
+          print(s)
+
+          update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <-
+            update.pars[min(mats$S[mats$S !=0]):max(mats$S)] - s*gg2[min(mats$S[mats$S !=0]):max(mats$S)]
         }
       }
     }else if(hessFun=="ram" & solver==FALSE){
