@@ -165,14 +165,14 @@ multi_optim <- function(model,max.try=10,lambda,
 
 
 
-            start.optim = c(rep(0,val1) + rnorm(val1,0,0.1),abs(rep(0.5,val2) + rnorm(val2,0,0.1)))
-
+            #start.optim = c(rep(0,val1) + rnorm(val1,0,0.1),abs(rep(0.5,val2) + rnorm(val2,0,0.1)))
+            start.optim=mats$parameters
 
           }else{
             start.optim = Start2
           }
         }else if(warm.start==TRUE){
-          start.optim= Start2
+          start.optim= mats$parameters
         }
 
         #else if(warm.start==TRUE){
@@ -202,14 +202,14 @@ multi_optim <- function(model,max.try=10,lambda,
           start.vals = NULL
 
           if(warm.start == TRUE){
-            start.vals <- extractMatrices(model)$parameters +
-              rnorm(length(extractMatrices(model)$parameters),0,0.05)
+            start.vals <- mats$parameters +
+              rnorm(length(mats$parameters),0,0.05)
           }
         }else{
           start.vals = NULL
 
           if(warm.start==TRUE){
-            start.vals <- as.numeric(fit1$coefficients) + rnorm(length(extractMatrices(model)$parameters),0,0.0001)
+            start.vals <- as.numeric(fit1$coefficients) + rnorm(length(mats$parameters),0,0.0001)
           }
 
           if(optMethod=="nlminb"){

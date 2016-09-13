@@ -167,27 +167,39 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
             update.pars[min(mats$S[mats$S !=0]):max(mats$S)] - s*gg2[min(mats$S[mats$S !=0]):max(mats$S)]
         }
       }
-    }else if(hessFun=="ram" & solver==FALSE){
-      alpha=1
+    }else if(hessFun!="none" & solver==FALSE){
+      #alpha <- .1 + .01*count
+     # alpha <- 1
+      #print(new.pars[count,])
       # A
       gg <- grad(new.pars[count,])
       hh <- hess(new.pars[count,])
-      update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha*solve(hh[1:max(mats$A),1:max(mats$A)]) %*% gg[1:max(mats$A)]
+      #print(round(solve(hh)%*%gg,3))
+     update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha1*solve(hh[1:max(mats$A),1:max(mats$A)]) %*% gg[1:max(mats$A)]
+      #update.pars <- update.pars - alpha*(solve(hh) %*% gg)
 
-      if(lambda > 0){
+
+      if(lambda > 0 & type=="lasso"){
         for(j in pars_pen){
-          update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha*lambda,0)
+          update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha1*lambda,0)
         }
       }
-
 
       # S
       gg2 <- grad(update.pars)
       hh2 <- hess(update.pars)
+      minS <- min(mats$S[mats$S !=0])
+      maxS <- max(mats$S)
+      print(eigen(hh2)$values)
 
       update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <-
-        update.pars[min(mats$S[mats$S !=0]):max(mats$S)] -
-        alpha*gg2[min(mats$S[mats$S !=0]):max(mats$S)]*solve(hh2[min(mats$S[mats$S !=0]):max(mats$S),min(mats$S[mats$S !=0]):max(mats$S)])
+        update.pars[minS:maxS] - alpha2*(solve(hh2[minS:maxS,minS:maxS])%*% gg2[minS:maxS])
+
+
+     # print(min(mats$S[mats$S !=0]))
+     # print(max(mats$S))
+
+
     }else if(solver==TRUE){
 
 

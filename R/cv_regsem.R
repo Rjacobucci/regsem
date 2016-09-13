@@ -77,7 +77,7 @@ cv_regsem = function(model,
                     test.cov=NULL,
                     parallel=FALSE,
                     ncore=2,
-                    Start="default",
+                    Start="lavaan",
                     subOpt="nlminb",
                     longMod=F,
                     optNL="NLOPT_LN_NEWUOA_BOUND",
@@ -89,7 +89,7 @@ cv_regsem = function(model,
                     UB=Inf,
                     block=TRUE,
                     calc="normal",
-                    max.iter=200,
+                    max.iter=2000,
                     tol=1e-5,
                     solver=FALSE,
                     solver.maxit=5,
@@ -114,7 +114,7 @@ cv_regsem = function(model,
 
 
 if(parallel==FALSE){
-par.matrix <- matrix(0,n.lambda,model@Fit@npar)
+par.matrix <- matrix(0,n.lambda,length(extractMatrices(model)$parameters))
 fits <- matrix(NA,n.lambda,length(fit.ret)+2)
 SHRINK = 0
 count = 0
