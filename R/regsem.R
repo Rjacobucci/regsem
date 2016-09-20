@@ -108,7 +108,8 @@
 #' # Recommended to specify meanstructure in lavaan
 #' outt = cfa(mod,HS,meanstructure=TRUE)
 #'
-#' fit1 <- regsem(outt,lambda=0.1,type="lasso",Start=extractMatrices(outt)$parameters)
+#' fit1 <- regsem(outt,lambda=0.05,type="lasso",pars_pen=c(1:2,6:8))
+#' #summary(fit1)
 
 
 
@@ -137,11 +138,11 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
                  nlminb.control=list(),
                  missing="listwise"){
 
-  if(optMethod=="default" & type=="lasso"){
+  if(optMethod=="default" & type=="lasso" | type=="diff_lasso"){
       optMethod<-"coord_desc"
   }
 
-  if(optMethod=="default" & type!="lasso"){
+  if(optMethod=="default" & type!="lasso" | type=="diff_lasso"){
     optMethod <- "nlminb"
   }
 
@@ -150,7 +151,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
   }
 
   if(optMethod=="nlminb"& type=="lasso"){
-    warning("ONly optMethod=coord_desc is recommended for use with lasso")
+    stop("ONly optMethod=coord_desc is recommended for use with lasso")
   }
 
   if(length(nlminb.control)==0){
@@ -188,10 +189,14 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
  #   stop("For ridge, only use optMethod=nlminb and gradFun=none")
  # }
 
-  if(type=="lasso" & gradFun != "ram"){
+  if(type=="lasso"  & gradFun != "ram"){
     warning("At this time, only gradFun=ram recommended with lasso penalties")
   }
 
+
+  if(type=="diff_lasso"  & gradFun != "ram"){
+    warning("At this time, only gradFun=ram recommended with lasso penalties")
+  }
  #   parL = parTable(model)[,"label"]
   #  if(sum(duplicated(parL[parL != ""])) > 0){
  #     stop("regsem currently does not allow equality constraints")
@@ -368,6 +373,9 @@ if(fac.type=="cfa"){
    }
 
 
+
+
+
   if(calc == "normal"){
     calc = function(start){
          mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
@@ -375,7 +383,7 @@ if(fac.type=="cfa"){
 
          #mult2 = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
          #print(mult2)
-         pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
+         pen_vec = c(mult$A_est22[match(pars_pen,A,nomatch=0)],mult$S_est22[match(pars_pen,S,nomatch=0)])
          if(type=="diff_lasso"){
            pen_diff = pen_vec - diff_par
          }else{
@@ -384,6 +392,7 @@ if(fac.type=="cfa"){
          if(calc_fit=="cov"){
            #fit = fit_fun(ImpCov=mult$ImpCov,SampCov,Areg=mult$A_est22,lambda,alpha,type,pen_vec)
            fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,pen_vec,pen_diff)
+           #print(round(fit,3));print(pen_diff)
            fit
          }else if(calc_fit=="ind"){
            #stop("Not currently supported")
@@ -411,7 +420,7 @@ if(fac.type=="cfa"){
     calc = function(start){
       mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
       #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
-      pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
+      pen_vec = c(mult$A_est22[match(pars_pen,A,nomatch=0)],mult$S_est22[match(pars_pen,S,nomatch=0)])
       if(type=="diff_lasso"){
         pen_diff = pen_vec - diff_par
       }else{
@@ -456,14 +465,14 @@ if(fac.type=="cfa"){
       #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
 
       if(optMethod=="coord_desc"){
-        if(type2==1) type2=0
+        if(type2==1 | type2==3) type2=0
 
-        pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
+        pen_vec = c(mult$A_est22[match(pars_pen,A,nomatch=0)],mult$S_est22[match(pars_pen,S,nomatch=0)])
         ret = rcpp_grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
                             Sreg=mult$S_est22,A,S,
                             F,lambda,type2=type2,pars_pen,diff_par=0)
       }else{
-        pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
+        pen_vec = c(mult$A_est22[match(pars_pen,A,nomatch=0)],mult$S_est22[match(pars_pen,S,nomatch=0)])
            ret = rcpp_grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
                            Sreg=mult$S_est22,A,S,
                              F,lambda,type2=type2,pars_pen,diff_par=0)
@@ -756,7 +765,7 @@ if(optMethod=="nlminb"){
                    lambda=lambda,mats=mats,block=block,tol=tol,full=full,
                    solver=solver,solver.maxit=solver.maxit,
                    alpha.inc=alpha.inc,momentum=momentum,step=step,
-                   step.ratio=step.ratio)
+                   step.ratio=step.ratio,diff_par=diff_par)
   res$out <- out
   res$optim_fit <- out$value
   res$convergence = out$convergence
@@ -817,7 +826,7 @@ if(optMethod=="nlminb"){
     Imp_Cov1 <- mult.out$ImpCov
     #Imp_Cov <- RAMmult(par=as.numeric(pars.df),A,S,F,A_fixed,A_est,S_fixed,S_est)$ImpCov
 
-    pen_vec = c(mult.out$A_est22[A %in% pars_pen],mult.out$S_est22[S %in% pars_pen])
+    pen_vec = c(mult.out$A_est22[match(pars_pen,A,nomatch=0)],mult.out$S_est22[match(pars_pen,S,nomatch=0)])
 
     if(extractMatrices(model)$mean==TRUE & missing=="listwise"){
       Imp_Cov = Imp_Cov1[1:(nrow(Imp_Cov1)-1),1:(ncol(Imp_Cov1)-1)] - SampMean %*% t(SampMean)
@@ -920,6 +929,12 @@ if(optMethod=="nlminb"){
       res$df = df + sum(pars_l2 < 0.001)
       res$npar = npar - sum(pars_l2 < 0.001)
 
+    }else if(type=="diff_lasso"){
+      pars_sum = as.numeric(pars.df[pars_pen])
+      #print(pars_sum);print(duplicated(round(pars_sum,3)))
+      res$df = df + sum(duplicated(round(pars_sum,3)))
+      res$npar = npar - sum(duplicated(round(pars_sum,3)))
+
     }
 
 
@@ -935,7 +950,13 @@ if(optMethod=="nlminb"){
     #  res$SampCov = SampCov
       #res$fit = 0.5*(log(det(Imp_Cov1)) + trace(SampCov %*% solve(Imp_Cov1)) -
        #              log(det(SampCov))  - nvar)
-      res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,pen_diff=0)
+     # pen_vec = c(mult$A_est22[A %in% pars_pen],mult$S_est22[S %in% pars_pen])
+      if(type=="diff_lasso"){
+        pen_diff = pen_vec - diff_par
+      }else{
+        pen_diff=0
+      }
+      res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,pen_diff=pen_diff)
     }else if(missing == "fiml" & type == "none"){
       #print(res$optim_fit)
       res$fit = (optFit/nobs)*.5
@@ -1040,7 +1061,8 @@ if(optMethod=="nlminb"){
 
 
     if(res$convergence != 0){
-      warning("WARNING: Model did not converge! It is recommended to try multi_optim()")
+      warning("WARNING: Model did not converge! It is recommended to try multi_optim() or
+              change step.ratio=TRUE")
     }
 
     res$call <- match.call()

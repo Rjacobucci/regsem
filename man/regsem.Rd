@@ -167,7 +167,8 @@ f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 # Recommended to specify meanstructure in lavaan
 outt = cfa(mod,HS,meanstructure=TRUE)
 
-fit1 <- regsem(outt,lambda=0.1,type="lasso",Start=extractMatrices(outt)$parameters)
+fit1 <- regsem(outt,lambda=0.05,type="lasso",pars_pen=c(1:2,6:8))
+#summary(fit1)
 }
 \keyword{calc}
 \keyword{optim}
