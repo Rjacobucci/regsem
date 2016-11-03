@@ -7,12 +7,11 @@
 regsem(model, lambda = 0, alpha = 0, type = "none", data = NULL,
   optMethod = "default", gradFun = "ram", hessFun = "none",
   parallel = "no", Start = "lavaan", subOpt = "nlminb", longMod = F,
-  optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
-  matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
-  LB = -Inf, UB = Inf, block = TRUE, full = FALSE, calc = "normal",
-  max.iter = 500, tol = 1e-05, solver = FALSE, solver.maxit = 5,
-  alpha.inc = TRUE, step = 0.5, momentum = FALSE, step.ratio = FALSE,
-  nlminb.control = list(), missing = "listwise")
+  pars_pen = NULL, diff_par = NULL, LB = -Inf, UB = Inf, block = TRUE,
+  full = FALSE, calc = "normal", max.iter = 500, tol = 1e-05,
+  solver = FALSE, solver.maxit = 5, alpha.inc = TRUE, step = 0.5,
+  momentum = FALSE, step.ratio = FALSE, nlminb.control = list(),
+  missing = "listwise")
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -34,6 +33,8 @@ mutli_optim() instead. See \code{\link{multi_optim}} for more detail.}
 \item{alpha}{Mixture for elastic net. Not currently working applied.}
 
 \item{type}{Penalty type. Options include "none", "lasso", "ridge",
+"enet" for the elastic net,
+"alasso" for the adaptive lasso, "scad, "mcp",
 and "diff_lasso". diff_lasso penalizes the discrepency between
 parameter estimates and some pre-specified values. The values
 to take the deviation from are specified in diff_par.}
@@ -67,14 +68,6 @@ chances in getting stuck at the previous parameter estimates.}
 
 \item{longMod}{If TRUE, the model is using longitudinal data? This changes
 the sample covariance used.}
-
-\item{optNL}{Type of optimization to use in the NLopt package. Currently
-not in use.}
-
-\item{fac.type}{Using "cfa" or "efa" type of model?}
-
-\item{matrices}{Function to use for extracting RAM matrices.Only recommended
-to use "extractMatrices".}
 
 \item{pars_pen}{Parameter indicators to penalize. If left NULL, by default,
 all parameters in the \emph{A} matrix outside of the intercepts are

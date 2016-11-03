@@ -87,9 +87,6 @@ cv_regsem = function(model,
                     Start="lavaan",
                     subOpt="nlminb",
                     longMod=F,
-                    optNL="NLOPT_LN_NEWUOA_BOUND",
-                    fac.type="cfa",
-                    matrices="extractMatrices",
                     pars_pen=NULL,
                     diff_par=NULL,
                     LB=-Inf,
@@ -135,16 +132,27 @@ while(count < counts){
   SHRINK <- SHRINK2 + jump*(count-1) # 0.01 works well & 0.007 as well with 150 iterations
 
 if(mult.start==FALSE){
-  warning("does not use warm starts")
+
+  if(warm.start==FALSE | count == 1){
+    itt = 0
+    Start="lavaan"
+  }else if(fits[count-1,2] == 0){
+    itt = 0
+    Start = par.matrix[count-1,]
+    Start[pars_pen] = Start[pars_pen]-jump
+  }else{
+    itt = itt + 1
+    Start = par.matrix[count-itt-1,]
+    Start[pars_pen] = Start[pars_pen]-itt*jump
+  }
+
+
   out <- regsem(model=model,lambda=SHRINK,type=type,data=data,
                    optMethod=optMethod,
                    gradFun=gradFun,hessFun=hessFun,
                    parallel=parallel,Start=Start,
                    subOpt=subOpt,
                    longMod=longMod,
-                   optNL=optNL,
-                   fac.type=fac.type,
-                   matrices=matrices,
                    pars_pen=pars_pen,
                    diff_par=diff_par,
                    LB=LB,

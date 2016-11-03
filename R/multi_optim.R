@@ -97,13 +97,13 @@ multi_optim <- function(model,max.try=10,lambda=0,
                         nlminb.control=NULL){
 
 
-  if(optMethod=="default" & type=="lasso"){
-    optMethod<-"coord_desc"
-  }
+#  if(optMethod=="default" & type=="lasso"){
+#    optMethod<-"coord_desc"
+#  }
 
-  if(optMethod=="default" & type!="lasso"){
-    optMethod <- "nlminb"
-  }
+#  if(optMethod=="default" & type!="lasso"){
+#    optMethod <- "nlminb"
+#  }
 
  # warning("Note it is not currently recommended to use multi_optim")
 

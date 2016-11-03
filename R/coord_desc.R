@@ -79,7 +79,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
-              update.pars[j] <- soft(update.pars[j],lambda,type=step=alpha,e_alpha)
+              update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha)
             }
           }
 
@@ -92,7 +92,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
-              update.pars[j] <- soft(update.pars[j],lambda,type=step=alpha,e_alpha)
+              update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha)
             }
           }else if(type=="diff_lasso" & lambda > 0){
             for(j in pars_pen){
@@ -113,7 +113,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
-              update.pars[j] <- soft(update.pars[j],lambda,type=step=alpha1,e_alpha)
+              update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha1,e_alpha)
             }
           }else if(type=="diff_lasso" & lambda > 0){
             for(j in 1:length(pen_diff)){

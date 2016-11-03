@@ -36,6 +36,8 @@ converging.}
 \item{UB}{Upper bound vector}
 
 \item{type}{Penalty type. Options include "none", "lasso", "ridge",
+"enet" for the elastic net,
+"alasso" for the adaptive lasso, "scad, "mcp",
 and "diff_lasso". diff_lasso penalizes the discrepency between
 parameter estimates and some pre-specified values. The values
 to take the deviation from are specified in diff_par.}
