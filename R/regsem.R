@@ -18,6 +18,8 @@
 #'        mutli_optim() instead. See \code{\link{multi_optim}} for more detail.
 #' @param alpha Mixture for elastic net. Not currently working applied.
 #' @param type Penalty type. Options include "none", "lasso", "ridge",
+#'        "enet" for the elastic net,
+#'        "alasso" for the adaptive lasso, "scad, "mcp",
 #'        and "diff_lasso". diff_lasso penalizes the discrepency between
 #'        parameter estimates and some pre-specified values. The values
 #'        to take the deviation from are specified in diff_par.
@@ -43,11 +45,6 @@
 #' @param subOpt Type of optimization to use in the optimx package.
 #' @param longMod If TRUE, the model is using longitudinal data? This changes
 #'        the sample covariance used.
-#' @param optNL Type of optimization to use in the NLopt package. Currently
-#'        not in use.
-#' @param fac.type Using "cfa" or "efa" type of model?
-#' @param matrices Function to use for extracting RAM matrices.Only recommended
-#'        to use "extractMatrices".
 #' @param pars_pen Parameter indicators to penalize. If left NULL, by default,
 #'        all parameters in the \emph{A} matrix outside of the intercepts are
 #'        penalized when lambda > 0 and type != "none".
@@ -73,7 +70,7 @@
 #' @param missing How to handle missing data. Current options are "listwise"
 #'        and "fiml". "fiml" is not currently working well.
 #' @return out List of return values from optimization program
-#' @return convergence Convergence status.
+#' @return convergence Convergence status. 0 = converged, 1 or 99 means the model did not converge.
 #' @return par.ret Final parameter estimates
 #' @return Imp_Cov Final implied covariance matrix
 #' @return grad Final gradient.
@@ -118,8 +115,6 @@
 regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="default",
                  gradFun="ram",hessFun="none",parallel="no",Start="lavaan",
                  subOpt="nlminb",longMod=F,
-                 optNL="NLOPT_LN_NEWUOA_BOUND",fac.type="cfa",
-                 matrices="extractMatrices",
                  pars_pen=NULL,
                  diff_par=NULL,
                  LB=-Inf,
@@ -138,29 +133,31 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
                  nlminb.control=list(),
                  missing="listwise"){
 
-  if(optMethod=="default" & type=="lasso" | type=="diff_lasso"){
+  if(optMethod=="default" & type=="lasso" | type=="diff_lasso" |
+     type=="enet" | type=="alasso" | type=="scad" | type=="mcp"){
       optMethod<-"coord_desc"
   }
 
-  if(optMethod=="default" & type!="lasso" | type=="diff_lasso"){
+  if(optMethod=="default" & type=="ridge" | type=="none"){
     optMethod <- "nlminb"
   }
+
 
   if(optMethod!="nlminb" & optMethod !="coord_desc"){
     stop("only optmethod==nlminb or coord_desc is currently supported well")
   }
 
-  if(optMethod=="nlminb"& type=="lasso"){
-    stop("ONly optMethod=coord_desc is recommended for use with lasso")
+  if(optMethod=="nlminb"& type !="ridge"){
+    stop("Only optMethod=coord_desc is recommended for use")
   }
 
   if(length(nlminb.control)==0){
-    nlminb.control <- list(abs.tol=1e-4,
+    nlminb.control <- list(abs.tol=1e-6,
                     iter.max=60000,
                     eval.max=60000,
-                    rel.tol=1e-4,
-                    x.tol=1e-4,
-                    xf.tol=1e-4)
+                    rel.tol=1e-6,
+                    x.tol=1e-6,
+                    xf.tol=1e-6)
   }
 
 
@@ -208,8 +205,14 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
   }
 
 
-
+  if(model@Fit@converged == FALSE){
+    sat.lik = NA
+  }else{
     sat.lik <- as.numeric(fitmeasures(model)["unrestricted.logl"])
+  }
+
+
+
 
     mats = extractMatrices(model)
     nvar = model@pta$nvar[[1]][1]
@@ -282,6 +285,14 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
       type2=2
     }else if(type=="diff_lasso"){
       type2=3
+    }else if(type=="enet"){
+      type2=4
+    }else if(type=="alasso"){ ## try just creating new pen_vec
+      type2=1
+    }else if(type=="scad"){
+      type2=6
+    }else if(type=="mcp"){
+      type2=7
     }
 
 
@@ -295,40 +306,8 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
     nload = length(model@ParTable$op[model@ParTable$op == "=~"])
 
 
-if(matrices == "semPlot"){
-if(fac.type=="cfa"){
-    # get matrices using semPlot package
-    out = semPlot::modelMatrices(model)
 
-    A = out$A[[1]]$par
-    S = out$S[[1]]$par
-    F = out$F[[1]]$est
-    A_fixed = out$A[[1]]$fixed
-    #A.std = out$A[[1]]$std # try not to use
-    A_est = out$A[[1]]$est
-    S_fixed = out$S[[1]]$fixed
-    #S.std = out$S[[1]]$std
-    S_est = out$S[[1]]$est
-    I <- diag(nrow(A))
-
-} else if(fac.type=="efa"){
-      out = semPlot::modelMatrices(model)
-      # if efaUnrotate minus S number by number of variables for intercepts
-      A = out$A[[1]]$par
-      S = out$S[[1]]$par
-      S[S != 0] <- S[S != 0] - nvar
-
-      F = out$F[[1]]$est
-      A.fixed = out$A[[1]]$fixed
-      A.std = out$A[[1]]$std # try not to use
-      A.est = out$A[[1]]$est
-      S.fixed = out$S[[1]]$fixed
-      S.std = out$S[[1]]$std
-      S.est = out$S[[1]]$est
-      I <- diag(nrow(A))
-}
-}else if(matrices == "extractMatrices"){
-  list <- extractMatrices(model)
+  list <- extractMatrices(model)  ############## redundant !!! need to clean #
   A <- list$A
   A_est <- list$A_est
   A_fixed <- list$A_fixed
@@ -337,7 +316,7 @@ if(fac.type=="cfa"){
   S_fixed <- list$S_fixed
   F <- list$F
   I <- diag(nrow(A))
-}
+
 
 
     if(is.null(pars_pen) == TRUE){
@@ -352,11 +331,6 @@ if(fac.type=="cfa"){
       }
     }
 
-    # set fixed parameters
-    ############## probably should be set after estimates are given as parameters fixed to
-    ############## 1 will be thought to be start parameter 1
-    #A[A.fixed ==T] <- A.est[A.fixed==T]
-    #S[S.fixed ==T] <- S.est[S.fixed==T]
 
    if(class(Start)=="numeric"){
       start=Start
@@ -389,6 +363,14 @@ if(fac.type=="cfa"){
          }else{
            pen_diff=0
          }
+
+         #### for alasso - weight the parameters ####
+         #### overwrite pen_vec ########
+         if(type=="alasso"){
+           pen_vec_ml = c(list$A_est[match(pars_pen,A,nomatch=0)],list$S_est[match(pars_pen,S,nomatch=0)])
+           pen_vec = pen_vec*pen_vec_ml
+         }
+
          if(calc_fit=="cov"){
            #fit = fit_fun(ImpCov=mult$ImpCov,SampCov,Areg=mult$A_est22,lambda,alpha,type,pen_vec)
            fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,pen_vec,pen_diff)
@@ -465,14 +447,14 @@ if(fac.type=="cfa"){
       #mult = RAMmult(par=start,A,S,F,A_fixed,A_est,S_fixed,S_est)
 
       if(optMethod=="coord_desc"){
-        if(type2==1 | type2==3) type2=0
+        if(type2==1 | type2==3 | type2 ==4 | type2==6 | type2==7) type2=0
 
-        pen_vec = c(mult$A_est22[match(pars_pen,A,nomatch=0)],mult$S_est22[match(pars_pen,S,nomatch=0)])
+
         ret = rcpp_grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
                             Sreg=mult$S_est22,A,S,
                             F,lambda,type2=type2,pars_pen,diff_par=0)
       }else{
-        pen_vec = c(mult$A_est22[match(pars_pen,A,nomatch=0)],mult$S_est22[match(pars_pen,S,nomatch=0)])
+
            ret = rcpp_grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
                            Sreg=mult$S_est22,A,S,
                              F,lambda,type2=type2,pars_pen,diff_par=0)
@@ -836,13 +818,18 @@ if(optMethod=="nlminb"){
 
     res$Imp_Cov <- Imp_Cov
 
-
+    res$Imp_Cov1 <- Imp_Cov1
 
      # N = nobs; p=nvar; SampCov00 <- model@SampleStats@cov[][[1]]
      # c <- N*p/2 * log(2 * pi)
       #res$logl_sat <- -c -(N/2) * log(det(SampCov00)) - (N/2)*p
 
+    if(model@Fit@converged == FALSE){
+      res$logl_sat= NA
+    }else{
       res$logl_sat <- as.numeric(fitmeasures(model)["unrestricted.logl"])
+    }
+
 
     #res$grad <- grad(as.numeric(pars.df))
     #### KKT conditions #####
@@ -921,7 +908,7 @@ if(optMethod=="nlminb"){
     if(type=="none" | lambda==0){
       res$df = df
       res$npar = npar
-    }else if(type=="lasso" | type=="ridge"){
+    }else if(type=="lasso"){
       #A_estim = A != 0
       #pars = A_est[A_estim]
       pars_sum = pars.df[pars_pen]
@@ -929,6 +916,10 @@ if(optMethod=="nlminb"){
       res$df = df + sum(pars_l2 < 0.001)
       res$npar = npar - sum(pars_l2 < 0.001)
 
+    }else if(type=="ridge"){
+      ratio1 <- sqrt(pars.df[pars_pen]**2)/sqrt(mats$parameters[pars_pen]**2)
+      res$df = df + length(ratio1) - sum(ratio1)
+      res$npar = npar - sum(ratio1)
     }else if(type=="diff_lasso"){
       pars_sum = as.numeric(pars.df[pars_pen])
       #print(pars_sum);print(duplicated(round(pars_sum,3)))
@@ -1057,7 +1048,7 @@ if(optMethod=="nlminb"){
       res$pars_pen <- NULL
     }
 
-
+    res$mean <- mats$mean
 
 
     if(res$convergence != 0){

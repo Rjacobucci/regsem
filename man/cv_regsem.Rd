@@ -4,9 +4,9 @@
 \alias{cv_regsem}
 \title{The main function that ties together and runs the models.}
 \usage{
-cv_regsem(model, n.lambda = 100, mult.start = FALSE, multi.iter = 100,
-  jump = 0.002, type = "none", fit.ret = c("rmsea", "BIC"),
-  fit.ret2 = "train", data = NULL, optMethod = "default",
+cv_regsem(model, n.lambda = 100, mult.start = TRUE, multi.iter = 100,
+  jump = 0.002, lambda.start = 0, type = "none", fit.ret = c("rmsea",
+  "BIC"), fit.ret2 = "train", data = NULL, optMethod = "default",
   gradFun = "ram", hessFun = "none", test.cov = NULL, parallel = FALSE,
   ncore = 2, Start = "lavaan", subOpt = "nlminb", longMod = F,
   optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
@@ -14,7 +14,7 @@ cv_regsem(model, n.lambda = 100, mult.start = FALSE, multi.iter = 100,
   LB = -Inf, UB = Inf, block = TRUE, calc = "normal", max.iter = 2000,
   tol = 1e-05, solver = FALSE, solver.maxit = 5, alpha.inc = TRUE,
   step = 0.5, momentum = FALSE, step.ratio = FALSE,
-  nlminb.control = list(), warm.start = FALSE, missing = "listwise", ...)
+  nlminb.control = list(), warm.start = TRUE, missing = "listwise", ...)
 }
 \arguments{
 \item{model}{lavaan output object.}
@@ -27,6 +27,8 @@ regsem() (FALSE).}
 \item{multi.iter}{maximum number of random starts for multi_optim}
 
 \item{jump}{Amount to increase penalization each iteration.}
+
+\item{lambda.start}{What value to start the penalty at}
 
 \item{type}{penalty type.}
 

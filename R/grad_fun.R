@@ -58,8 +58,8 @@ grad_fun = function(par,ImpCov,SampCov,Areg,Sreg,A,S,F,
       ImpCovL = rcpp_RAMmult((par+add),A,S,S_fixed,A_fixed,A_est,S_est,F,I)[[1]]
       #ImpCovL = RAMmult((par+add),A,S,F,A_fixed,A_est,S_fixed,S_est)[[1]]
       ImpCovDot <- (ImpCovL - ImpCov)/h
-      grad_out[i] <- 0.5 * (trace(solve(ImpCov) %*% (ImpCov - SampCov) %*% solve(ImpCov) %*% ImpCovDot)) +
-        if(any(i==pars_pen)) lambda*sign(max(Areg[A == i], Sreg[S==i])) else(0)
+      grad_out[i] <- 0.5 * (trace(solve(ImpCov) %*% (ImpCov - SampCov) %*% solve(ImpCov) %*% ImpCovDot)) #+
+      #  if(any(i==pars_pen)) lambda*sign(max(Areg[A == i], Sreg[S==i])) else(0)
     }
 
 

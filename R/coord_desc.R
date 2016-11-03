@@ -46,9 +46,8 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       pen_diff=0
     }
 
-    #print(pen_diff)
-
       update.pars <- new.pars[count,]
+      #print(round(update.pars,4))
       #a.pars <- update.pars[1:max(mats$A)]
       #s.pars <- update.pars[min(mats$S != 0):max(mats$S)]
     # gg <- grad(new.pars[count,])
@@ -70,28 +69,34 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
         if(full==TRUE & solver == FALSE){
           gg <- grad(new.pars[count,])
+          print(round(gg,3))
+          print(round(new.pars[count,],3))
 
-          print(func(new.pars[count,]))
-
+         # print(func(new.pars[count,]))
+          #update.pars2 <- new.pars[count,]
 
           update.pars <- update.pars - alpha*gg
 
-          if(type=="lasso" & lambda > 0){
+          if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
-              update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha*lambda,0)
+              update.pars[j] <- soft(update.pars[j],lambda,type=step=alpha,e_alpha)
             }
           }
+
+
+
         }else if(full==TRUE & solver == TRUE){
           out <- nlminb(new.pars[count,],func,grad,control=list(iter.max=solver.maxit))
-          print(out$objective)
+         # print(out$objective)
           update.pars <- out$par
 
-          if(type=="lasso" & lambda > 0){
+          if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
-              update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha*lambda,0)
+              update.pars[j] <- soft(update.pars[j],lambda,type=step=alpha,e_alpha)
             }
           }else if(type=="diff_lasso" & lambda > 0){
             for(j in pars_pen){
+              #print(update.pars[j])
               update.pars[j] <- update.pars[j] + sign(pen_diff[j])*max(abs(pen_diff[j])-alpha*lambda,0)
             }
           }
@@ -106,13 +111,14 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha1*t(gg[1:max(mats$A)])
 
 
-          if(type=="lasso" & lambda > 0){
+          if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
-              update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha1*lambda,0)
+              update.pars[j] <- soft(update.pars[j],lambda,type=step=alpha1,e_alpha)
             }
           }else if(type=="diff_lasso" & lambda > 0){
             for(j in 1:length(pen_diff)){
               ind <- pars_pen[j]
+              print(ind)
             #  print(round(sign(pen_diff[j])*max(abs(pen_diff[j])-alpha*lambda,0),3))
              # print(ind); print(sign(pen_diff[j])*max(abs(pen_diff[j])-alpha*lambda,0))
               #update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha*lambda,0)
@@ -121,7 +127,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
              # print(ind)
              # update.pars[ind] <- update.temp[j] - sign(pen_diff[j])*max(abs(pen_diff[j]) - alpha1*lambda,0)
-              pen  <- pen_diff[j] - sign(pen_diff[j])*max(abs(pen_diff[j]) - alpha1*lambda,0)
+              pen  <- pen_diff[j] - sign(pen_diff[j])*max(abs(pen_diff[j]) - alpha*lambda,0)
               update.pars[ind] <- update.temp[j] - pen
              # print(round(update.pars[ind],3));print(round(pen_diff[j],3))
              # update.pars[ind] <- update.temp[j] - pen_diff[j]
@@ -142,7 +148,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           # S
           gg2 <- grad(update.pars)
-          #print(rbind(t(gg),t(gg2)))
+         # print(round(rbind(t(gg),t(gg2))),4)
 
           update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <-
             update.pars[min(mats$S[mats$S !=0]):max(mats$S)] - alpha2*gg2[min(mats$S[mats$S !=0]):max(mats$S)]
@@ -289,6 +295,8 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
     if(inherits(st.crit, "try-error")){
       convergence=99
     }else if(is.na(st.crit)==TRUE){
+      convergence=99
+    }else if(any(new.pars[count+1,] > 500)){
       convergence=99
     }else{
       if(st.crit==TRUE){

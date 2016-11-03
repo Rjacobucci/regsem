@@ -46,11 +46,17 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
     }
     res$Data_Type = "Test"
 
-    dat <- model$data
+    #dat <- model$data
   # ids <-  sample(nrow(dat),nrow(dat)/2)
+    SampCov <- CovMat
 
 
-    ImpCov = model$Imp_Cov
+    if(model$mean==TRUE){
+      ImpCov = model$Imp_Cov1
+    }else{
+      ImpCov = model$Imp_Cov
+    }
+
    # SampCov=CovMat
     fit = 0.5*(log(det(ImpCov)) + trace(SampCov %*% solve(ImpCov)) - log(det(SampCov))  - p)
   }else if(CV=="boot"){

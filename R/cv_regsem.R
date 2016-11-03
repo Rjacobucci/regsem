@@ -7,7 +7,13 @@
 #'         regsem() (FALSE).
 #' @param multi.iter maximum number of random starts for multi_optim
 #' @param jump Amount to increase penalization each iteration.
-#' @param type penalty type.
+#' @param lambda.start What value to start the penalty at
+#' @param type Penalty type. Options include "none", "lasso", "ridge",
+#'        "enet" for the elastic net,
+#'        "alasso" for the adaptive lasso, "scad, "mcp",
+#'        and "diff_lasso". diff_lasso penalizes the discrepency between
+#'        parameter estimates and some pre-specified values. The values
+#'        to take the deviation from are specified in diff_par.
 #' @param fit.ret Fit indices to return.
 #' @param fit.ret2 Return fits using only dataset "train" or bootstrap "boot"? Have to
 #'        do 2 sample CV manually.
@@ -64,9 +70,10 @@
 
 cv_regsem = function(model,
                      n.lambda=100,
-                     mult.start=FALSE,
+                     mult.start=TRUE,
                      multi.iter=100,
                      jump=0.002,
+                     lambda.start=0,
                      type="none",
                      fit.ret=c("rmsea","BIC"),
                      fit.ret2 = "train",
@@ -98,7 +105,7 @@ cv_regsem = function(model,
                     momentum=FALSE,
                     step.ratio=FALSE,
                     nlminb.control=list(),
-                    warm.start=FALSE,
+                    warm.start=TRUE,
                     missing="listwise",
                     ...){
 
@@ -116,19 +123,19 @@ cv_regsem = function(model,
 if(parallel==FALSE){
 par.matrix <- matrix(0,n.lambda,length(extractMatrices(model)$parameters))
 fits <- matrix(NA,n.lambda,length(fit.ret)+2)
-SHRINK = 0
+SHRINK2 = lambda.start
 count = 0
 counts=n.lambda
 #res2 <- data.frame(matrix(NA,counts,3))
 #coefs = rep(1,14)
 
 while(count < counts){
-
   count = count + 1
   print(count)
-  SHRINK <- jump*(count-1) # 0.01 works well & 0.007 as well with 150 iterations
+  SHRINK <- SHRINK2 + jump*(count-1) # 0.01 works well & 0.007 as well with 150 iterations
 
 if(mult.start==FALSE){
+  warning("does not use warm starts")
   out <- regsem(model=model,lambda=SHRINK,type=type,data=data,
                    optMethod=optMethod,
                    gradFun=gradFun,hessFun=hessFun,
@@ -155,6 +162,19 @@ if(mult.start==FALSE){
 
 
   }else if(mult.start==TRUE){
+
+    if(warm.start==FALSE | count == 1){
+      itt = 0
+      Start2=NULL
+    }else if(fits[count-1,2] == 0){
+      itt = 0
+      Start2 = par.matrix[count-1,]
+      Start2[pars_pen] = Start2[pars_pen]-jump
+    }else{
+      itt = itt + 1
+      Start2 = par.matrix[count-itt-1,]
+      Start2[pars_pen] = Start2[pars_pen]-itt*jump
+    }
    out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
                       LB=LB,UB=UB,type=type,optMethod=optMethod,
                       gradFun=gradFun,hessFun=hessFun,
@@ -162,10 +182,10 @@ if(mult.start==FALSE){
                       solver=solver,
                       solver.maxit=solver.maxit,
                       alpha.inc=alpha.inc,
-                      step=step,
+                      step=step,Start2=Start2,
                       momentum=momentum,
                       step.ratio=step.ratio,nlminb.control=nlminb.control,
-                      pars_pen=pars_pen,diff_par=NULL,warm.start=warm.start)
+                      pars_pen=pars_pen,diff_par=NULL)
   }
   #print(pars_pen)
  # pars_pen <- out$pars_pen
@@ -182,6 +202,7 @@ if(mult.start==FALSE){
 
   }else if(fit.ret2 == "test"){
    # stop("fit.ret2=test is currently not implemented")
+    #print(summary(out))
     fitt = try(fit_indices(out,CovMat=test.cov,CV=TRUE)$fits[fit.ret],silent=T)
     if(inherits(fitt, "try-error")) {
       fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)

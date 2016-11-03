@@ -120,7 +120,7 @@ and "fiml". "fiml" is not currently working well.}
 \value{
 out List of return values from optimization program
 
-convergence Convergence status.
+convergence Convergence status. 0 = converged, 1 or 99 means the model did not converge.
 
 par.ret Final parameter estimates
 
