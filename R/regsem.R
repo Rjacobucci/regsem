@@ -133,6 +133,8 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
                  nlminb.control=list(),
                  missing="listwise"){
 
+  e_alpha=alpha
+
   if(optMethod=="default" & type=="lasso" | type=="diff_lasso" |
      type=="enet" | type=="alasso" | type=="scad" | type=="mcp"){
       optMethod<-"coord_desc"
@@ -368,7 +370,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
          #### overwrite pen_vec ########
          if(type=="alasso"){
            pen_vec_ml = c(list$A_est[match(pars_pen,A,nomatch=0)],list$S_est[match(pars_pen,S,nomatch=0)])
-           pen_vec = pen_vec*pen_vec_ml
+           pen_vec = abs(pen_vec)*(1/(abs(pen_vec_ml)))
          }
 
          if(calc_fit=="cov"){
@@ -496,14 +498,14 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
         retH
     }
   } else if(parallel=="yes"){
-
-    hess = function(start){
-    mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+    stop("not supported")
+  #  hess = function(start){
+  #  mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
     #mult = RAMmult(par=start,A,S,F,A.fixed,A.est,S.fixed,S.est)
-    retH = hessian_parallel(par=start,ImpCov=mult$ImpCov,A,A.fixed,A.est,
-                   S,S.fixed,S.est,F)
-    retH
-  }
+  #  retH = hessian_parallel(par=start,ImpCov=mult$ImpCov,A,A.fixed,A.est,
+  #                 S,S.fixed,S.est,F)
+   # retH
+#  }
 }
 }  else if(hessFun=="ram"){
 
@@ -741,13 +743,24 @@ if(optMethod=="nlminb"){
   res$convergence = 0
   res$par.ret <- summary(out)$solution
 }else if(optMethod=="coord_desc"){
+
+
+  if(type=="alasso"){
+    mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
+    pen_vec = c(mult$A_est22[match(pars_pen,A,nomatch=0)],mult$S_est22[match(pars_pen,S,nomatch=0)])
+    pen_vec_ml = c(list$A_est[match(pars_pen,A,nomatch=0)],list$S_est[match(pars_pen,S,nomatch=0)])
+    pen_vec = abs(pen_vec)*(1/(abs(pen_vec_ml)))
+  }
+
+
+
   out = coord_desc(start=start,func=calc,type=type,grad=grad,
                    hess=hess,hessFun=hessFun,
                    pars_pen=pars_pen,model=model,max.iter=max.iter,
                    lambda=lambda,mats=mats,block=block,tol=tol,full=full,
                    solver=solver,solver.maxit=solver.maxit,
                    alpha.inc=alpha.inc,momentum=momentum,step=step,
-                   step.ratio=step.ratio,diff_par=diff_par)
+                   step.ratio=step.ratio,diff_par=diff_par,pen_vec=pen_vec)
   res$out <- out
   res$optim_fit <- out$value
   res$convergence = out$convergence

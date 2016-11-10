@@ -8,12 +8,10 @@ cv_regsem(model, n.lambda = 100, mult.start = TRUE, multi.iter = 100,
   jump = 0.002, lambda.start = 0, type = "none", fit.ret = c("rmsea",
   "BIC"), fit.ret2 = "train", data = NULL, optMethod = "default",
   gradFun = "ram", hessFun = "none", test.cov = NULL, parallel = FALSE,
-  ncore = 2, Start = "lavaan", subOpt = "nlminb", longMod = F,
-  optNL = "NLOPT_LN_NEWUOA_BOUND", fac.type = "cfa",
-  matrices = "extractMatrices", pars_pen = NULL, diff_par = NULL,
-  LB = -Inf, UB = Inf, block = TRUE, calc = "normal", max.iter = 2000,
-  tol = 1e-05, solver = FALSE, solver.maxit = 5, alpha.inc = TRUE,
-  step = 0.5, momentum = FALSE, step.ratio = FALSE,
+  ncore = 2, Start = "lavaan", subOpt = "nlminb", pars_pen = NULL,
+  diff_par = NULL, LB = -Inf, UB = Inf, block = TRUE, calc = "normal",
+  max.iter = 2000, tol = 1e-05, solver = FALSE, solver.maxit = 5,
+  alpha.inc = TRUE, step = 0.5, momentum = FALSE, step.ratio = FALSE,
   nlminb.control = list(), warm.start = TRUE, missing = "listwise", ...)
 }
 \arguments{
@@ -60,14 +58,6 @@ values of lambda.}
 \item{Start}{type of starting values to use.}
 
 \item{subOpt}{type of optimization to use in the optimx package.}
-
-\item{longMod}{longitudinal model?}
-
-\item{optNL}{type of optimization to use in the NLopt package.}
-
-\item{fac.type}{using cfa or efa type of model.}
-
-\item{matrices}{function to use for extracting RAM matrices.}
 
 \item{pars_pen}{parameter indicators to penalize.}
 
