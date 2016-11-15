@@ -27,6 +27,10 @@
 #' @param ncore Number of cores to use when parallel=TRUE
 #' @param Start type of starting values to use.
 #' @param subOpt type of optimization to use in the optimx package.
+#' @param longMod longitudinal model?
+#' @param optNL type of optimization to use in the NLopt package.
+#' @param fac.type using cfa or efa type of model.
+#' @param matrices function to use for extracting RAM matrices.
 #' @param pars_pen parameter indicators to penalize.
 #' @param diff_par parameter values to deviate from.
 #' @param LB lower bound vector.
@@ -82,6 +86,7 @@ cv_regsem = function(model,
                     ncore=2,
                     Start="lavaan",
                     subOpt="nlminb",
+                    longMod=F,
                     pars_pen=NULL,
                     diff_par=NULL,
                     LB=-Inf,
@@ -147,6 +152,7 @@ if(mult.start==FALSE){
                    gradFun=gradFun,hessFun=hessFun,
                    parallel=parallel,Start=Start,
                    subOpt=subOpt,
+                   longMod=longMod,
                    pars_pen=pars_pen,
                    diff_par=diff_par,
                    LB=LB,
@@ -256,6 +262,10 @@ if(mult.start==FALSE){
                     gradFun=gradFun,hessFun=hessFun,
                     parallel=parallel,Start=Start,
                     subOpt=subOpt,
+                    longMod=longMod,
+                    optNL=optNL,
+                    fac.type=fac.type,
+                    matrices=matrices,
                     pars_pen=pars_pen,
                     diff_par=diff_par,
                     LB=LB,
@@ -327,6 +337,10 @@ if(mult.start==FALSE){
                      "gradFun","hessFun",
                      "parallel","Start",
                      "subOpt",
+                     "longMod",
+                     "optNL",
+                     "fac.type",
+                     "matrices",
                      "pars_pen",
                      "diff_par",
                      "LB",

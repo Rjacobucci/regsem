@@ -1,6 +1,6 @@
 
 
-soft <- function(par,lambda,type,step,e_alpha=0.5){
+soft <- function(par,lambda,type,step,e_alpha=NULL){
   if(type=="lasso"){
 
       ret.val <- sign(par)*max(abs(par)-step*lambda,0)
@@ -14,8 +14,8 @@ soft <- function(par,lambda,type,step,e_alpha=0.5){
     ret.val <- (sign(par)*(max(abs(par)-step*lambda/2,0)))/(1+step*lambda2)
 
   }else if(type=="alasso"){
-    # ftp://ftp.stat.math.ethz.ch/Teaching/buhlmann/advanced-comput-statist/notes1.pdf
-    ret.val <- sign(par)*max(abs(par)-(step*lambda)/(2*abs(par)),0)
+
+    ret.val <- sign(par)*max(abs(par)-step*lambda,0)
 
   }else if(type=="scad"){
 

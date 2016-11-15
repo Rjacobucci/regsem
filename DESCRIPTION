@@ -1,7 +1,7 @@
 Package: regsem
 Type: Package
 Title: Performs Regularization on Structural Equation Models
-Version: 0.4.3
+Version: 0.4.2
 Author: Ross Jacobucci[aut,cre], Kevin J. Grimm [ctb]
 Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
 Description: Uses both ridge and lasso penalties (and extensions) to penalize
