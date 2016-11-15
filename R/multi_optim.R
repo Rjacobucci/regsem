@@ -276,7 +276,7 @@ iter.optim = iter.optim + 1
         #fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
         #               Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
          #              LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol))
-        return(ret.mult$fit1)
+        ret.mult$fit1
         break
         }else{
           return
@@ -304,7 +304,7 @@ iter.optim = iter.optim + 1
                      LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))
 
         fit1$convergence <- 99
-        return(fit1)
+        fit1
    # }
 
 

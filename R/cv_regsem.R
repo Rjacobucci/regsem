@@ -188,6 +188,7 @@ if(mult.start==FALSE){
                       momentum=momentum,
                       step.ratio=step.ratio,nlminb.control=nlminb.control,
                       pars_pen=pars_pen,diff_par=NULL)
+
   }
   #print(pars_pen)
  # pars_pen <- out$pars_pen
@@ -314,7 +315,7 @@ if(mult.start==FALSE){
       }
     }
     fitss <- matrix(fitss,1,length(fit.ret))
-    return(data.frame(SHRINK,conv=out$out$convergence,fitss,out$coefficients))
+    data.frame(SHRINK,conv=out$out$convergence,fitss,out$coefficients)
   }
 
 
