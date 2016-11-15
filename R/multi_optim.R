@@ -276,7 +276,7 @@ iter.optim = iter.optim + 1
         #fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
         #               Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
          #              LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol))
-        ret.mult$fit1
+        return(ret.mult$fit1)
         break
         }else{
           return
