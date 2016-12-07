@@ -304,7 +304,7 @@ iter.optim = iter.optim + 1
                      LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))
 
         fit1$convergence <- 99
-        fit1
+        return(fit1)
    # }
 
 
