@@ -216,11 +216,11 @@ multi_optim <- function(model,max.try=10,lambda=0,
 
           if(optMethod=="nlminb"){
             mtt[n.optim,1] = fit1$out$objective
-            mtt[n.optim,2] = fit1$out$convergence
+            mtt[n.optim,2] = fit1$convergence
           }else{
-            #print(fit1$out$value)
+            #print(fit1$convergence)
             mtt[n.optim,1] = fit1$out$value
-            mtt[n.optim,2] = fit1$out$convergence
+            mtt[n.optim,2] = fit1$convergence
           }
         }
     }
@@ -276,7 +276,8 @@ iter.optim = iter.optim + 1
         #fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
         #               Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
          #              LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol))
-        return(ret.mult$fit1)
+          fit1 <- ret.mult$fit1
+        return(fit1)
         break
         }else{
           return
@@ -285,13 +286,13 @@ iter.optim = iter.optim + 1
         return
       }
     }
-   # if(exists("fit1")==FALSE){
+    if(exists("fit1")==FALSE){
 
-      if(warm.start==TRUE){
-        Start=Start2
-      }else{
+     # if(warm.start==TRUE){
+     #   Start=Start2
+     # }else{
         Start="default"
-      }
+     # }
       fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
                      Start=Start,gradFun=gradFun,hessFun=hessFun,
                      nlminb.control=nlminb.control,tol=tol,
@@ -303,16 +304,20 @@ iter.optim = iter.optim + 1
                      step.ratio=step.ratio,
                      LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))
 
-        fit1$convergence <- 99
-        fit1
-   # }
+       # summary(fit1)
 
+
+       fit1$convergence <- 99
+       # print(class(fit1))
+       # fit1
+
+    }
 
 
     if(fit1$convergence != 0){
       warning("WARNING: Model did not converge! It is recommended to increase max.try")
     }
-
+return(fit1)
 }
 
 

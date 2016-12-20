@@ -221,7 +221,17 @@ if(mult.start==FALSE){
     }
   }
   fits[count,1] <- SHRINK
-  fits[count,2] <- out$out$convergence
+
+#  if(class(out$convergence)=="numeric"){
+  #print(class(out$convergence));print(1)
+  #print(out$convergence);print(class(out$convergence))
+    fits[count,2] <- out$convergence
+
+ # }else{
+ #   fits[count,2] <- 99
+    #out$convergence <- 99
+ # }
+
 
   if(is.null(out$coefficients)==TRUE){
     break
@@ -315,7 +325,7 @@ if(mult.start==FALSE){
       }
     }
     fitss <- matrix(fitss,1,length(fit.ret))
-    data.frame(SHRINK,conv=out$out$convergence,fitss,out$coefficients)
+    data.frame(SHRINK,conv=out$convergence,fitss,out$coefficients)
   }
 
 
