@@ -558,6 +558,7 @@ if(optMethod=="nlminb"){
         out <- nlminb(start,calc,grad,lower=LB,upper=UB,control=list(eval.max=max.iter,
                                                                      iter.max=max.iter))
         res$out <- out
+
         res$convergence = out$convergence
         #res$optim_fit <- out$objective
         par.ret <- out$par
@@ -763,7 +764,10 @@ if(optMethod=="nlminb"){
                    step.ratio=step.ratio,diff_par=diff_par,pen_vec=pen_vec)
   res$out <- out
   res$optim_fit <- out$value
-  res$convergence = out$convergence
+  #print(out$convergence)
+
+    res$convergence <- out$convergence
+
   par.ret <- out$pars
   res$iterations <- out$iterations
 }
