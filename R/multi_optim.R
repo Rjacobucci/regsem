@@ -21,6 +21,8 @@
 #'        when using regularization. It greatly increases the chances of
 #'        converging.
 #' @param UB Upper bound vector
+#' @param block Whether to use block coordinate descent
+#' @param full Whether to do full gradient descent or block
 #' @param type Penalty type. Options include "none", "lasso", "ridge",
 #'        "enet" for the elastic net,
 #'        "alasso" for the adaptive lasso, "scad, "mcp",
@@ -85,8 +87,17 @@
 
 
 multi_optim <- function(model,max.try=10,lambda=0,
-                         LB=-Inf,UB=Inf,type="none",optMethod="default",gradFun="ram",
-                         pars_pen=NULL,diff_par=NULL,hessFun="none",tol=1e-5,
+                         LB=-Inf,
+                        UB=Inf,
+                        block=TRUE,
+                        full=TRUE,
+                        type="none",
+                        optMethod="default",
+                        gradFun="ram",
+                        pars_pen=NULL,
+                        diff_par=NULL,
+                        hessFun="none",
+                        tol=1e-5,
                         solver=FALSE,
                         solver.maxit=50000,
                         alpha.inc=TRUE,
@@ -145,7 +156,10 @@ multi_optim <- function(model,max.try=10,lambda=0,
   sss = seq(1,max.try)
 
     mult_run <- function(model,n.try=1,lambda,LB=-Inf,tol,
-                         UB=Inf,type,optMethod,warm.start,
+                         UB=Inf,
+                         block,
+                         full,
+                         type,optMethod,warm.start,
                          solver,
                          solver.maxit,
                          alpha.inc,
@@ -189,6 +203,8 @@ multi_optim <- function(model,max.try=10,lambda=0,
                                             Start=start.optim,gradFun=gradFun,hessFun=hessFun,
                                             nlminb.control=nlminb.control,tol=tol,
                                             solver=solver,
+                                            block=block,
+                                            full=full,
                                             solver.maxit=solver.maxit,
                                             alpha.inc=alpha.inc,
                                             step=step,
@@ -238,6 +254,8 @@ iter.optim = iter.optim + 1
     ret.mult = mult_run(model,n.try=1,lambda=lambda,LB,UB,type,warm.start=warm.start,
                         nlminb.control=nlminb.control,tol=tol,
                         solver=solver,
+                        block=block,
+                        full=full,
                         solver.maxit=solver.maxit,
                         alpha.inc=alpha.inc,
                         step=step,
@@ -296,6 +314,8 @@ iter.optim = iter.optim + 1
                      Start=Start,gradFun=gradFun,hessFun=hessFun,
                      nlminb.control=nlminb.control,tol=tol,
                      solver=solver,
+                     block=block,
+                     full=full,
                      solver.maxit=solver.maxit,
                      alpha.inc=alpha.inc,
                      step=step,

@@ -68,9 +68,9 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       }else if(block==TRUE){
 
         if(full==TRUE & solver == FALSE){
+
           gg <- grad(new.pars[count,])
-          print(round(gg,3))
-          print(round(new.pars[count,],3))
+
 
          # print(func(new.pars[count,]))
           #update.pars2 <- new.pars[count,]
@@ -80,6 +80,16 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
               update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha)
+            }
+          }else if(type=="diff_lasso" & lambda > 0){
+            for(j in pars_pen){
+              #print(update.pars[j])
+              update.pars[j] <- update.pars[j] + sign(pen_diff[j])*max(abs(pen_diff[j])-alpha*lambda,0)
+            }
+          }else if(type=="alasso" & lambda > 0){
+            for(j in pars_pen){
+              #print(update.pars[j])
+              update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha)
             }
           }
 
@@ -259,7 +269,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
     }else if(solver==TRUE){
 
 
-      out <- nlminb(new.pars[count,],func,grad,control=list(eval.max=solver.maxit))
+      out <- nlminb(new.pars[count,],func,grad,control=list(eval.max=1))
       #print(out$objective)
       update.pars <- out$par
 
@@ -280,7 +290,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       }
 
       # S
-      out <- nlminb(update.pars,func,grad,control=list(eval.max=solver.maxit))
+      out <- nlminb(update.pars,func,control=list(eval.max=solver.maxit))
       pp.pars <- out$par
 
       update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <- pp.pars[min(mats$S[mats$S !=0]):max(mats$S)]

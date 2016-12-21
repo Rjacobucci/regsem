@@ -5,10 +5,10 @@
 \title{Multiple starts for Regularized Structural Equation Modeling}
 \usage{
 multi_optim(model, max.try = 10, lambda = 0, LB = -Inf, UB = Inf,
-  type = "none", optMethod = "default", gradFun = "ram",
-  pars_pen = NULL, diff_par = NULL, hessFun = "none", tol = 1e-05,
-  solver = FALSE, solver.maxit = 50000, alpha.inc = TRUE, step = 0.5,
-  momentum = FALSE, step.ratio = FALSE, verbose = FALSE,
+  block = TRUE, full = TRUE, type = "none", optMethod = "default",
+  gradFun = "ram", pars_pen = NULL, diff_par = NULL, hessFun = "none",
+  tol = 1e-05, solver = FALSE, solver.maxit = 50000, alpha.inc = TRUE,
+  step = 0.5, momentum = FALSE, step.ratio = FALSE, verbose = FALSE,
   warm.start = FALSE, Start2 = NULL, nlminb.control = NULL)
 }
 \arguments{
@@ -34,6 +34,10 @@ when using regularization. It greatly increases the chances of
 converging.}
 
 \item{UB}{Upper bound vector}
+
+\item{block}{Whether to use block coordinate descent}
+
+\item{full}{Whether to do full gradient descent or block}
 
 \item{type}{Penalty type. Options include "none", "lasso", "ridge",
 "enet" for the elastic net,

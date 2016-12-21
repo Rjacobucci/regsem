@@ -9,10 +9,11 @@ cv_regsem(model, n.lambda = 100, mult.start = TRUE, multi.iter = 100,
   "BIC"), fit.ret2 = "train", data = NULL, optMethod = "default",
   gradFun = "ram", hessFun = "none", test.cov = NULL, parallel = FALSE,
   ncore = 2, Start = "lavaan", subOpt = "nlminb", pars_pen = NULL,
-  diff_par = NULL, LB = -Inf, UB = Inf, block = TRUE, calc = "normal",
-  max.iter = 2000, tol = 1e-05, solver = FALSE, solver.maxit = 5,
-  alpha.inc = TRUE, step = 0.5, momentum = FALSE, step.ratio = FALSE,
-  nlminb.control = list(), warm.start = TRUE, missing = "listwise", ...)
+  diff_par = NULL, LB = -Inf, UB = Inf, block = TRUE, full = TRUE,
+  calc = "normal", max.iter = 2000, tol = 1e-05, solver = FALSE,
+  solver.maxit = 5, alpha.inc = TRUE, step = 0.5, momentum = FALSE,
+  step.ratio = FALSE, nlminb.control = list(), warm.start = TRUE,
+  missing = "listwise", ...)
 }
 \arguments{
 \item{model}{lavaan output object.}
@@ -68,6 +69,8 @@ values of lambda.}
 \item{UB}{upper bound vector}
 
 \item{block}{Whether to use block coordinate descent}
+
+\item{full}{Whether to do full gradient descent or block}
 
 \item{calc}{Type of calc function to use with means or not. Not recommended
 for use.}

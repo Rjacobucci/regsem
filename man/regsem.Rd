@@ -8,7 +8,7 @@ regsem(model, lambda = 0, alpha = 0, type = "none", data = NULL,
   optMethod = "default", gradFun = "ram", hessFun = "none",
   parallel = "no", Start = "lavaan", subOpt = "nlminb", longMod = F,
   pars_pen = NULL, diff_par = NULL, LB = -Inf, UB = Inf, block = TRUE,
-  full = FALSE, calc = "normal", max.iter = 500, tol = 1e-05,
+  full = TRUE, calc = "normal", max.iter = 500, tol = 1e-05,
   solver = FALSE, solver.maxit = 5, alpha.inc = TRUE, step = 0.5,
   momentum = FALSE, step.ratio = FALSE, nlminb.control = list(),
   missing = "listwise")

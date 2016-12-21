@@ -120,7 +120,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
                  LB=-Inf,
                  UB=Inf,
                  block=TRUE,
-                 full=FALSE,
+                 full=TRUE,
                  calc="normal",
                  max.iter=500,
                  tol=1e-5,

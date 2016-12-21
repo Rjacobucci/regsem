@@ -32,6 +32,7 @@
 #' @param LB lower bound vector.
 #' @param UB upper bound vector
 #' @param block Whether to use block coordinate descent
+#' @param full Whether to do full gradient descent or block
 #' @param calc Type of calc function to use with means or not. Not recommended
 #'        for use.
 #' @param nlminb.control list of control values to pass to nlminb
@@ -87,6 +88,7 @@ cv_regsem = function(model,
                     LB=-Inf,
                     UB=Inf,
                     block=TRUE,
+                    full=TRUE,
                     calc="normal",
                     max.iter=2000,
                     tol=1e-5,
@@ -151,6 +153,8 @@ if(mult.start==FALSE){
                    diff_par=diff_par,
                    LB=LB,
                    UB=UB,
+                   block=block,
+                   full=full,
                    calc=calc,
                    tol=tol,
                     solver=solver,
@@ -183,6 +187,8 @@ if(mult.start==FALSE){
                       tol=tol,
                       solver=solver,
                       solver.maxit=solver.maxit,
+                      full=full,
+                      block=block,
                       alpha.inc=alpha.inc,
                       step=step,Start2=Start2,
                       momentum=momentum,
@@ -273,6 +279,8 @@ if(mult.start==FALSE){
                     calc=calc,
                     nlminb.control=nlminb.control,
                     tol=tol,
+                    full=full,
+                    block=block,
                     solver=solver,
                     solver.maxit=solver.maxit,
                     alpha.inc=alpha.inc,
@@ -287,6 +295,8 @@ if(mult.start==FALSE){
                          LB=LB,UB=UB,type=type,optMethod=optMethod,
                          gradFun=gradFun,hessFun=hessFun,nlminb.control=nlminb.control,
                          tol=tol,
+                         full=full,
+                         block=block,
                          solver=solver,
                          solver.maxit=solver.maxit,
                          alpha.inc=alpha.inc,
@@ -340,6 +350,8 @@ if(mult.start==FALSE){
                      "pars_pen",
                      "diff_par",
                      "LB",
+                     "block",
+                     "full",
                      "UB",
                      "calc",
                      "nlminb.control",
