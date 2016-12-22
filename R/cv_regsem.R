@@ -112,7 +112,9 @@ cv_regsem = function(model,
 
 
 
-
+if(parallel == TRUE){
+  stop("parallel is not currently supported")
+}
 
 if(parallel==FALSE){
 par.matrix <- matrix(0,n.lambda,length(extractMatrices(model)$parameters))

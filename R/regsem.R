@@ -149,9 +149,9 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
     stop("only optmethod==nlminb or coord_desc is currently supported well")
   }
 
-  if(optMethod=="nlminb"& type !="ridge"){
-    stop("Only optMethod=coord_desc is recommended for use")
-  }
+#  if(optMethod=="nlminb"& type !="ridge" | type != "none"){
+#    stop("Only optMethod=coord_desc is recommended for use")
+#  }
 
   if(length(nlminb.control)==0){
     nlminb.control <- list(abs.tol=1e-6,
