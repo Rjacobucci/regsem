@@ -81,6 +81,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
          # print(func(new.pars[count,]))
           #update.pars2 <- new.pars[count,]
 
+
           update.pars <- new.pars[count,] - alpha*gg
 
 
