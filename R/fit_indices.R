@@ -25,6 +25,10 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
                   "CFI","TLI","BIC","AIC",
                   "CAIC","EBIC.5","EBIC.25")
 
+
+
+
+
   p=model$nvar
   ret["p"] = p
   nfac = model$nfac
@@ -90,14 +94,34 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
   chisq = fit*N*2
   ret["chisq"] = chisq
 
-  baseline.chisq = model$baseline.chisq
+  lav.fits <- fitmeasures(model$lav.model)
+
+
+  if(model$lav.model@Fit@converged == FALSE){
+    baseline.chisq = NA
+    baseline.df = NA
+  }else{
+    baseline.chisq = lav.fits["baseline.chisq"]
+    baseline.df = lav.fits["baseline.df"]
+  }
+
+
+  #baseline.chisq = model$baseline.chisq
   ret["baseline.chisq"] = baseline.chisq
-  baseline.df = model$baseline.df
+  #baseline.df = model$baseline.df
   ret["baseline.df"] = baseline.df
 
 
 #  c <- N*p/2 * log(2 * pi)
-  logl_sat = model$logl_sat# -c -(N/2) * log(det(SampCov)) - (N/2)*p
+
+
+
+  if(model$lav.model@Fit@converged == FALSE){
+    logl_sat = NA
+  }else{
+    logl_sat <- as.numeric(lav.fits["unrestricted.logl"])
+  }
+  #logl_sat = model$logl_sat# -c -(N/2) * log(det(SampCov)) - (N/2)*p
   logl = -N * (fit- logl_sat/N)
   ret["logl"] = logl
 

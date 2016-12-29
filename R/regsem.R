@@ -65,7 +65,6 @@
 #' @param solver.maxit Max iterations for solver in coord_desc
 #' @param alpha.inc Whether alpha should increase for coord_desc
 #' @param step Step size
-#' @param momentum Logical for coord_desc
 #' @param step.ratio Ratio of step size between A and S. Logical
 #' @param missing How to handle missing data. Current options are "listwise"
 #'        and "fiml". "fiml" is not currently working well.
@@ -128,7 +127,6 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
                  solver.maxit=5,
                  alpha.inc=TRUE,
                  step=.5,
-                 momentum=FALSE,
                  step.ratio=FALSE,
                  nlminb.control=list(),
                  missing="listwise"){
@@ -207,11 +205,13 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
   }
 
 
-  if(model@Fit@converged == FALSE){
-    sat.lik = NA
-  }else{
-    sat.lik <- as.numeric(fitmeasures(model)["unrestricted.logl"])
-  }
+ # lav.fits <- fitmeasures(model)
+
+#  if(model@Fit@converged == FALSE){
+#    sat.lik = NA
+#  }else{
+#    sat.lik <- as.numeric(lav.fits["unrestricted.logl"])
+#  }
 
 
 
@@ -227,8 +227,8 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
 
 
       # get mediation parameters
-      if(any(is.na(extractMatrices(model)$mediation))==FALSE){
-        mediation_vals <- extractMatrices(model)$mediation
+      if(any(is.na(mats$mediation))==FALSE){
+        mediation_vals <- mats$mediation
       }else{
         mediation_vals <- NA
       }
@@ -240,8 +240,8 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
       }
 
 
-      if(extractMatrices(model)$mean == TRUE){
-        mm = extractMatrices(model)$A[,"1"]
+      if(mats$mean == TRUE){
+        mm = mats$A[,"1"]
 
         SampMean <- model@SampleStats@mean[][[1]]
         ss = match(names(mm[mm > 0]),model@Data@ov$name)
@@ -252,7 +252,7 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
         # try changing size of SampCov
         SampCov3 = cbind(SampCov2,SampMean)
         SampCov = rbind(SampCov3,append(SampMean,1))
-      }else if(extractMatrices(model)$mean == FALSE){
+      }else if(mats$mean == FALSE){
        # SampCov <- model@SampleStats@cov[][[1]]
         SampMean = NULL
       }
@@ -309,14 +309,14 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
 
 
 
-  list <- extractMatrices(model)  ############## redundant !!! need to clean #
-  A <- list$A
-  A_est <- list$A_est
-  A_fixed <- list$A_fixed
-  S <- list$S
-  S_est <- list$S_est
-  S_fixed <- list$S_fixed
-  F <- list$F
+
+  A <- mats$A
+  A_est <- mats$A_est
+  A_fixed <- mats$A_fixed
+  S <- mats$S
+  S_est <- mats$S_est
+  S_fixed <- mats$S_fixed
+  F <- mats$F
   I <- diag(nrow(A))
 
 
@@ -480,6 +480,13 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
 
     #mult = RAMmult(par=start,A,S,F,A.fixed,A.est,S.fixed,S.est)
     ret = numDeriv::grad(calc,x=start)
+    ret
+  }
+} else if(gradFun=="auto"){
+  grad = function(start){
+
+
+    ret = numderiv(calc,x=start)
     ret
   }
 }
@@ -760,7 +767,7 @@ if(optMethod=="nlminb"){
                    pars_pen=pars_pen,model=model,max.iter=max.iter,
                    lambda=lambda,mats=mats,block=block,tol=tol,full=full,
                    solver=solver,solver.maxit=solver.maxit,
-                   alpha.inc=alpha.inc,momentum=momentum,step=step,
+                   alpha.inc=alpha.inc,step=step,
                    step.ratio=step.ratio,diff_par=diff_par,pen_vec=pen_vec)
   res$out <- out
   res$optim_fit <- out$value
@@ -827,7 +834,7 @@ if(optMethod=="nlminb"){
 
     pen_vec = c(mult.out$A_est22[match(pars_pen,A,nomatch=0)],mult.out$S_est22[match(pars_pen,S,nomatch=0)])
 
-    if(extractMatrices(model)$mean==TRUE & missing=="listwise"){
+    if(mats$mean==TRUE & missing=="listwise"){
       Imp_Cov = Imp_Cov1[1:(nrow(Imp_Cov1)-1),1:(ncol(Imp_Cov1)-1)] - SampMean %*% t(SampMean)
     }else{
       Imp_Cov = Imp_Cov1
@@ -841,11 +848,11 @@ if(optMethod=="nlminb"){
      # c <- N*p/2 * log(2 * pi)
       #res$logl_sat <- -c -(N/2) * log(det(SampCov00)) - (N/2)*p
 
-    if(model@Fit@converged == FALSE){
-      res$logl_sat= NA
-    }else{
-      res$logl_sat <- as.numeric(fitmeasures(model)["unrestricted.logl"])
-    }
+#    if(model@Fit@converged == FALSE){
+#      res$logl_sat= NA
+#    }else{
+ #     res$logl_sat <- as.numeric(lav.fits["unrestricted.logl"])
+ #   }
 
 
     #res$grad <- grad(as.numeric(pars.df))
@@ -988,13 +995,13 @@ if(optMethod=="nlminb"){
     res$N = nobs
     res$nfac = nfac
 
-    if(model@Fit@converged == FALSE){
-      res$baseline.chisq = NA
-      res$baseline.df = NA
-    }else{
-      res$baseline.chisq = fitMeasures(model)["baseline.chisq"]
-      res$baseline.df = fitMeasures(model)["baseline.df"]
-    }
+#    if(model@Fit@converged == FALSE){
+#      res$baseline.chisq = NA
+#      res$baseline.df = NA
+#    }else{
+#      res$baseline.chisq = lav.fits["baseline.chisq"]
+#      res$baseline.df = lav.fits["baseline.df"]
+#    }
 
     #res$grad <- grad(res$par.ret)
 
@@ -1067,6 +1074,7 @@ if(optMethod=="nlminb"){
 
     res$mean <- mats$mean
 
+    res$lav.model <- model
 
     if(res$convergence != 0){
       warning("WARNING: Model did not converge! It is recommended to try multi_optim() or

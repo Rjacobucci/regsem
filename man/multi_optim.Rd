@@ -8,8 +8,8 @@ multi_optim(model, max.try = 10, lambda = 0, LB = -Inf, UB = Inf,
   block = TRUE, full = TRUE, type = "none", optMethod = "default",
   gradFun = "ram", pars_pen = NULL, diff_par = NULL, hessFun = "none",
   tol = 1e-05, solver = FALSE, solver.maxit = 50000, alpha.inc = TRUE,
-  step = 0.5, momentum = FALSE, step.ratio = FALSE, verbose = FALSE,
-  warm.start = FALSE, Start2 = NULL, nlminb.control = NULL)
+  step = 0.5, step.ratio = FALSE, verbose = FALSE, warm.start = FALSE,
+  Start2 = NULL, nlminb.control = NULL)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -76,8 +76,6 @@ calculating the hessian. This is slower and less accurate.}
 \item{alpha.inc}{Whether alpha should increase for coord_desc}
 
 \item{step}{Step size}
-
-\item{momentum}{Logical for coord_desc}
 
 \item{step.ratio}{Ratio of step size between A and S. Logical}
 

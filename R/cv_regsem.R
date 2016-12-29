@@ -42,7 +42,6 @@
 #' @param solver.maxit Max iterations for solver in coord_desc
 #' @param alpha.inc Whether alpha should increase for coord_desc
 #' @param step Step size
-#' @param momentum Logical for coord_desc
 #' @param step.ratio Ratio of step size between A and S. Logical
 #' @param warm.start Whether start values are based on previous iteration.
 #'        This is not recommended.
@@ -96,7 +95,6 @@ cv_regsem = function(model,
                     solver.maxit=5,
                     alpha.inc=TRUE,
                     step=.5,
-                    momentum=FALSE,
                     step.ratio=FALSE,
                     nlminb.control=list(),
                     warm.start=TRUE,
@@ -163,7 +161,6 @@ if(mult.start==FALSE){
                   solver.maxit=solver.maxit,
                   alpha.inc=alpha.inc,
                   step=step,
-                  momentum=momentum,
                   step.ratio=step.ratio,
                    nlminb.control=nlminb.control,
                    missing=missing)
@@ -193,7 +190,6 @@ if(mult.start==FALSE){
                       block=block,
                       alpha.inc=alpha.inc,
                       step=step,Start2=Start2,
-                      momentum=momentum,
                       step.ratio=step.ratio,nlminb.control=nlminb.control,
                       pars_pen=pars_pen,diff_par=NULL)
 
@@ -287,7 +283,6 @@ if(mult.start==FALSE){
                     solver.maxit=solver.maxit,
                     alpha.inc=alpha.inc,
                     step=step,
-                    momentum=momentum,
                     step.ratio=step.ratio,
                     missing=missing)
 
@@ -303,7 +298,6 @@ if(mult.start==FALSE){
                          solver.maxit=solver.maxit,
                          alpha.inc=alpha.inc,
                          step=step,
-                         momentum=momentum,
                          step.ratio=step.ratio,
                          pars_pen=pars_pen,diff_par=NULL,warm.start=warm.start)
     }

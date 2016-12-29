@@ -11,9 +11,8 @@ cv_regsem(model, n.lambda = 100, mult.start = TRUE, multi.iter = 100,
   ncore = 2, Start = "lavaan", subOpt = "nlminb", pars_pen = NULL,
   diff_par = NULL, LB = -Inf, UB = Inf, block = TRUE, full = TRUE,
   calc = "normal", max.iter = 2000, tol = 1e-05, solver = FALSE,
-  solver.maxit = 5, alpha.inc = TRUE, step = 0.5, momentum = FALSE,
-  step.ratio = FALSE, nlminb.control = list(), warm.start = TRUE,
-  missing = "listwise", ...)
+  solver.maxit = 5, alpha.inc = TRUE, step = 0.5, step.ratio = FALSE,
+  nlminb.control = list(), warm.start = TRUE, missing = "listwise", ...)
 }
 \arguments{
 \item{model}{lavaan output object.}
@@ -86,8 +85,6 @@ for use.}
 \item{alpha.inc}{Whether alpha should increase for coord_desc}
 
 \item{step}{Step size}
-
-\item{momentum}{Logical for coord_desc}
 
 \item{step.ratio}{Ratio of step size between A and S. Logical}
 
