@@ -1,17 +1,24 @@
 
 
-soft <- function(par,lambda,type,step,e_alpha=0.5){
+soft <- function(par,lambda,type,step,e_alpha){
   if(type=="lasso"){
 
       ret.val <- sign(par)*max(abs(par)-step*lambda,0)
 
   }else if(type=="enet"){
+      lambda <- lambda*step
 
-    stop("currently not supported")
-    lambda1 = e_alpha*lambda
-    lambda2 = (1-e_alpha)*lambda
+     # lambda1 <- e_alpha*(lambda)
+    #  lambda2 <- (1-e_alpha)*lambda
 
-    ret.val <- (sign(par)*(max(abs(par)-step*lambda/2,0)))/(1+step*lambda2)
+    #  ret.val <- (sign(par)*max(abs(par)-step*lambda,0))/(1+lambda2)
+
+      if(abs(par) < e_alpha*lambda){
+        ret.val <- 0
+      }else{
+        # might be missing max(0,lambda)
+        ret.val <- (sign(par)*(abs(par)-e_alpha*lambda))/(1+(1-e_alpha)*lambda)
+      }
 
   }else if(type=="alasso"){
     # ftp://ftp.stat.math.ethz.ch/Teaching/buhlmann/advanced-comput-statist/notes1.pdf

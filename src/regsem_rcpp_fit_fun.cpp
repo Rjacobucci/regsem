@@ -13,6 +13,7 @@ using namespace arma;
 //' @param lambda penalty value.
 //' @param pen_vec vector of penalized parameters.
 //' @param pen_diff Vector of values to take deviation from.
+//' @param e_alpha Alpha for elastic net
 //'
 // [[Rcpp::export]]
 double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov,
@@ -20,7 +21,8 @@ double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov,
                  int type2,
                  double lambda,
                  arma::vec pen_vec,
-                 arma::vec pen_diff){
+                 arma::vec pen_diff,
+                 double e_alpha){
            //      int alpha,
 
 
@@ -51,6 +53,10 @@ arma::mat SampCov2 = Rcpp::as<arma::mat>(SampCov);
   }
   else if (type2 == 3) {
     fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  + 2*lambda * norm(pen_diff,1));
+  }
+  else if (type2 == 4) {
+    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  +
+      2*lambda * (.5*(1-e_alpha)*norm(pen_vec,2) + e_alpha*norm(pen_vec,1)));
   }
   else{
     fit = -9999999;

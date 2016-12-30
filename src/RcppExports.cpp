@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // rcpp_fit_fun
-double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov, Rcpp::NumericMatrix SampCov, int type2, double lambda, arma::vec pen_vec, arma::vec pen_diff);
-RcppExport SEXP regsem_rcpp_fit_fun(SEXP ImpCovSEXP, SEXP SampCovSEXP, SEXP type2SEXP, SEXP lambdaSEXP, SEXP pen_vecSEXP, SEXP pen_diffSEXP) {
+double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov, Rcpp::NumericMatrix SampCov, int type2, double lambda, arma::vec pen_vec, arma::vec pen_diff, double e_alpha);
+RcppExport SEXP regsem_rcpp_fit_fun(SEXP ImpCovSEXP, SEXP SampCovSEXP, SEXP type2SEXP, SEXP lambdaSEXP, SEXP pen_vecSEXP, SEXP pen_diffSEXP, SEXP e_alphaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -18,7 +18,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type pen_vec(pen_vecSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type pen_diff(pen_diffSEXP);
-    __result = Rcpp::wrap(rcpp_fit_fun(ImpCov, SampCov, type2, lambda, pen_vec, pen_diff));
+    Rcpp::traits::input_parameter< double >::type e_alpha(e_alphaSEXP);
+    __result = Rcpp::wrap(rcpp_fit_fun(ImpCov, SampCov, type2, lambda, pen_vec, pen_diff, e_alpha));
     return __result;
 END_RCPP
 }
