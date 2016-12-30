@@ -1,6 +1,6 @@
 
 
-soft <- function(par,lambda,type,step,e_alpha){
+soft <- function(par,lambda,type,step,e_alpha,gamma){
   if(type=="lasso"){
 
       ret.val <- sign(par)*max(abs(par)-step*lambda,0)
@@ -25,22 +25,37 @@ soft <- function(par,lambda,type,step,e_alpha){
     ret.val <- sign(par)*max(abs(par)-(step*lambda)/(2*abs(par)),0)
 
   }else if(type=="scad"){
+    lambda <- lambda*step
+    gamma <- gamma*step
+    #stop("currently not supported")
 
-    stop("currently not supported")
 
-    #if (abs(par) <= gm * (1+wq)) {
-   #   par <- sign(par) * max(abs(par) - lambda, 0)
-   # } else if (abs(par) >= alpha*lambda & abs(par) <= 2*lambda) {
-   #   par <- sign(par) * max(abs(par) - gm * wq * dt / (dt - 1), 0) / (1 - (wq / (dt - 1)))
-   # } else {}
+
+    if(abs(par) <= 2*lambda){
+      ret.val <- sign(par)*max(abs(par)-lambda,0)
+
+    #  ret.val <- sign(par)*max(abs(par)-lambda*gamma,0)
+    }else if(abs(par) > 2*lambda & abs(par) <= lambda*gamma){
+      ret.val <- ((gamma - 1)/(gamma - 2)) * sign(par)*max(abs(par)-((lambda*gamma)/(gamma-1)),0)
+
+     # ret.val <- ((gamma-1)*par - sign(par)*gamma*lambda)/(gamma-2)
+    }else if(abs(par) > lambda*gamma){
+      ret.val <- par
+
+    }
 
   }else if(type=="mcp"){
 
-    stop("currently not supported")
+    lambda <- lambda*step
+    gamma <- gamma*step
+    print(lambda*gamma)
+    #stop("currently not supported")
 
-  #  if (abs(par) <= gm * dt) {
-  #    ttq <- sign(par) * max(abs(par) - gm * wq, 0) / (1 - (wq / dt))
-  #  } else {}
+    if(abs(par) <= lambda * gamma){
+      ret.val <- (gamma/(gamma-1)) * sign(par)*max(abs(par)-lambda,0)
+    }else if(abs(par) > lambda*gamma){
+      ret.val <- par
+    }
 
   }
   ret.val

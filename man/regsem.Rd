@@ -4,8 +4,8 @@
 \alias{regsem}
 \title{Regularized Structural Equation Modeling}
 \usage{
-regsem(model, lambda = 0, alpha = 0, type = "none", data = NULL,
-  optMethod = "default", gradFun = "ram", hessFun = "none",
+regsem(model, lambda = 0, alpha = 0, gamma = 2, type = "none",
+  data = NULL, optMethod = "default", gradFun = "ram", hessFun = "none",
   parallel = "no", Start = "lavaan", subOpt = "nlminb", longMod = F,
   pars_pen = NULL, diff_par = NULL, LB = -Inf, UB = Inf, block = TRUE,
   full = TRUE, calc = "normal", max.iter = 500, tol = 1e-05,
@@ -30,6 +30,8 @@ convergence issues. If using values > 0.1, it is recommended to use
 mutli_optim() instead. See \code{\link{multi_optim}} for more detail.}
 
 \item{alpha}{Mixture for elastic net. Not currently working applied.}
+
+\item{gamma}{Additional penalty for MCP and SCAD}
 
 \item{type}{Penalty type. Options include "none", "lasso", "ridge",
 "enet" for the elastic net,

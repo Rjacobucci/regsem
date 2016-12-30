@@ -11,6 +11,7 @@ using namespace arma;
 //' @param SampCov Sample covariance matrix.
 //' @param type2 penalty type.
 //' @param lambda penalty value.
+//' @param gamma additional penalty for mcp and scad
 //' @param pen_vec vector of penalized parameters.
 //' @param pen_diff Vector of values to take deviation from.
 //' @param e_alpha Alpha for elastic net
@@ -20,6 +21,7 @@ double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov,
                  Rcpp::NumericMatrix SampCov,
                  int type2,
                  double lambda,
+                 double gamma,
                  arma::vec pen_vec,
                  arma::vec pen_diff,
                  double e_alpha){
@@ -29,6 +31,7 @@ double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov,
 double m;
 m = ImpCov.nrow();
 double fit;
+double add;
 arma::mat ImpCov2 = Rcpp::as <arma::mat>(ImpCov);
 arma::mat SampCov2 = Rcpp::as<arma::mat>(SampCov);
 //arma::mat Areg2 = Rcpp::as<arma::mat>(Areg);
@@ -57,6 +60,35 @@ arma::mat SampCov2 = Rcpp::as<arma::mat>(SampCov);
   else if (type2 == 4) {
     fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  +
       2*lambda * (.5*(1-e_alpha)*norm(pen_vec,2) + e_alpha*norm(pen_vec,1)));
+  }
+  else if (type2 == 6) {
+    add = 0;
+    for (double i = 0; i < pen_vec.n_elem; i++) {
+      if (pen_vec[i] <= lambda){
+        add = add + lambda;
+      }
+      else if(pen_vec[i] > lambda){
+        if (gamma*lambda - pen_vec[i] > 0) {
+          add = add + (gamma*lambda - pen_vec[i])/((gamma - 1)*lambda) * lambda;
+        }
+        else {
+          add = add + 0;
+        }
+      }
+    }
+    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m + add);
+  }
+  else if (type2 == 7) {
+    add = 0;
+    for (double i = 0; i < pen_vec.n_elem; i++) {
+      if (pen_vec[i] <= lambda*gamma){
+        add = add + (lambda * (abs(pen_vec[i] - (pen_vec[i] - ((pen_vec[i]*pen_vec[i])/2*lambda*gamma)))));
+      }
+      else if(pen_vec[i] > lambda * gamma){
+        add = add + pen_vec[i];
+      }
+    }
+    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m + add);
   }
   else{
     fit = -9999999;

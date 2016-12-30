@@ -1,7 +1,7 @@
 
 coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,mats,
                        block,max.iter,tol,full,solver,solver.maxit,alpha.inc,step,
-                       step.ratio,diff_par,pen_vec,e_alpha){
+                       step.ratio,diff_par,pen_vec,e_alpha,gamma){
   count = 0
   ret <- list()
   max.iter = max.iter
@@ -88,7 +88,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
-              update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha)
+              update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
             }
           }else if(type=="diff_lasso" & lambda > 0){
             for(j in pars_pen){
@@ -98,7 +98,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           }else if(type=="alasso" & lambda > 0){
             for(j in pars_pen){
               #print(update.pars[j])
-              update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha)
+              update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
             }
           }
 
@@ -111,7 +111,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
-              update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha)
+              update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
             }
           }else if(type=="diff_lasso" & lambda > 0){
             for(j in pars_pen){
@@ -121,7 +121,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           }else if(type=="alasso" & lambda > 0){
             for(j in pars_pen){
               #print(update.pars[j])
-              update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha)
+              update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
             }
           }
 
@@ -137,7 +137,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           if(type=="lasso" | type=="alasso" & lambda > 0){
             for(j in pars_pen){
-              update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha1,e_alpha)
+              update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha1,e_alpha,gamma)
             }
           }else if(type=="diff_lasso" & lambda > 0){
             for(j in 1:length(pen_diff)){
@@ -256,7 +256,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
      if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
        for(j in pars_pen){
-         update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha)
+         update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
        }
      }else if(type=="diff_lasso" & lambda > 0){
        for(j in pars_pen){
@@ -266,7 +266,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
      }else if(type=="alasso" & lambda > 0){
        for(j in pars_pen){
          #print(update.pars[j])
-         update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha)
+         update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
        }
      }
 
@@ -294,7 +294,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
       if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
         for(j in pars_pen){
-          update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha)
+          update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
         }
       }else if(type=="diff_lasso" & lambda > 0){
         for(j in pars_pen){
@@ -304,7 +304,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       }else if(type=="alasso" & lambda > 0){
         for(j in pars_pen){
           #print(update.pars[j])
-          update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha)
+          update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
         }
       }
 

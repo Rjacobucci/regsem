@@ -17,6 +17,7 @@
 #'        convergence issues. If using values > 0.1, it is recommended to use
 #'        mutli_optim() instead. See \code{\link{multi_optim}} for more detail.
 #' @param alpha Mixture for elastic net. Not currently working applied.
+#' @param gamma Additional penalty for MCP and SCAD
 #' @param type Penalty type. Options include "none", "lasso", "ridge",
 #'        "enet" for the elastic net,
 #'        "alasso" for the adaptive lasso, "scad, "mcp",
@@ -111,7 +112,7 @@
 
 
 
-regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="default",
+regsem = function(model,lambda=0,alpha=0,gamma=3.7, type="none",data=NULL,optMethod="default",
                  gradFun="ram",hessFun="none",parallel="no",Start="lavaan",
                  subOpt="nlminb",longMod=F,
                  pars_pen=NULL,
@@ -133,6 +134,10 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
 
   e_alpha=alpha
 
+
+  if(type == "scad" | type == "mcp"){
+    warning("this type is currently not working well")
+  }
   if(optMethod=="default" & type=="lasso" | type=="diff_lasso" |
      type=="enet" | type=="alasso" | type=="scad" | type=="mcp"){
       optMethod<-"coord_desc"
@@ -375,8 +380,9 @@ regsem = function(model,lambda=0,alpha=0,type="none",data=NULL,optMethod="defaul
 
          if(calc_fit=="cov"){
            #fit = fit_fun(ImpCov=mult$ImpCov,SampCov,Areg=mult$A_est22,lambda,alpha,type,pen_vec)
-           fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,pen_vec,pen_diff,e_alpha)
-           #print(round(fit,3));print(pen_diff)
+           fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,gamma,pen_vec,pen_diff,e_alpha)
+          # print(type2)
+           print(round(fit,3))#;print(pen_diff)
            fit
          }else if(calc_fit=="ind"){
            stop("Not currently supported")
@@ -768,7 +774,7 @@ if(optMethod=="nlminb"){
                    lambda=lambda,mats=mats,block=block,tol=tol,full=full,
                    solver=solver,solver.maxit=solver.maxit,
                    alpha.inc=alpha.inc,step=step,
-                   e_alpha=e_alpha,
+                   e_alpha=e_alpha,gamma=gamma,
                    step.ratio=step.ratio,diff_par=diff_par,pen_vec=pen_vec)
   res$out <- out
   res$optim_fit <- out$value
@@ -933,7 +939,7 @@ if(optMethod=="nlminb"){
     if(type=="none" | lambda==0){
       res$df = df
       res$npar = npar
-    }else if(type=="lasso" | type=="alasso" | type=="enet"){
+    }else if(type=="lasso" | type=="alasso" | type=="enet" | type=="scad" | type=="mcp"){
       #A_estim = A != 0
       #pars = A_est[A_estim]
       pars_sum = pars.df[pars_pen]
@@ -972,7 +978,7 @@ if(optMethod=="nlminb"){
       }else{
         pen_diff=0
       }
-      res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,pen_diff=pen_diff,e_alpha=0)
+      res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,pen_diff=pen_diff,e_alpha=0,gamma=0)
     }else if(missing == "fiml" & type == "none"){
       #print(res$optim_fit)
       res$fit = (optFit/nobs)*.5
@@ -982,7 +988,7 @@ if(optMethod=="nlminb"){
       #res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,pen_diff=0)
     }else if(missing=="fiml" & type != "none"){
       res$fit = rcpp_fit_fun(ImpCov=Imp_Cov,SampCov,
-                             type2,lambda,pen_vec=0,pen_diff=0)
+                             type2,lambda,pen_vec=0,pen_diff=0,e_alpha=0,gamma=0)
 
     }
 
