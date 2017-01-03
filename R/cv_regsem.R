@@ -10,10 +10,12 @@
 #' @param lambda.start What value to start the penalty at
 #' @param type Penalty type. Options include "none", "lasso", "ridge",
 #'        "enet" for the elastic net,
-#'        "alasso" for the adaptive lasso, "scad, "mcp",
+#'        "alasso" for the adaptive lasso
 #'        and "diff_lasso". diff_lasso penalizes the discrepency between
 #'        parameter estimates and some pre-specified values. The values
-#'        to take the deviation from are specified in diff_par.
+#'        to take the deviation from are specified in diff_par. Two methods for
+#'        sparser results than lasso are the smooth clipped absolute deviation,
+#'        "scad", and the minimum concave penalty, "mcp".
 #' @param fit.ret Fit indices to return.
 #' @param fit.ret2 Return fits using only dataset "train" or bootstrap "boot"? Have to
 #'        do 2 sample CV manually.
