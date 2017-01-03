@@ -50,6 +50,7 @@
 #' @param solver.maxit Max iterations for solver in coord_desc
 #' @param alpha.inc Whether alpha should increase for coord_desc
 #' @param step Step size
+#' @param momentum Momentum for step sizes
 #' @param step.ratio Ratio of step size between A and S. Logical
 #' @param verbose Whether to print iteration number.
 #' @param warm.start Whether start values are based on previous iteration.
@@ -99,8 +100,9 @@ multi_optim <- function(model,max.try=10,lambda=0,
                         tol=1e-5,
                         solver=FALSE,
                         solver.maxit=50000,
-                        alpha.inc=TRUE,
+                        alpha.inc=FALSE,
                         step=.5,
+                        momentum=FALSE,
                         step.ratio=FALSE,
                         verbose=FALSE,warm.start=FALSE,Start2=NULL,
                         nlminb.control=NULL){
@@ -162,6 +164,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                          solver.maxit,
                          alpha.inc,
                          step,
+                         momentum,
                          step.ratio,
                          gradFun,n.optim,pars_pen,nlminb.control,
                          diff_par,hessFun,Start2){
@@ -205,6 +208,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                                             solver.maxit=solver.maxit,
                                             alpha.inc=alpha.inc,
                                             step=step,
+                                            momentum=momentum,
                                             step.ratio=step.ratio,
                                             LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par),silent=T))
 
@@ -255,6 +259,7 @@ iter.optim = iter.optim + 1
                         solver.maxit=solver.maxit,
                         alpha.inc=alpha.inc,
                         step=step,
+                        momentum=momentum,
                         step.ratio=step.ratio,
                     optMethod=optMethod,gradFun=gradFun,n.optim=iter.optim,Start2=Start2,
                     pars_pen=pars_pen,diff_par=diff_par,hessFun=hessFun)
@@ -314,6 +319,7 @@ iter.optim = iter.optim + 1
                      solver.maxit=solver.maxit,
                      alpha.inc=alpha.inc,
                      step=step,
+                     momentum=momentum,
                      step.ratio=step.ratio,
                      LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))
 

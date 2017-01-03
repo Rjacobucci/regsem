@@ -48,7 +48,7 @@ soft <- function(par,lambda,type,step,e_alpha,gamma){
 
     lambda <- lambda*step
     gamma <- gamma*step
-    print(lambda*gamma)
+    #print(lambda*gamma)
     #stop("currently not supported")
 
     if(abs(par) <= lambda * gamma){

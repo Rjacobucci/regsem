@@ -1,19 +1,13 @@
 
 coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,mats,
                        block,max.iter,tol,full,solver,solver.maxit,alpha.inc,step,
-                       step.ratio,diff_par,pen_vec,e_alpha,gamma){
+                       step.ratio,diff_par,pen_vec,e_alpha,gamma,momentum){
   count = 0
   ret <- list()
   max.iter = max.iter
   tol=tol
   #solver=TRUE
   line.search=FALSE
-
-  if(full==TRUE){
-    momentum<-TRUE
-  }else{
-    momentum<-FALSE
-  }
 
 
   if(step.ratio == TRUE){
@@ -41,6 +35,8 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       alpha <- step
     }else if(alpha.inc==TRUE){
       alpha <- 0.01 + 0.01*count
+    }else if(alpha.inc=="dec"){
+      alpha <- step - 0.01*count
     }
 
 
@@ -77,6 +73,8 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           gg <- grad(new.pars[count,])
 
+          #print(round(t(gg),3))
+
 
          # print(func(new.pars[count,]))
           #update.pars2 <- new.pars[count,]
@@ -84,7 +82,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           update.pars <- new.pars[count,] - alpha*gg
 
-
+         # print(round(t(alpha*gg),3))
 
           if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
@@ -129,50 +127,25 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           gg <- grad(new.pars[count,])
 
-          if(type=="diff_lasso"){
-            update.temp <- update.pars[pars_pen]
-          }
+
           update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha1*t(gg[1:max(mats$A)])
 
 
-          if(type=="lasso" | type=="alasso" & lambda > 0){
+          if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
               update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha1,e_alpha,gamma)
             }
           }else if(type=="diff_lasso" & lambda > 0){
-            for(j in 1:length(pen_diff)){
-              ind <- pars_pen[j]
-              print(ind)
-            #  print(round(sign(pen_diff[j])*max(abs(pen_diff[j])-alpha*lambda,0),3))
-             # print(ind); print(sign(pen_diff[j])*max(abs(pen_diff[j])-alpha*lambda,0))
-              #update.pars[j] <- sign(update.pars[j])*max(abs(update.pars[j])-alpha*lambda,0)
-             # print(sign(pen_diff[j]));print(max(abs(pen_diff[j])-alpha*lambda,0))
-           #   print(sign(pen_diff[j])*max(abs(pen_diff[j])-alpha*lambda,abs(pen_diff[j])))
-
-             # print(ind)
-             # update.pars[ind] <- update.temp[j] - sign(pen_diff[j])*max(abs(pen_diff[j]) - alpha1*lambda,0)
-              pen  <- pen_diff[j] - sign(pen_diff[j])*max(abs(pen_diff[j]) - alpha*lambda,0)
-              update.pars[ind] <- update.temp[j] - pen
-             # print(round(update.pars[ind],3));print(round(pen_diff[j],3))
-             # update.pars[ind] <- update.temp[j] - pen_diff[j]
-
-             # print(round(update.pars[ind] - pen_diff[j],3));print(round(update.pars[ind],3))
-             # print(round(update.pars[ind],3))
-
+            for(j in pars_pen){
+              #print(update.pars[j])
+              update.pars[j] <- update.pars[j] + sign(pen_diff[j])*max(abs(pen_diff[j])-alpha1*lambda,0)
             }
-          }#else if(type=="alasso" & lambda > 0){
-           # for(j in pars_pen){
-           #   update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha1,e_alpha)
-          #  }
-          #}
-
-          ####################################################
-          ####################################################
-
-          # one problem with convergence seems to be going to far with A
-          # parameters. This is why it seems to work well to set alpha=1
-          # for S, but use small step sizes for A
-         # print(round(update.pars,3))
+          }else if(type=="alasso" & lambda > 0){
+            for(j in pars_pen){
+              #print(update.pars[j])
+              update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha1,e_alpha,gamma)
+            }
+          }
 
           # S
           gg2 <- grad(update.pars)
@@ -332,6 +305,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
     st.crit = try(abs(vals[count+1] - vals[count])<tol)
   #  st.crit2 <- all(abs(gg) < .01)
     dif <- abs(vals[count+1] - vals[count])
+    #print(dif)
 
    # print(rbind(update.pars,t(gg2)))
     #print(round(dif,5))

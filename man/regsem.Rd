@@ -4,13 +4,14 @@
 \alias{regsem}
 \title{Regularized Structural Equation Modeling}
 \usage{
-regsem(model, lambda = 0, alpha = 0, gamma = 2, type = "none",
+regsem(model, lambda = 0, alpha = 0, gamma = 3.7, type = "none",
   data = NULL, optMethod = "default", gradFun = "ram", hessFun = "none",
   parallel = "no", Start = "lavaan", subOpt = "nlminb", longMod = F,
   pars_pen = NULL, diff_par = NULL, LB = -Inf, UB = Inf, block = TRUE,
   full = TRUE, calc = "normal", max.iter = 500, tol = 1e-05,
-  solver = FALSE, solver.maxit = 5, alpha.inc = TRUE, step = 0.5,
-  step.ratio = FALSE, nlminb.control = list(), missing = "listwise")
+  solver = FALSE, solver.maxit = 5, alpha.inc = FALSE, step = 0.5,
+  momentum = FALSE, step.ratio = FALSE, nlminb.control = list(),
+  missing = "listwise")
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -101,6 +102,8 @@ for use.}
 \item{alpha.inc}{Whether alpha should increase for coord_desc}
 
 \item{step}{Step size}
+
+\item{momentum}{Momentum for step sizes}
 
 \item{step.ratio}{Ratio of step size between A and S. Logical}
 

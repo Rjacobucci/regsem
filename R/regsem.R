@@ -66,6 +66,7 @@
 #' @param solver.maxit Max iterations for solver in coord_desc
 #' @param alpha.inc Whether alpha should increase for coord_desc
 #' @param step Step size
+#' @param momentum Momentum for step sizes
 #' @param step.ratio Ratio of step size between A and S. Logical
 #' @param missing How to handle missing data. Current options are "listwise"
 #'        and "fiml". "fiml" is not currently working well.
@@ -126,8 +127,9 @@ regsem = function(model,lambda=0,alpha=0,gamma=3.7, type="none",data=NULL,optMet
                  tol=1e-5,
                  solver=FALSE,
                  solver.maxit=5,
-                 alpha.inc=TRUE,
+                 alpha.inc=FALSE,
                  step=.5,
+                 momentum=FALSE,
                  step.ratio=FALSE,
                  nlminb.control=list(),
                  missing="listwise"){
@@ -382,7 +384,7 @@ regsem = function(model,lambda=0,alpha=0,gamma=3.7, type="none",data=NULL,optMet
            #fit = fit_fun(ImpCov=mult$ImpCov,SampCov,Areg=mult$A_est22,lambda,alpha,type,pen_vec)
            fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,gamma,pen_vec,pen_diff,e_alpha)
           # print(type2)
-           print(round(fit,3))#;print(pen_diff)
+           #print(round(fit,3))#;print(pen_diff)
            fit
          }else if(calc_fit=="ind"){
            stop("Not currently supported")
@@ -773,7 +775,7 @@ if(optMethod=="nlminb"){
                    pars_pen=pars_pen,model=model,max.iter=max.iter,
                    lambda=lambda,mats=mats,block=block,tol=tol,full=full,
                    solver=solver,solver.maxit=solver.maxit,
-                   alpha.inc=alpha.inc,step=step,
+                   alpha.inc=alpha.inc,step=step,momentum=momentum,
                    e_alpha=e_alpha,gamma=gamma,
                    step.ratio=step.ratio,diff_par=diff_par,pen_vec=pen_vec)
   res$out <- out
