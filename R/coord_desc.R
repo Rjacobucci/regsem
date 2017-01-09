@@ -307,7 +307,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
   #  st.crit2 <- all(abs(gg) < .01)
     dif <- abs(vals[count+1] - vals[count])
     #print(dif)
-
+  print(count)
    # print(rbind(update.pars,t(gg2)))
     #print(round(dif,5))
    # print(as.vector(round(gg,3)))
