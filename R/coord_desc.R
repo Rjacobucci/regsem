@@ -83,8 +83,9 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           update.pars <- new.pars[count,] - alpha*gg
 
          # print(round(t(alpha*gg),3))
-
-          if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
+          if(type == "ridge" | type=="none"){
+            update.pars <- update.pars
+          }else if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
               update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
             }
