@@ -59,6 +59,7 @@
 #'        This is not recommended.
 #' @param Start2 Provided starting values. Not required
 #' @param nlminb.control list of control values to pass to nlminb
+#' @param max.iter Number of iterations for coordinate descent
 #' @keywords multiple optim
 #' @export
 #' @examples
@@ -107,7 +108,8 @@ multi_optim <- function(model,max.try=10,lambda=0,
                         momentum=FALSE,
                         step.ratio=FALSE,
                         verbose=FALSE,warm.start=FALSE,Start2=NULL,
-                        nlminb.control=NULL){
+                        nlminb.control=NULL,
+                        max.iter=500){
 
 
 #  if(optMethod=="default" & type=="lasso"){
@@ -167,6 +169,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                          alpha.inc,
                          step,
                          momentum,
+                         max.iter,
                          step.ratio,
                          gradFun,n.optim,pars_pen,nlminb.control,
                          diff_par,hessFun,Start2){
@@ -209,6 +212,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                                             full=full,
                                             solver.maxit=solver.maxit,
                                             alpha.inc=alpha.inc,
+                                            max.iter=max.iter,
                                             step=step,
                                             momentum=momentum,
                                             step.ratio=step.ratio,
@@ -259,6 +263,7 @@ iter.optim = iter.optim + 1
                         block=block,
                         full=full,
                         solver.maxit=solver.maxit,
+                        max.iter=max.iter,
                         alpha.inc=alpha.inc,
                         step=step,
                         momentum=momentum,
@@ -318,6 +323,7 @@ iter.optim = iter.optim + 1
                      solver=solver,
                      block=block,
                      full=full,
+                     max.iter=max.iter,
                      solver.maxit=solver.maxit,
                      alpha.inc=alpha.inc,
                      step=step,
