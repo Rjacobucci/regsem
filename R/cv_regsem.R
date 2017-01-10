@@ -33,6 +33,8 @@
 #' @param diff_par parameter values to deviate from.
 #' @param LB lower bound vector.
 #' @param UB upper bound vector
+#' @param par.lim Vector of minimum and maximum parameter estimates. Used to
+#'        stop optimization and move to new starting values if violated.
 #' @param block Whether to use block coordinate descent
 #' @param full Whether to do full gradient descent or block
 #' @param calc Type of calc function to use with means or not. Not recommended
@@ -89,6 +91,7 @@ cv_regsem = function(model,
                     diff_par=NULL,
                     LB=-Inf,
                     UB=Inf,
+                    par.lim=c(-Inf,Inf),
                     block=TRUE,
                     full=TRUE,
                     calc="normal",
@@ -141,6 +144,8 @@ if(mult.start==FALSE){
     itt = 0
     Start = par.matrix[count-1,]
     Start[pars_pen] = Start[pars_pen]-jump
+  }else if(fits[count-1,2] == 99){
+    Start="lavaan"
   }else{
     itt = itt + 1
     Start = par.matrix[count-itt-1,]
@@ -157,6 +162,7 @@ if(mult.start==FALSE){
                    diff_par=diff_par,
                    LB=LB,
                    UB=UB,
+                  par.lim=par.lim,
                    block=block,
                    full=full,
                    calc=calc,
@@ -174,20 +180,23 @@ if(mult.start==FALSE){
 
   }else if(mult.start==TRUE){
 
-    if(warm.start==FALSE | count == 1){
+    if(warm.start==FALSE | count == 1 | count == 99){
       itt = 0
       Start2=NULL
     }else if(fits[count-1,2] == 0){
       itt = 0
       Start2 = par.matrix[count-1,]
       Start2[pars_pen] = Start2[pars_pen]-jump
+    }else if(fits[count-1,2] == 99){
+      Start="lavaan"
     }else{
       itt = itt + 1
       Start2 = par.matrix[count-itt-1,]
       Start2[pars_pen] = Start2[pars_pen]-itt*jump
     }
    out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
-                      LB=LB,UB=UB,type=type,optMethod=optMethod,
+                      LB=LB,UB=UB,par.lim=par.lim,
+                      type=type,optMethod=optMethod,
                       gradFun=gradFun,hessFun=hessFun,
                       tol=tol,
                       solver=solver,

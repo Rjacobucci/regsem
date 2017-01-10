@@ -9,7 +9,8 @@ multi_optim(model, max.try = 10, lambda = 0, LB = -Inf, UB = Inf,
   gradFun = "ram", pars_pen = NULL, diff_par = NULL, hessFun = "none",
   tol = 1e-05, solver = FALSE, solver.maxit = 50000, alpha.inc = FALSE,
   step = 0.5, momentum = FALSE, step.ratio = FALSE, verbose = FALSE,
-  warm.start = FALSE, Start2 = NULL, nlminb.control = NULL)
+  warm.start = FALSE, Start2 = NULL, nlminb.control = NULL,
+  max.iter = 500)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -91,6 +92,8 @@ This is not recommended.}
 \item{Start2}{Provided starting values. Not required}
 
 \item{nlminb.control}{list of control values to pass to nlminb}
+
+\item{max.iter}{Number of iterations for coordinate descent}
 }
 \description{
 Multiple starts for Regularized Structural Equation Modeling

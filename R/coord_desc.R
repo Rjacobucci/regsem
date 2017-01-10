@@ -1,7 +1,7 @@
 
 coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,mats,
                        block,max.iter,tol,full,solver,solver.maxit,alpha.inc,step,
-                       step.ratio,diff_par,pen_vec,e_alpha,gamma,momentum){
+                       step.ratio,diff_par,pen_vec,e_alpha,gamma,momentum,par.lim){
   count = 0
   ret <- list()
   max.iter = max.iter
@@ -71,9 +71,19 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
         if(full==TRUE & solver == FALSE){
 
-          print("gg")
-          gg <- grad(new.pars[count,])
-          print("gg2")
+          #print("gg")
+
+          print(round(new.pars[count,],3))
+          gg <- try(grad(new.pars[count,]),silent=TRUE)
+
+           if(inherits(gg, "try-error")) {
+            gg <- rnorm(length(new.pars[count,]),0,.01)
+              }else{
+            gg <- gg
+              }
+
+
+          #print("gg2")
           #print(round(t(gg),3))
 
 
@@ -313,6 +323,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
     #print(round(dif,5))
    # print(as.vector(round(gg,3)))
    # print(dif)
+   # print(count)
   #  print(round(gg,3))
   #  print(convergence)
 
@@ -320,7 +331,8 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       convergence=99
     }else if(is.na(st.crit)==TRUE){
       convergence=99
-    }else if(any(new.pars[count+1,] > 500)){
+    }else if(any(new.pars[count+1,] > par.lim[2]) | any(new.pars[count+1,] < par.lim[1])){
+      break
       convergence=99
     }else{
       if(st.crit==TRUE){

@@ -2,8 +2,8 @@
 
 soft <- function(par,lambda,type,step,e_alpha,gamma){
   if(type=="lasso"){
-
-      ret.val <- sign(par)*max(abs(par)-step*lambda,0)
+    lambda <- lambda*step
+      ret.val <- sign(par)*max(abs(par)-lambda,0)
 
   }else if(type=="enet"){
       lambda <- lambda*step

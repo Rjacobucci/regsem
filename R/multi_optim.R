@@ -21,6 +21,8 @@
 #'        when using regularization. It greatly increases the chances of
 #'        converging.
 #' @param UB Upper bound vector
+#' @param par.lim Vector of minimum and maximum parameter estimates. Used to
+#'        stop optimization and move to new starting values if violated.
 #' @param block Whether to use block coordinate descent
 #' @param full Whether to do full gradient descent or block
 #' @param type Penalty type. Options include "none", "lasso", "ridge",
@@ -92,6 +94,7 @@
 multi_optim <- function(model,max.try=10,lambda=0,
                          LB=-Inf,
                         UB=Inf,
+                        par.lim=c(-Inf,Inf),
                         block=TRUE,
                         full=TRUE,
                         type="none",
@@ -161,6 +164,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
 
     mult_run <- function(model,n.try=1,lambda,LB=-Inf,tol,
                          UB=Inf,
+                         par.lim,
                          block,
                          full,
                          type,optMethod,warm.start,
@@ -209,6 +213,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                                             nlminb.control=nlminb.control,tol=tol,
                                             solver=solver,
                                             block=block,
+                                            par.lim=par.lim,
                                             full=full,
                                             solver.maxit=solver.maxit,
                                             alpha.inc=alpha.inc,
@@ -261,6 +266,7 @@ iter.optim = iter.optim + 1
                         nlminb.control=nlminb.control,tol=tol,
                         solver=solver,
                         block=block,
+                        par.lim=par.lim,
                         full=full,
                         solver.maxit=solver.maxit,
                         max.iter=max.iter,
@@ -323,6 +329,7 @@ iter.optim = iter.optim + 1
                      solver=solver,
                      block=block,
                      full=full,
+                     par.lim=par.lim,
                      max.iter=max.iter,
                      solver.maxit=solver.maxit,
                      alpha.inc=alpha.inc,

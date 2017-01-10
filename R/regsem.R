@@ -57,6 +57,8 @@
 #'        when using regularization. It greatly increases the chances of
 #'        converging.
 #' @param UB Upper bound vector
+#' @param par.lim Vector of minimum and maximum parameter estimates. Used to
+#'        stop optimization and move to new starting values if violated.
 #' @param block Whether to use block coordinate descent
 #' @param full Whether to do full gradient descent or block
 #' @param calc Type of calc function to use with means or not. Not recommended
@@ -122,6 +124,7 @@ regsem = function(model,lambda=0,alpha=0,gamma=3.7, type="none",data=NULL,optMet
                  diff_par=NULL,
                  LB=-Inf,
                  UB=Inf,
+                 par.lim=c(-Inf,Inf),
                  block=TRUE,
                  full=TRUE,
                  calc="normal",
@@ -779,6 +782,7 @@ if(optMethod=="nlminb"){
                    solver=solver,solver.maxit=solver.maxit,
                    alpha.inc=alpha.inc,step=step,momentum=momentum,
                    e_alpha=e_alpha,gamma=gamma,
+                   par.lim=par.lim,
                    step.ratio=step.ratio,diff_par=diff_par,pen_vec=pen_vec)
   res$out <- out
   res$optim_fit <- out$value
