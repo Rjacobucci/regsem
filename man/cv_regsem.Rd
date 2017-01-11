@@ -9,11 +9,11 @@ cv_regsem(model, n.lambda = 100, mult.start = TRUE, multi.iter = 100,
   "BIC"), fit.ret2 = "train", data = NULL, optMethod = "default",
   gradFun = "ram", hessFun = "none", test.cov = NULL, parallel = FALSE,
   ncore = 2, Start = "lavaan", subOpt = "nlminb", pars_pen = NULL,
-  diff_par = NULL, LB = -Inf, UB = Inf, block = TRUE, full = TRUE,
-  calc = "normal", max.iter = 2000, tol = 1e-05, solver = FALSE,
-  solver.maxit = 5, alpha.inc = FALSE, step = 0.5, momentum = FALSE,
-  step.ratio = FALSE, nlminb.control = list(), warm.start = TRUE,
-  missing = "listwise", ...)
+  diff_par = NULL, LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf),
+  block = TRUE, full = TRUE, calc = "normal", max.iter = 2000,
+  tol = 1e-05, solver = FALSE, solver.maxit = 5, alpha.inc = FALSE,
+  step = 0.5, momentum = FALSE, step.ratio = FALSE,
+  nlminb.control = list(), warm.start = TRUE, missing = "listwise", ...)
 }
 \arguments{
 \item{model}{lavaan output object.}
@@ -69,6 +69,9 @@ values of lambda.}
 \item{LB}{lower bound vector.}
 
 \item{UB}{upper bound vector}
+
+\item{par.lim}{Vector of minimum and maximum parameter estimates. Used to
+stop optimization and move to new starting values if violated.}
 
 \item{block}{Whether to use block coordinate descent}
 

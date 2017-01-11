@@ -5,12 +5,12 @@
 \title{Multiple starts for Regularized Structural Equation Modeling}
 \usage{
 multi_optim(model, max.try = 10, lambda = 0, LB = -Inf, UB = Inf,
-  block = TRUE, full = TRUE, type = "none", optMethod = "default",
-  gradFun = "ram", pars_pen = NULL, diff_par = NULL, hessFun = "none",
-  tol = 1e-05, solver = FALSE, solver.maxit = 50000, alpha.inc = FALSE,
-  step = 0.5, momentum = FALSE, step.ratio = FALSE, verbose = FALSE,
-  warm.start = FALSE, Start2 = NULL, nlminb.control = NULL,
-  max.iter = 500)
+  par.lim = c(-Inf, Inf), block = TRUE, full = TRUE, type = "none",
+  optMethod = "default", gradFun = "ram", pars_pen = NULL,
+  diff_par = NULL, hessFun = "none", tol = 1e-05, solver = FALSE,
+  solver.maxit = 50000, alpha.inc = FALSE, step = 0.5, momentum = FALSE,
+  step.ratio = FALSE, verbose = FALSE, warm.start = FALSE,
+  Start2 = NULL, nlminb.control = NULL, max.iter = 500)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -35,6 +35,9 @@ when using regularization. It greatly increases the chances of
 converging.}
 
 \item{UB}{Upper bound vector}
+
+\item{par.lim}{Vector of minimum and maximum parameter estimates. Used to
+stop optimization and move to new starting values if violated.}
 
 \item{block}{Whether to use block coordinate descent}
 

@@ -48,6 +48,8 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       pen_diff=0
     }
 
+   # print(pen_diff)
+
       update.pars <- new.pars[count,]
       #print(round(update.pars,4))
       #a.pars <- update.pars[1:max(mats$A)]
@@ -73,7 +75,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           #print("gg")
 
-          print(round(new.pars[count,],3))
+          #print(round(new.pars[count,],3))
           gg <- try(grad(new.pars[count,]),silent=TRUE)
 
            if(inherits(gg, "try-error")) {
@@ -96,14 +98,19 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
          # print(round(t(alpha*gg),3))
           if(type == "ridge" | type=="none"){
             update.pars <- update.pars
-          }else if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
+          }else if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
               update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
             }
           }else if(type=="diff_lasso" & lambda > 0){
+            cc=0
             for(j in pars_pen){
+              cc <- cc + 1
               #print(update.pars[j])
-              update.pars[j] <- update.pars[j] + sign(pen_diff[j])*max(abs(pen_diff[j])-alpha*lambda,0)
+              #print(pen_diff[j])
+              #print(soft(pen_diff[j],lambda,type="lasso",step=alpha1,e_alpha,gamma))
+              update.pars[j] <- update.pars[j] -
+                pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
             }
           }else if(type=="alasso" & lambda > 0){
             for(j in pars_pen){
@@ -119,14 +126,18 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
          # print(out$objective)
           update.pars <- out$par
 
-          if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
+          if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
               update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
             }
           }else if(type=="diff_lasso" & lambda > 0){
+            cc=0
             for(j in pars_pen){
+              cc <- cc + 1
               #print(update.pars[j])
-              update.pars[j] <- update.pars[j] + sign(pen_diff[j])*max(abs(pen_diff[j])-alpha*lambda,0)
+              #print(pen_diff[j])
+              #print(soft(pen_diff[j],lambda,type="lasso",step=alpha1,e_alpha,gamma))
+              update.pars[j] <- update.pars[j] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
             }
           }else if(type=="alasso" & lambda > 0){
             for(j in pars_pen){
@@ -143,14 +154,20 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha1*t(gg[1:max(mats$A)])
 
 
-          if(type!="none" | type!="ridge" | type!="diff_lasso" & lambda > 0){
+          if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
             for(j in pars_pen){
               update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha1,e_alpha,gamma)
             }
           }else if(type=="diff_lasso" & lambda > 0){
+            cc=0
             for(j in pars_pen){
-              #print(update.pars[j])
-              update.pars[j] <- update.pars[j] + sign(pen_diff[j])*max(abs(pen_diff[j])-alpha1*lambda,0)
+              cc <- cc + 1
+              pen_vec = update.pars[pars_pen]
+              pen_diff = pen_vec - diff_par
+
+              print(pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma))
+              update.pars[j] <- update.pars[j] -
+                  pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
             }
           }else if(type=="alasso" & lambda > 0){
             for(j in pars_pen){
@@ -161,12 +178,12 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           # S
           gg2 <- grad(update.pars)
-         # print(round(rbind(t(gg),t(gg2))),4)
+          #print(round(rbind(t(gg),t(gg2))),4)
 
           update.pars[min(mats$S[mats$S !=0]):max(mats$S)] <-
             update.pars[min(mats$S[mats$S !=0]):max(mats$S)] - alpha2*gg2[min(mats$S[mats$S !=0]):max(mats$S)]
 
-
+          #print(round(update.pars,3))
 
 
         }else if(full == FALSE & line.search==TRUE){

@@ -388,6 +388,7 @@ regsem = function(model,lambda=0,alpha=0,gamma=3.7, type="none",data=NULL,optMet
          if(calc_fit=="cov"){
            #fit = fit_fun(ImpCov=mult$ImpCov,SampCov,Areg=mult$A_est22,lambda,alpha,type,pen_vec)
            fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,gamma,pen_vec,pen_diff,e_alpha)
+           #print(fit)
           # print(type2)
            #print(round(fit,3))#;print(pen_diff)
            fit
@@ -956,9 +957,9 @@ if(optMethod=="nlminb"){
       res$npar = npar - sum(pars_l2 < 0.001)
 
     }else if(type=="ridge"){
-      ratio1 <- sqrt(pars.df[pars_pen]**2)/sqrt(mats$parameters[pars_pen]**2)
-      res$df = df + length(ratio1) - sum(ratio1)
-      res$npar = npar - sum(ratio1)
+      #ratio1 <- sqrt(pars.df[pars_pen]**2)/sqrt(mats$parameters[pars_pen]**2)
+      res$df = df #+ length(ratio1) - sum(ratio1)
+      res$npar = npar #- sum(ratio1)
     }else if(type=="diff_lasso"){
       pars_sum = as.numeric(pars.df[pars_pen])
       #print(pars_sum);print(duplicated(round(pars_sum,3)))
