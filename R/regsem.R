@@ -133,7 +133,7 @@ regsem = function(model,lambda=0,alpha=0,gamma=3.7, type="none",data=NULL,optMet
                  solver=FALSE,
                  solver.maxit=5,
                  alpha.inc=FALSE,
-                 step=.5,
+                 step=.1,
                  momentum=FALSE,
                  step.ratio=FALSE,
                  nlminb.control=list(),

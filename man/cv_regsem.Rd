@@ -12,7 +12,7 @@ cv_regsem(model, n.lambda = 100, mult.start = TRUE, multi.iter = 100,
   diff_par = NULL, LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf),
   block = TRUE, full = TRUE, calc = "normal", max.iter = 2000,
   tol = 1e-05, solver = FALSE, solver.maxit = 5, alpha.inc = FALSE,
-  step = 0.5, momentum = FALSE, step.ratio = FALSE,
+  step = 0.1, momentum = FALSE, step.ratio = FALSE,
   nlminb.control = list(), warm.start = TRUE, missing = "listwise", ...)
 }
 \arguments{

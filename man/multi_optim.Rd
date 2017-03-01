@@ -8,7 +8,7 @@ multi_optim(model, max.try = 10, lambda = 0, LB = -Inf, UB = Inf,
   par.lim = c(-Inf, Inf), block = TRUE, full = TRUE, type = "none",
   optMethod = "default", gradFun = "ram", pars_pen = NULL,
   diff_par = NULL, hessFun = "none", tol = 1e-05, solver = FALSE,
-  solver.maxit = 50000, alpha.inc = FALSE, step = 0.5, momentum = FALSE,
+  solver.maxit = 50000, alpha.inc = FALSE, step = 0.1, momentum = FALSE,
   step.ratio = FALSE, verbose = FALSE, warm.start = FALSE,
   Start2 = NULL, nlminb.control = NULL, max.iter = 500)
 }

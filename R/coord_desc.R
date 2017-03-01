@@ -337,6 +337,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
     #print(dif)
   #print(count)
    # print(rbind(update.pars,t(gg2)))
+    #print(vals[count+1])
     #print(round(dif,5))
    # print(as.vector(round(gg,3)))
    # print(dif)
