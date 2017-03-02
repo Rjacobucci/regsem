@@ -3,6 +3,7 @@
 #' The main function that ties together and runs the models.
 #' @param model lavaan output object.
 #' @param n.lambda number of penalization values to test.
+#' @param pars_pen parameter indicators to penalize.
 #' @param mult.start Logical. Whether to use multi_optim() (TRUE) or
 #'         regsem() (FALSE).
 #' @param multi.iter maximum number of random starts for multi_optim
@@ -29,7 +30,6 @@
 #' @param ncore Number of cores to use when parallel=TRUE
 #' @param Start type of starting values to use.
 #' @param subOpt type of optimization to use in the optimx package.
-#' @param pars_pen parameter indicators to penalize.
 #' @param diff_par parameter values to deviate from.
 #' @param LB lower bound vector.
 #' @param UB upper bound vector
@@ -71,6 +71,7 @@
 
 cv_regsem = function(model,
                      n.lambda=100,
+                     pars_pen=NULL,
                      mult.start=TRUE,
                      multi.iter=100,
                      jump=0.002,
@@ -87,7 +88,6 @@ cv_regsem = function(model,
                     ncore=2,
                     Start="lavaan",
                     subOpt="nlminb",
-                    pars_pen=NULL,
                     diff_par=NULL,
                     LB=-Inf,
                     UB=Inf,

@@ -381,7 +381,7 @@ regsem = function(model,lambda=0,alpha=0,gamma=3.7, type="none",data=NULL,optMet
          #### for alasso - weight the parameters ####
          #### overwrite pen_vec ########
          if(type=="alasso"){
-           pen_vec_ml = c(list$A_est[match(pars_pen,A,nomatch=0)],list$S_est[match(pars_pen,S,nomatch=0)])
+           pen_vec_ml = c(mats$A_est[match(pars_pen,A,nomatch=0)],mats$S_est[match(pars_pen,S,nomatch=0)])
            pen_vec = abs(pen_vec)*(1/(abs(pen_vec_ml)))
          }
 
@@ -770,7 +770,7 @@ if(optMethod=="nlminb"){
   if(type=="alasso"){
     mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
     pen_vec = c(mult$A_est22[match(pars_pen,A,nomatch=0)],mult$S_est22[match(pars_pen,S,nomatch=0)])
-    pen_vec_ml = c(list$A_est[match(pars_pen,A,nomatch=0)],list$S_est[match(pars_pen,S,nomatch=0)])
+    pen_vec_ml = c(mats$A_est[match(pars_pen,A,nomatch=0)],mats$S_est[match(pars_pen,S,nomatch=0)])
     pen_vec = abs(pen_vec)*(1/(abs(pen_vec_ml)))
   }
 

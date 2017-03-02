@@ -4,21 +4,23 @@
 \alias{cv_regsem}
 \title{The main function that ties together and runs the models.}
 \usage{
-cv_regsem(model, n.lambda = 100, mult.start = TRUE, multi.iter = 100,
-  jump = 0.002, lambda.start = 0, type = "none", fit.ret = c("rmsea",
-  "BIC"), fit.ret2 = "train", data = NULL, optMethod = "default",
-  gradFun = "ram", hessFun = "none", test.cov = NULL, parallel = FALSE,
-  ncore = 2, Start = "lavaan", subOpt = "nlminb", pars_pen = NULL,
-  diff_par = NULL, LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf),
-  block = TRUE, full = TRUE, calc = "normal", max.iter = 2000,
-  tol = 1e-05, solver = FALSE, solver.maxit = 5, alpha.inc = FALSE,
-  step = 0.1, momentum = FALSE, step.ratio = FALSE,
+cv_regsem(model, n.lambda = 100, pars_pen = NULL, mult.start = TRUE,
+  multi.iter = 100, jump = 0.002, lambda.start = 0, type = "none",
+  fit.ret = c("rmsea", "BIC"), fit.ret2 = "train", data = NULL,
+  optMethod = "default", gradFun = "ram", hessFun = "none",
+  test.cov = NULL, parallel = FALSE, ncore = 2, Start = "lavaan",
+  subOpt = "nlminb", diff_par = NULL, LB = -Inf, UB = Inf,
+  par.lim = c(-Inf, Inf), block = TRUE, full = TRUE, calc = "normal",
+  max.iter = 2000, tol = 1e-05, solver = FALSE, solver.maxit = 5,
+  alpha.inc = FALSE, step = 0.1, momentum = FALSE, step.ratio = FALSE,
   nlminb.control = list(), warm.start = TRUE, missing = "listwise", ...)
 }
 \arguments{
 \item{model}{lavaan output object.}
 
 \item{n.lambda}{number of penalization values to test.}
+
+\item{pars_pen}{parameter indicators to penalize.}
 
 \item{mult.start}{Logical. Whether to use multi_optim() (TRUE) or
 regsem() (FALSE).}
@@ -61,8 +63,6 @@ values of lambda.}
 \item{Start}{type of starting values to use.}
 
 \item{subOpt}{type of optimization to use in the optimx package.}
-
-\item{pars_pen}{parameter indicators to penalize.}
 
 \item{diff_par}{parameter values to deviate from.}
 
