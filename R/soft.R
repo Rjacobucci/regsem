@@ -8,21 +8,24 @@ soft <- function(par,lambda,type,step,e_alpha,gamma){
   }else if(type=="enet"){
       lambda <- lambda*step
 
-     # lambda1 <- e_alpha*(lambda)
-    #  lambda2 <- (1-e_alpha)*lambda
+      lambda2 <- e_alpha*(lambda)*step
+      lambda1 <- (1-e_alpha)*lambda*step
+      ret.val <- sign(par)*(max(abs(par)-(lambda1)/2,0)/(1+lambda2))
 
     #  ret.val <- (sign(par)*max(abs(par)-step*lambda,0))/(1+lambda2)
 
-      if(abs(par) < e_alpha*lambda){
-        ret.val <- 0
-      }else{
+    #  if(abs(par) < e_alpha*lambda){
+     #   ret.val <- 0
+     # }else{
         # might be missing max(0,lambda)
-        ret.val <- (sign(par)*(abs(par)-e_alpha*lambda))/(1+(1-e_alpha)*lambda)
-      }
+    #    ret.val <- (sign(par)*(abs(par)-e_alpha*lambda))/(1+(1-e_alpha)*lambda)
+    #    ret.val <- sign(par)*(max(abs(par)-(step*lambda)/2,0)/(1+step*lambda))
+    #  }
 
   }else if(type=="alasso"){
     # ftp://ftp.stat.math.ethz.ch/Teaching/buhlmann/advanced-comput-statist/notes1.pdf
     ret.val <- sign(par)*max(abs(par)-(step*lambda)/(2*abs(par)),0)
+
 
   }else if(type=="scad"){
     lambda <- lambda*step
