@@ -123,4 +123,3 @@ cv.out = cv_regsem(outt,type="ridge",gradFun="none",n.lambda=100)
 }
 \keyword{calc}
 \keyword{optim}
-

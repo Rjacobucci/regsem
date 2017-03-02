@@ -26,4 +26,3 @@ mod <- cfa(HS.model, data=HolzingerSwineford1939)
 mats = extractMatrices(mod)
 }
 \keyword{extract}
-

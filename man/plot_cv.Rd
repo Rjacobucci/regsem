@@ -18,4 +18,3 @@ plot_cv(object, pars, color = TRUE, ...)
 \description{
 Plot function for cv_regsem
 }
-

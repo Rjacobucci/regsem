@@ -172,4 +172,3 @@ fit1 <- regsem(outt,lambda=0.05,type="lasso",pars_pen=c(1:2,6:8))
 }
 \keyword{calc}
 \keyword{optim}
-

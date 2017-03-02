@@ -35,4 +35,3 @@ rcpp_grad_ram(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec,
 \description{
 Calculates the gradient vector based on Von Oertzen \& Brick, 2014
 }
-

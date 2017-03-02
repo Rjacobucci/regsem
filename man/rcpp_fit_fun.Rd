@@ -26,4 +26,3 @@ rcpp_fit_fun(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha)
 \description{
 Calculates the objective function values.
 }
-

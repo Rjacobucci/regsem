@@ -95,7 +95,7 @@
 #' @return baseline.chisq Baseline chi-square.
 #' @return baseline.df Baseline degrees of freedom.
 #' @keywords optim calc
-#' @useDynLib regsem
+#' @useDynLib regsem, .registration=TRUE
 #' @import Rcpp
 #' @import lavaan
 #' @importFrom stats cov na.omit nlminb pchisq rnorm runif sd uniroot var weighted.mean

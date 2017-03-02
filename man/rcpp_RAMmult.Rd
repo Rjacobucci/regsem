@@ -28,4 +28,3 @@ rcpp_RAMmult(par, A, S, S_fixed, A_fixed, A_est, S_est, F, I)
 \description{
 Take RAM matrices, multiplies, and returns Implied Covariance matrix.
 }
-

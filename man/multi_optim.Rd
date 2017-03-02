@@ -128,4 +128,3 @@ summary(fit3)
 }
 \keyword{multiple}
 \keyword{optim}
-

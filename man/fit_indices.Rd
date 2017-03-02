@@ -30,4 +30,3 @@ fit_indices()
 \keyword{fit}
 \keyword{ncp}
 \keyword{rmsea}
-
