@@ -4,7 +4,7 @@
 \alias{summary.regsem}
 \title{Summary results from regsem.}
 \usage{
-summary.regsem(object, ...)
+\method{summary}{regsem}(object, ...)
 }
 \arguments{
 \item{object}{An object from regsem.}

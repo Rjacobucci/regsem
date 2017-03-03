@@ -2,6 +2,7 @@
 #'
 #' @param object An object from regsem.
 #' @param ... Other arguments.
+#' @method summary regsem
 #' @export
 
 

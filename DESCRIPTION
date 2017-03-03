@@ -6,7 +6,8 @@ Author: Ross Jacobucci[aut,cre], Kevin J. Grimm [ctb]
 Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
 Description: Uses both ridge and lasso penalties (and extensions) to penalize
     specific parameters in structural equation models. The package offers additional
-    cost functions, cross validation, and other extensions beyond traditional SEM.
+    cost functions, cross validation, and other extensions beyond traditional structural
+    equation models.
 License: GPL (>= 2)
 LazyData: TRUE
 Depends:
