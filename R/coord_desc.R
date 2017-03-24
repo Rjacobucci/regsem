@@ -77,7 +77,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           #print(round(new.pars[count,],3))
           gg <- try(grad(new.pars[count,]),silent=TRUE)
-
+          #print(round(gg,2))
            if(inherits(gg, "try-error")) {
             gg <- rnorm(length(new.pars[count,]),0,.01)
               }else{
@@ -122,7 +122,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
 
         }else if(full==TRUE & solver == TRUE){
-          out <- nlminb(new.pars[count,],func,grad,control=list(iter.max=1))
+          out <- nlminb(new.pars[count,],func,grad,control=list(iter.max=5,eval.max=5))
          # print(out$objective)
           update.pars <- out$par
 
@@ -149,7 +149,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
         }else if(full==FALSE & line.search==FALSE){
 
           gg <- grad(new.pars[count,])
-
+          #print(round(gg,2))
 
           update.pars[1:max(mats$A)] <- update.pars[1:max(mats$A)] - alpha1*t(gg[1:max(mats$A)])
 
@@ -329,7 +329,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
     if(type != "diff_lasso") pen_diff <- 0
     vals[count+1] = func(new.pars[count+1,])
-  #  print(round(vals[count+1],3))
+    #print(round(vals[count+1],3))
 
     st.crit = try(abs(vals[count+1] - vals[count])<tol)
   #  st.crit2 <- all(abs(gg) < .01)

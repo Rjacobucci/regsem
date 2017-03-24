@@ -363,7 +363,6 @@ regsem = function(model,lambda=0,alpha=0,gamma=3.7, type="none",data=NULL,optMet
 
 
 
-
   if(calc == "normal"){
     calc = function(start){
          mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)

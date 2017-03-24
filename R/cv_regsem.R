@@ -143,7 +143,7 @@ if(mult.start==FALSE){
   }else if(fits[count-1,2] == 0){
     itt = 0
     Start = par.matrix[count-1,]
-    Start[pars_pen] = Start[pars_pen]-jump
+    Start[pars_pen] = Start[pars_pen]#-step*jump
   }else if(fits[count-1,2] == 99){
     Start="lavaan"
   }else{
@@ -186,7 +186,7 @@ if(mult.start==FALSE){
     }else if(fits[count-1,2] == 0){
       itt = 0
       Start2 = par.matrix[count-1,]
-      Start2[pars_pen] = Start2[pars_pen]-jump
+      Start2[pars_pen] = Start2[pars_pen]-step*jump
     }else if(fits[count-1,2] == 99){
       Start="lavaan"
     }else{
