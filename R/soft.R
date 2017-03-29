@@ -7,7 +7,6 @@ soft <- function(par,lambda,type,step,e_alpha,gamma){
 
   }else if(type=="enet"){
       lambda <- lambda*step
-
       lambda2 <- e_alpha*(lambda)*step
       lambda1 <- (1-e_alpha)*lambda*step
       ret.val <- sign(par)*(max(abs(par)-(lambda1)/2,0)/(1+lambda2))

@@ -17,6 +17,7 @@
 #' @param max.try number of starts to try before convergence.
 #' @param lambda Penalty value. Note: higher values will result in additional
 #'        convergence issues.
+#' @param alpha Mixture for elastic net.
 #' @param LB lower bound vector. Note: This is very important to specify
 #'        when using regularization. It greatly increases the chances of
 #'        converging.
@@ -92,6 +93,7 @@
 
 
 multi_optim <- function(model,max.try=10,lambda=0,
+                        alpha=.5,
                          LB=-Inf,
                         UB=Inf,
                         par.lim=c(-Inf,Inf),
@@ -162,7 +164,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
 
   sss = seq(1,max.try)
 
-    mult_run <- function(model,n.try=1,lambda,LB=-Inf,tol,
+    mult_run <- function(model,n.try=1,lambda,LB=-Inf,tol,alpha,
                          UB=Inf,
                          par.lim,
                          block,
@@ -208,7 +210,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
        # }
 
 
-        fit1 <- suppressWarnings(try(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
+        fit1 <- suppressWarnings(try(regsem(model,lambda=lambda,alpha=alpha,type=type,optMethod=optMethod,
                                             Start=start.optim,gradFun=gradFun,hessFun=hessFun,
                                             nlminb.control=nlminb.control,tol=tol,
                                             solver=solver,
@@ -262,7 +264,7 @@ iter.optim = iter.optim + 1
 
 
 
-    ret.mult = mult_run(model,n.try=1,lambda=lambda,LB,UB,type,warm.start=warm.start,
+    ret.mult = mult_run(model,n.try=1,lambda=lambda,alpha=alpha,LB,UB,type,warm.start=warm.start,
                         nlminb.control=nlminb.control,tol=tol,
                         solver=solver,
                         block=block,
@@ -323,7 +325,7 @@ iter.optim = iter.optim + 1
       }else{
         Start="default"
       }
-      fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
+      fit1 <- suppressWarnings(regsem(model,lambda=lambda,alpha=alpha,type=type,optMethod=optMethod,
                      Start=Start,gradFun=gradFun,hessFun=hessFun,
                      nlminb.control=nlminb.control,tol=tol,
                      solver=solver,

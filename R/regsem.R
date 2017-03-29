@@ -16,7 +16,7 @@
 #' @param lambda Penalty value. Note: higher values will result in additional
 #'        convergence issues. If using values > 0.1, it is recommended to use
 #'        mutli_optim() instead. See \code{\link{multi_optim}} for more detail.
-#' @param alpha Mixture for elastic net. Not currently working applied.
+#' @param alpha Mixture for elastic net.
 #' @param gamma Additional penalty for MCP and SCAD
 #' @param type Penalty type. Options include "none", "lasso", "ridge",
 #'        "enet" for the elastic net,
@@ -117,7 +117,7 @@
 
 
 
-regsem = function(model,lambda=0,alpha=0,gamma=3.7, type="none",data=NULL,optMethod="default",
+regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optMethod="default",
                  gradFun="ram",hessFun="none",parallel="no",Start="lavaan",
                  subOpt="nlminb",longMod=F,
                  pars_pen=NULL,

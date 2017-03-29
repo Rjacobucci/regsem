@@ -9,6 +9,7 @@
 #' @param multi.iter maximum number of random starts for multi_optim
 #' @param jump Amount to increase penalization each iteration.
 #' @param lambda.start What value to start the penalty at
+#' @param alpha Mixing for elastic net
 #' @param type Penalty type. Options include "none", "lasso", "ridge",
 #'        "enet" for the elastic net,
 #'        "alasso" for the adaptive lasso
@@ -76,6 +77,7 @@ cv_regsem = function(model,
                      multi.iter=100,
                      jump=0.002,
                      lambda.start=0,
+                     alpha=.5,
                      type="none",
                      fit.ret=c("rmsea","BIC"),
                      fit.ret2 = "train",
@@ -158,6 +160,7 @@ if(mult.start==FALSE){
                    gradFun=gradFun,hessFun=hessFun,
                    parallel=parallel,Start=Start,
                    subOpt=subOpt,
+                  alpha=alpha,
                    pars_pen=pars_pen,
                    diff_par=diff_par,
                    LB=LB,
@@ -199,6 +202,7 @@ if(mult.start==FALSE){
                       type=type,optMethod=optMethod,
                       gradFun=gradFun,hessFun=hessFun,
                       tol=tol,
+                      alpha=alpha,
                       solver=solver,
                       solver.maxit=solver.maxit,
                       max.iter=max.iter,
@@ -291,6 +295,7 @@ if(mult.start==FALSE){
                     pars_pen=pars_pen,
                     diff_par=diff_par,
                     LB=LB,
+                    alpha=alpha,
                     UB=UB,
                     calc=calc,
                     nlminb.control=nlminb.control,
@@ -312,6 +317,7 @@ if(mult.start==FALSE){
                          gradFun=gradFun,hessFun=hessFun,nlminb.control=nlminb.control,
                          tol=tol,
                          full=full,
+                         alpha=alpha,
                          block=block,
                          solver=solver,
                          solver.maxit=solver.maxit,
