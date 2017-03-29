@@ -4,7 +4,7 @@
 \alias{regsem}
 \title{Regularized Structural Equation Modeling}
 \usage{
-regsem(model, lambda = 0, alpha = 0, gamma = 3.7, type = "none",
+regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "none",
   data = NULL, optMethod = "default", gradFun = "ram", hessFun = "none",
   parallel = "no", Start = "lavaan", subOpt = "nlminb", longMod = F,
   pars_pen = NULL, diff_par = NULL, LB = -Inf, UB = Inf,
@@ -30,7 +30,7 @@ sample covariance matrix.}
 convergence issues. If using values > 0.1, it is recommended to use
 mutli_optim() instead. See \code{\link{multi_optim}} for more detail.}
 
-\item{alpha}{Mixture for elastic net. Not currently working applied.}
+\item{alpha}{Mixture for elastic net.}
 
 \item{gamma}{Additional penalty for MCP and SCAD}
 

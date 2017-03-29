@@ -5,9 +5,9 @@
 \title{The main function that ties together and runs the models.}
 \usage{
 cv_regsem(model, n.lambda = 100, pars_pen = NULL, mult.start = TRUE,
-  multi.iter = 100, jump = 0.002, lambda.start = 0, type = "none",
-  fit.ret = c("rmsea", "BIC"), fit.ret2 = "train", data = NULL,
-  optMethod = "default", gradFun = "ram", hessFun = "none",
+  multi.iter = 100, jump = 0.002, lambda.start = 0, alpha = 0.5,
+  type = "none", fit.ret = c("rmsea", "BIC"), fit.ret2 = "train",
+  data = NULL, optMethod = "default", gradFun = "ram", hessFun = "none",
   test.cov = NULL, parallel = FALSE, ncore = 2, Start = "lavaan",
   subOpt = "nlminb", diff_par = NULL, LB = -Inf, UB = Inf,
   par.lim = c(-Inf, Inf), block = TRUE, full = TRUE, calc = "normal",
@@ -30,6 +30,8 @@ regsem() (FALSE).}
 \item{jump}{Amount to increase penalization each iteration.}
 
 \item{lambda.start}{What value to start the penalty at}
+
+\item{alpha}{Mixing for elastic net}
 
 \item{type}{Penalty type. Options include "none", "lasso", "ridge",
 "enet" for the elastic net,

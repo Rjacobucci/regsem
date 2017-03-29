@@ -4,13 +4,14 @@
 \alias{multi_optim}
 \title{Multiple starts for Regularized Structural Equation Modeling}
 \usage{
-multi_optim(model, max.try = 10, lambda = 0, LB = -Inf, UB = Inf,
-  par.lim = c(-Inf, Inf), block = TRUE, full = TRUE, type = "none",
-  optMethod = "default", gradFun = "ram", pars_pen = NULL,
-  diff_par = NULL, hessFun = "none", tol = 1e-05, solver = FALSE,
-  solver.maxit = 50000, alpha.inc = FALSE, step = 0.1, momentum = FALSE,
-  step.ratio = FALSE, verbose = FALSE, warm.start = FALSE,
-  Start2 = NULL, nlminb.control = NULL, max.iter = 500)
+multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5, LB = -Inf,
+  UB = Inf, par.lim = c(-Inf, Inf), block = TRUE, full = TRUE,
+  type = "none", optMethod = "default", gradFun = "ram",
+  pars_pen = NULL, diff_par = NULL, hessFun = "none", tol = 1e-05,
+  solver = FALSE, solver.maxit = 50000, alpha.inc = FALSE, step = 0.1,
+  momentum = FALSE, step.ratio = FALSE, verbose = FALSE,
+  warm.start = FALSE, Start2 = NULL, nlminb.control = NULL,
+  max.iter = 500)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -29,6 +30,8 @@ sample covariance matrix.}
 
 \item{lambda}{Penalty value. Note: higher values will result in additional
 convergence issues.}
+
+\item{alpha}{Mixture for elastic net.}
 
 \item{LB}{lower bound vector. Note: This is very important to specify
 when using regularization. It greatly increases the chances of
