@@ -2,22 +2,22 @@
 #'
 #' @param object An object from cv_regsem.
 #' @param pars Which parameters to plot
-#' @param color Whether to plot in color
+#' @param color Vector of colors for each parameter
 #' @param ... Other arguments.
 #' @export
 
 
 
-plot_cv <- function(object,pars,color=TRUE,...){
+plot_cv <- function(object,pars,color=NULL,...){
 
 
   coef.mat <- object[[1]][,pars]
 
-  if(color==TRUE){
-
+  if(is.null(color)){
+    set.seed(1)
     colls <- sample(colorspace::rainbow_hcl(length(pars)))
   }else{
-    colls <- rep(1,length(pars))
+    colls <- color
   }
 
 
