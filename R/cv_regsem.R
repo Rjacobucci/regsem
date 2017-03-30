@@ -117,7 +117,7 @@ cv_regsem = function(model,
 #  dat.test <- dat[-ids,]
 #}
 
-
+pars_pen <- parse_parameters(pars_pen, model)
 
 if(parallel == TRUE){
   stop("parallel is not currently supported")
