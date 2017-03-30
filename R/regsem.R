@@ -99,7 +99,7 @@
 #' @import Rcpp
 #' @import lavaan
 #' @importFrom stats cov na.omit nlminb pchisq rnorm runif sd uniroot var weighted.mean
-#' @importFrom graphics abline lines plot
+#' @importFrom graphics abline lines plot points
 #' @export
 #' @examples
 #' library(lavaan)

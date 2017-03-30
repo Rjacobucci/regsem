@@ -401,6 +401,8 @@ if(mult.start==FALSE){
 }
 #fits = fit_indices(out,CV=FALSE)
 out2$pars_pen <- pars_pen
+out2$call <- match.call()
+class(out2) <- "cvregsem"
 out2
 
 }
