@@ -331,6 +331,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
   F <- mats$F
   I <- diag(nrow(A))
 
+  pars_pen <- parse_parameters(pars_pen, model)
 
 
     if(is.null(pars_pen) == TRUE){
