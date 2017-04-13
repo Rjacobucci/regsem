@@ -1000,9 +1000,10 @@ if(optMethod=="nlminb"){
                              type2,lambda,pen_vec=0,pen_diff=0,e_alpha=0,gamma=0)
 
     }
-
+    SampCov2 <- SampCov
     SampCov <- model@SampleStats@cov[][[1]]
     res$SampCov = SampCov
+    res$SampCov2 <- SampCov2
 
     res$data <- as.data.frame(model@Data@X)
 

@@ -232,10 +232,13 @@ if(mult.start==FALSE){
   }else if(fit.ret2 == "test"){
    # stop("fit.ret2=test is currently not implemented")
     #print(summary(out))
+
     fitt = try(fit_indices(out,CovMat=test.cov,CV=TRUE)$fits[fit.ret],silent=T)
     if(inherits(fitt, "try-error")) {
+
       fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)
     }else{
+
       fits[count,3:ncol(fits)] = fitt
     }
   }else if(fit.ret2 == "boot"){
