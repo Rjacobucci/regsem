@@ -73,7 +73,7 @@
 cv_regsem = function(model,
                      n.lambda=100,
                      pars_pen=NULL,
-                     mult.start=TRUE,
+                     mult.start=FALSE,
                      multi.iter=100,
                      jump=0.002,
                      lambda.start=0,
@@ -155,30 +155,78 @@ if(mult.start==FALSE){
   }
 
 
-  out <- regsem(model=model,lambda=SHRINK,type=type,data=data,
-                   optMethod=optMethod,
-                   gradFun=gradFun,hessFun=hessFun,
-                   parallel=parallel,Start=Start,
-                   subOpt=subOpt,
+  if(fit.ret2 != "boot"){
+    out <- regsem(model=model,lambda=SHRINK,type=type,data=data,
+                  optMethod=optMethod,
+                  gradFun=gradFun,hessFun=hessFun,
+                  parallel=parallel,Start=Start,
+                  subOpt=subOpt,
                   alpha=alpha,
-                   pars_pen=pars_pen,
-                   diff_par=diff_par,
-                   LB=LB,
-                   UB=UB,
+                  pars_pen=pars_pen,
+                  diff_par=diff_par,
+                  LB=LB,
+                  UB=UB,
                   par.lim=par.lim,
-                   block=block,
-                   full=full,
-                   calc=calc,
-                   tol=tol,
-                    solver=solver,
+                  block=block,
+                  full=full,
+                  calc=calc,
+                  tol=tol,
+                  solver=solver,
                   solver.maxit=solver.maxit,
                   alpha.inc=alpha.inc,
                   step=step,
-                max.iter=max.iter,
-                momentum=momentum,
+                  max.iter=max.iter,
+                  momentum=momentum,
                   step.ratio=step.ratio,
-                   nlminb.control=nlminb.control,
-                   missing=missing)
+                  nlminb.control=nlminb.control,
+                  missing=missing)
+  }else{
+
+    fitt <- matrix(NA,5,length(fit.ret))
+    for(i in 1:5){
+      set.seed(i)
+      data <- as.data.frame(model@Data@X)
+
+      ids1 <- sample(1:nrow(data),nrow(data),replace=TRUE)
+
+      train <- data[ids1,]
+      test <- data[-ids1,]
+
+      colnames(train) <- model@pta$vnames$ov[[1]]
+      colnames(test) <- model@pta$vnames$ov[[1]]
+
+      mod1 <- lavaan(parTable(model),train)
+
+    out <- regsem(model=mod1,lambda=SHRINK,type=type,data=NULL,
+                  optMethod=optMethod,
+                  gradFun=gradFun,hessFun=hessFun,
+                  parallel=parallel,Start=Start,
+                  subOpt=subOpt,
+                  alpha=alpha,
+                  pars_pen=pars_pen,
+                  diff_par=diff_par,
+                  LB=LB,
+                  UB=UB,
+                  par.lim=par.lim,
+                  block=block,
+                  full=full,
+                  calc=calc,
+                  tol=tol,
+                  solver=solver,
+                  solver.maxit=solver.maxit,
+                  alpha.inc=alpha.inc,
+                  step=step,
+                  max.iter=max.iter,
+                  momentum=momentum,
+                  step.ratio=step.ratio,
+                  nlminb.control=nlminb.control,
+                  missing=missing)
+    fitt[i,] = fit_indices(out,CV=TRUE,CovMat=cov(test))$fits[fit.ret]
+    }
+    fits[count,3:ncol(fits)] <- colMeans(fitt)
+  }
+
+
 
 
   }else if(mult.start==TRUE){
@@ -239,13 +287,6 @@ if(mult.start==FALSE){
       fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)
     }else{
 
-      fits[count,3:ncol(fits)] = fitt
-    }
-  }else if(fit.ret2 == "boot"){
-    fitt = try(fit_indices(out,CV="boot")$fits[fit.ret],silent=T)
-    if(inherits(fitt, "try-error")) {
-      fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)
-    }else{
       fits[count,3:ncol(fits)] = fitt
     }
   }

@@ -59,7 +59,7 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
 
     #dat <- model$data
   # ids <-  sample(nrow(dat),nrow(dat)/2)
-    SampCov <- CovMat
+    SampCov <- SampCov2 <- CovMat
 
 
     if(model$mean==TRUE){
