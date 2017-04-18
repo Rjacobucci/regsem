@@ -21,6 +21,7 @@
 #' @param fit.ret Fit indices to return.
 #' @param fit.ret2 Return fits using only dataset "train" or bootstrap "boot"? Have to
 #'        do 2 sample CV manually.
+#' @param n.boot Number of bootstrap samples if fit.ret2="boot"
 #' @param data Optional dataframe. Only required for missing="fiml".
 #' @param optMethod solver to use.
 #' @param gradFun gradient function to use.
@@ -74,13 +75,14 @@ cv_regsem = function(model,
                      n.lambda=100,
                      pars_pen=NULL,
                      mult.start=FALSE,
-                     multi.iter=100,
+                     multi.iter=10,
                      jump=0.002,
                      lambda.start=0,
                      alpha=.5,
                      type="none",
                      fit.ret=c("rmsea","BIC"),
                      fit.ret2 = "train",
+                     n.boot=20,
                      data=NULL,
                      optMethod="default",
                     gradFun="ram",
@@ -116,7 +118,7 @@ cv_regsem = function(model,
 #  dat.train <- dat[ids,]
 #  dat.test <- dat[-ids,]
 #}
-
+fits.var=NA
 pars_pen <- parse_parameters(pars_pen, model)
 
 if(parallel == TRUE){
@@ -126,6 +128,7 @@ if(parallel == TRUE){
 if(parallel==FALSE){
 par.matrix <- matrix(0,n.lambda,length(extractMatrices(model)$parameters))
 fits <- matrix(NA,n.lambda,length(fit.ret)+2)
+fitt.var <- matrix(NA,n.lambda,length(fit.ret))
 SHRINK2 = lambda.start
 count = 0
 counts=n.lambda
@@ -182,22 +185,9 @@ if(mult.start==FALSE){
                   missing=missing)
   }else{
 
-    fitt <- matrix(NA,5,length(fit.ret))
-    for(i in 1:5){
-      set.seed(i)
-      data <- as.data.frame(model@Data@X)
+    fitt <- matrix(NA,n.boot,length(fit.ret))
 
-      ids1 <- sample(1:nrow(data),nrow(data),replace=TRUE)
-
-      train <- data[ids1,]
-      test <- data[-ids1,]
-
-      colnames(train) <- model@pta$vnames$ov[[1]]
-      colnames(test) <- model@pta$vnames$ov[[1]]
-
-      mod1 <- lavaan(parTable(model),train)
-
-    out <- regsem(model=mod1,lambda=SHRINK,type=type,data=NULL,
+    out <- regsem(model=model,lambda=SHRINK,type=type,data=NULL,
                   optMethod=optMethod,
                   gradFun=gradFun,hessFun=hessFun,
                   parallel=parallel,Start=Start,
@@ -221,9 +211,55 @@ if(mult.start==FALSE){
                   step.ratio=step.ratio,
                   nlminb.control=nlminb.control,
                   missing=missing)
-    fitt[i,] = fit_indices(out,CV=TRUE,CovMat=cov(test))$fits[fit.ret]
+
+    for(i in 1:n.boot){
+      set.seed(i)
+      data <- as.data.frame(model@Data@X)
+
+      ids1 <- sample(1:nrow(data),nrow(data),replace=TRUE)
+
+      train <- data[ids1,]
+      test <- data[-ids1,]
+
+      colnames(train) <- model@pta$vnames$ov[[1]]
+      colnames(test) <- model@pta$vnames$ov[[1]]
+
+
+      mod1 <- lavaan(parTable(model),train)
+
+    out2 <- regsem(model=mod1,lambda=SHRINK,type=type,data=NULL,
+                  optMethod=optMethod,
+                  gradFun=gradFun,hessFun=hessFun,
+                  parallel=parallel,Start=Start,
+                  subOpt=subOpt,
+                  alpha=alpha,
+                  pars_pen=pars_pen,
+                  diff_par=diff_par,
+                  LB=LB,
+                  UB=UB,
+                  par.lim=par.lim,
+                  block=block,
+                  full=full,
+                  calc=calc,
+                  tol=tol,
+                  solver=solver,
+                  solver.maxit=solver.maxit,
+                  alpha.inc=alpha.inc,
+                  step=step,
+                  max.iter=max.iter,
+                  momentum=momentum,
+                  step.ratio=step.ratio,
+                  nlminb.control=nlminb.control,
+                  missing=missing)
+
+    if(out$convergence==0){
+      fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=cov(test))$fits[fit.ret]
+    }else{
+      fitt[i,] = NA
     }
-    fits[count,3:ncol(fits)] <- colMeans(fitt)
+    }
+    fits[count,3:ncol(fits)] <- apply(fitt, 2, function(x) mean(x, trim = .2,na.rm=TRUE))
+    fitt.var[count,1:length(fit.ret)] <- apply(fitt, 2, function(x) var(x,na.rm=TRUE))
   }
 
 
@@ -245,7 +281,10 @@ if(mult.start==FALSE){
       Start2 = par.matrix[count-itt-1,]
       Start2[pars_pen] = Start2[pars_pen]-itt*jump
     }
-   out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
+
+
+    if(fit.ret2 != "boot"){
+      out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
                       LB=LB,UB=UB,par.lim=par.lim,
                       type=type,optMethod=optMethod,
                       gradFun=gradFun,hessFun=hessFun,
@@ -262,6 +301,71 @@ if(mult.start==FALSE){
                       Start2=Start2,
                       step.ratio=step.ratio,nlminb.control=nlminb.control,
                       pars_pen=pars_pen,diff_par=NULL)
+
+    }else{
+      fitt <- matrix(NA,n.boot,length(fit.ret))
+
+      out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
+                         LB=LB,UB=UB,par.lim=par.lim,
+                         type=type,optMethod=optMethod,
+                         gradFun=gradFun,hessFun=hessFun,
+                         tol=tol,
+                         alpha=alpha,
+                         solver=solver,
+                         solver.maxit=solver.maxit,
+                         max.iter=max.iter,
+                         full=full,
+                         block=block,
+                         alpha.inc=alpha.inc,
+                         step=step,
+                         momentum=momentum,
+                         Start2=Start2,
+                         step.ratio=step.ratio,nlminb.control=nlminb.control,
+                         pars_pen=pars_pen,diff_par=NULL)
+
+
+      for(i in 1:n.boot){
+        set.seed(i)
+        data <- as.data.frame(model@Data@X)
+
+        ids1 <- sample(1:nrow(data),nrow(data),replace=TRUE)
+
+        train <- data[ids1,]
+        test <- data[-ids1,]
+
+        colnames(train) <- model@pta$vnames$ov[[1]]
+        colnames(test) <- model@pta$vnames$ov[[1]]
+
+        mod1 <- lavaan(parTable(model),train)
+
+        out2 <- multi_optim(model=mod1,max.try=multi.iter,lambda=SHRINK,
+                           LB=LB,UB=UB,par.lim=par.lim,
+                           type=type,optMethod=optMethod,
+                           gradFun=gradFun,hessFun=hessFun,
+                           tol=tol,
+                           alpha=alpha,
+                           solver=solver,
+                           solver.maxit=solver.maxit,
+                           max.iter=max.iter,
+                           full=full,
+                           block=block,
+                           alpha.inc=alpha.inc,
+                           step=step,
+                           momentum=momentum,
+                           Start2=Start2,
+                           step.ratio=step.ratio,nlminb.control=nlminb.control,
+                           pars_pen=pars_pen,diff_par=NULL)
+
+
+        if(out$convergence==0){
+          fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=cov(test))$fits[fit.ret]
+        }else{
+          fitt[i,] = NA
+        }
+      }
+      fits[count,3:ncol(fits)] <- apply(fitt, 2, function(x) mean(x, trim = .2,na.rm=TRUE))
+      fitt.var[count,1:length(fit.ret)] <- apply(fitt, 2, function(x) var(x,na.rm=TRUE))
+    }
 
   }
   #print(pars_pen)
@@ -310,13 +414,13 @@ if(mult.start==FALSE){
 
   colnames(par.matrix) = names(out$coefficients)
   colnames(fits) <- c("lambda","conv",fit.ret)
-  out2 <- list(par.matrix,fits,pars_pen)
+  out2 <- list(par.matrix,fits,pars_pen,fitt.var)
  # ret
 
 }
 }else if(parallel==TRUE){
 
-
+  stop("Parallel is not currently recommended")
 
   par.matrix <- matrix(0,n.lambda,model@Fit@npar)
   fits <- matrix(NA,n.lambda,length(fit.ret)+2)

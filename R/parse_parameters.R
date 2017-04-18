@@ -1,6 +1,7 @@
 #' Takes either a vector of parameter ids or a
 #' vector of named parameters and returns a vector of parameter ids
-#'
+#' x Parameter labels
+#' model Lavaan model
 #' @return NULL if undefined input. Else vector of parameter ids
 #'
 parse_parameters <- function(x, model)
@@ -15,7 +16,7 @@ parse_parameters <- function(x, model)
       warning("Not all requested parameters could be matched to the lavaan model parameters.")
     }
     return(ids[matching.ids])
-    
+
   } else {
     warning("Unknown class type passed to parse_parameters().")
     return(NULL)
