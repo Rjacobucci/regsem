@@ -4,7 +4,7 @@
 \alias{summary.cvregsem}
 \title{print information about cvregsem object}
 \usage{
-summary.cvregsem(x, ...)
+\method{summary}{cvregsem}(x, ...)
 }
 \description{
 print information about cvregsem object
