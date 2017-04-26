@@ -508,7 +508,7 @@ stop("gradFun = auto is not supported at this time")
 
   if(hessFun=="norm"){
 
-    if(parallel=="no"){
+
 
     hess = function(start){
 
@@ -518,19 +518,10 @@ stop("gradFun = auto is not supported at this time")
                  S,S_fixed,S_est,F)
         retH
     }
-  } else if(parallel=="yes"){
-    stop("not supported")
-  #  hess = function(start){
-  #  mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
-    #mult = RAMmult(par=start,A,S,F,A.fixed,A.est,S.fixed,S.est)
-  #  retH = hessian_parallel(par=start,ImpCov=mult$ImpCov,A,A.fixed,A.est,
-  #                 S,S.fixed,S.est,F)
-   # retH
-#  }
-}
+
 }  else if(hessFun=="ram"){
 
-    if(parallel=="no"){
+
     hess = function(start){
 
       mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
@@ -539,16 +530,7 @@ stop("gradFun = auto is not supported at this time")
                       Sreg=mult$S_est22,A,S,F)
       ret
     }
-  } else if(parallel=="yes"){
-      hess = function(start){
-        mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
-        #mult = RAMmult(par=start,A,S,F,A.fixed,A.est,S.fixed,S.est)
-        ret = hess_ramParallel(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A.est22,
-                        Sreg=mult$S.est22,A,S,F)
-        ret
-      }
 
-    }
 } else if(hessFun=="numDeriv"){
   hess = function(start){
 
