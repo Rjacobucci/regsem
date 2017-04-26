@@ -28,6 +28,9 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
   vals <- rep(NA,max.iter)
   vals[1] <- 0
   new.pars <- matrix(NA,max.iter+1,length(start))
+  grad.vec <- matrix(NA,max.iter+1,length(start))
+ # B <- rep(NA,max.iter+1)
+ # B <- matrix(NA,2,2)
   new.pars[1,] <- start
  # print(new.pars[1,])
 
@@ -58,7 +61,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       #s.pars <- update.pars[min(mats$S != 0):max(mats$S)]
     # gg <- grad(new.pars[count,])
 
-    if(hessFun=="none"){
+    if(hessFun=="none" ){
       if(block == FALSE){
         for(j in 1:length(update.pars)){ # update A
 
@@ -126,9 +129,47 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
         }else if(full==TRUE & solver == TRUE){
 
           #out <- nlminb(new.pars[count,],func,control=list(iter.max=1,eval.max=1,step.min=alpha,step.max=alpha)) # iter.max=1,eval.max=1
-          out <- nlminb(new.pars[count,],func,control=list(iter.max=1,eval.max=1,step.min=alpha,step.max=alpha))
+         # out <- nlminb(new.pars[count,],func,control=list(iter.max=1,eval.max=1,step.min=alpha,step.max=alpha))
+          #out <- optim(new.pars[count,],func,method="BFGS")#,control=list(maxit=1,ndeps=rep(alpha,length(new.pars[count,]))))
+          grad.vec[count,] <- grad(new.pars[count,])
+
+
+          if(count == 1){
+            s = cbind(new.pars[count,])
+            y = cbind(grad.vec[count,])
+            #B <- diag(1,length(new.pars[count,]))
+            H <- diag(length(new.pars[count,]))
+            #H <- hess(new.pars[count,])
+            dir <- -H %*% grad.vec[count,]
+          }else{
+            s = cbind(new.pars[count,] - new.pars[count-1,])
+            y =  cbind(grad.vec[count,] - grad.vec[count-1,])
+            #print((B%*%s%*%t(s)%*%B)*(1/(t(s)%*%B%*%s)))
+            #B[count] <- ((y-B[count-1]*s)*(t(y-B[count-1]*s)))/(t(y-B[count-1]*s)*s)
+           # B <- B - (B%*%s%*%t(s)%*%B)/(t(s)%*%B%*%s) + (y%*%t(y))/(t(y)%*%s)
+            #inv.B <- solve(B)
+            #print((t(s)%*%y + t(y)%*%inv.B%*%y))
+            #print((s%*%t(s)))
+            #inv.B <- inv.B + ((t(s)%*%y + t(y)%*%inv.B%*%y) %*%(s%*%t(s)))/((t(s)%*%y)**2) - (inv.B%*%y%*%t(s)+s%*%t(y)%*%inv.B)/(t(s)%*%y)
+          #http://terminus.sdsu.edu/SDSU/Math693a/Lectures/18/lecture.pdf
+            p <- as.numeric(1/(t(y)%*%s))
+            #print(dim(s%*%t(y)))
+            H <- (diag(length(new.pars[count,])) - p*s%*%t(y))%*%H%*%(diag(length(new.pars[count,]))-p*y%*%t(s)) + p*s%*%t(s)
+
+
+            dir <- -H %*% grad.vec[count,]
+
+          }
+
+
+          #dir <- (-(B[count]**-1))*grad.vec[count,]
+          #dir <- -solve(B) %*% grad.vec[count,]
+
+          update.pars <- new.pars[count,] + alpha*dir
+
+
          # print(out$objective)
-          update.pars <- (out$par - new.pars[count,]) + new.pars[count,]
+          #update.pars <- out$par# - new.pars[count,]) + new.pars[count,]
 
           if(type == "ridge" | type=="none"){
             update.pars <- update.pars
@@ -152,6 +193,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
               update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
             }
           }
+
 
         }else if(full==FALSE & line.search==FALSE){
 
