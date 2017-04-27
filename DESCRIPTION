@@ -1,7 +1,7 @@
 Package: regsem
 Type: Package
 Title: Performs Regularization on Structural Equation Models
-Version: 0.7.10
+Version: 0.7.11
 Author: Ross Jacobucci[aut,cre], 
         Kevin J. Grimm [ctb], 
         Andreas M. Brandmaier [ctb]

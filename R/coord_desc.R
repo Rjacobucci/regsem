@@ -161,9 +161,21 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           }
 
+          delta1 <- function(step){
+            func(new.pars[count,] + step*dir)
+          }
 
-          #dir <- (-(B[count]**-1))*grad.vec[count,]
-          #dir <- -solve(B) %*% grad.vec[count,]
+        #  s <- try(uniroot(f=delta1, c(0,1),f.lower=0),silent=TRUE)
+
+         # if(inherits(s, "try-error")) {
+         #    s <- 0.01
+         #    print(88)
+         #  }else{
+         #    print(99)
+         #    s <- s$root
+         #   }
+
+        #  alpha=s
 
           update.pars <- new.pars[count,] + alpha*dir
 
