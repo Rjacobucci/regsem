@@ -874,24 +874,24 @@ if(optMethod=="nlminb"){
     }
 
 
-    if(hessFun=="none"){
+#    if(hessFun=="none"){
       res$KKT2 = "hess not specified"
-    }else{
-      hess.mat = hess(as.numeric(pars.df))
-      eig = eigen(hess.mat)$values
-      hess.eigs = try(all(eig) > 1e-6)
-      if(inherits(hess.eigs, "try-error")){
-        res$KKT2 = "error"
-      }else{
-        if(hess.eigs == TRUE){
-          res$KKT2 = TRUE
-        }else if(hess.eigs == FALSE){
-          res$KKT2 = FALSE
-        }else{
-          res$KKT2 = NA
-        }
-      }
-    }
+#    }else{
+#      hess.mat = hess(as.numeric(pars.df))
+#      eig = eigen(hess.mat)$values
+#      hess.eigs = try(all(eig) > 1e-6)
+#      if(inherits(hess.eigs, "try-error")){
+#        res$KKT2 = "error"
+ #     }else{
+ #       if(hess.eigs == TRUE){
+#          res$KKT2 = TRUE
+#        }else if(hess.eigs == FALSE){
+#          res$KKT2 = FALSE
+#        }else{
+#          res$KKT2 = NA
+#        }
+#      }
+#    }
 
 
 

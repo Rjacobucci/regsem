@@ -61,7 +61,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       #s.pars <- update.pars[min(mats$S != 0):max(mats$S)]
     # gg <- grad(new.pars[count,])
 
-    if(hessFun=="none" ){
+    if(hessFun=="none" | solver==TRUE){
       if(block == FALSE){
         for(j in 1:length(update.pars)){ # update A
 
@@ -137,9 +137,14 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           if(count == 1){
             s = cbind(new.pars[count,])
             y = cbind(grad.vec[count,])
+            alpha = 1 # always use as first step length
             #B <- diag(1,length(new.pars[count,]))
-            H <- diag(length(new.pars[count,]))
-            #H <- hess(new.pars[count,])
+           # H <- diag(length(new.pars[count,]))
+            if(hessFun != "none"){
+              H <- solve(hess(new.pars[count,]))
+            }else{
+              H <-  diag(length(new.pars[count,])) #*as.numeric((t(y)%*%s)/t(y)%*%y)
+            }
             dir <- -H %*% grad.vec[count,]
           }else{
             s = cbind(new.pars[count,] - new.pars[count-1,])
@@ -159,23 +164,26 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
             dir <- -H %*% grad.vec[count,]
 
+            delta1 <- function(step){
+              func(new.pars[count,] + step*dir)
+            }
+
+              s <- try(uniroot(f=delta1, c(0.01,1),f.lower=0),silent=TRUE)
+
+             if(inherits(s, "try-error")) {
+                s <- 0.01
+                print(88)
+              }else{
+                print(99)
+                s <- s$root
+               }
+            print(s)
+            alpha=s
+
           }
 
-          delta1 <- function(step){
-            func(new.pars[count,] + step*dir)
-          }
 
-        #  s <- try(uniroot(f=delta1, c(0,1),f.lower=0),silent=TRUE)
 
-         # if(inherits(s, "try-error")) {
-         #    s <- 0.01
-         #    print(88)
-         #  }else{
-         #    print(99)
-         #    s <- s$root
-         #   }
-
-        #  alpha=s
 
           update.pars <- new.pars[count,] + alpha*dir
 
