@@ -7,6 +7,9 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
   max.iter = max.iter
   tol=tol
   #solver=TRUE
+  phi_func <- rep(1,max.iter)
+  phi_grad <- rep(1,max.iter)
+
 
   if(type=="enet"){
     step=step*2
@@ -23,7 +26,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
   # mats
  # mats <- extractMatrices(model)
 
-
+  alpha.vec <- rep(NA,max.iter)
   convergence = 1
   vals <- rep(NA,max.iter)
   vals[1] <- 0
@@ -90,13 +93,22 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
               }
 
 
-          #print("gg2")
-          #print(round(t(gg),3))
+          #https://scicomp.stackexchange.com/questions/24460/adaptive-gradient-descent-step-size-when-you-cant-do-a-line-search
 
+          delta1 <- function(step){
+            func(new.pars[count,] + step*dir)
+          }
 
-         # print(func(new.pars[count,]))
-          #update.pars2 <- new.pars[count,]
+          s1 <- try(uniroot(f=delta1, c(0.01,1),f.lower=0.01),silent=TRUE)
 
+          if(inherits(s1, "try-error")) {
+            s1 <- 0.01
+          }else{
+            s1 <- s$root
+          }
+
+          alpha=s1
+          print(alpha)
 
           update.pars <- new.pars[count,] - alpha*gg
 
@@ -137,54 +149,82 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           if(count == 1){
             s = cbind(new.pars[count,])
             y = cbind(grad.vec[count,])
-            alpha = 1 # always use as first step length
-            #B <- diag(1,length(new.pars[count,]))
-           # H <- diag(length(new.pars[count,]))
+            #alpha = 1 # always use as first step length
+            alpha.vec[count] <- s1 <- alpha<- 1
+
             if(hessFun != "none"){
               H <- solve(hess(new.pars[count,]))
             }else{
               H <-  diag(length(new.pars[count,])) #*as.numeric((t(y)%*%s)/t(y)%*%y)
             }
             dir <- -H %*% grad.vec[count,]
+
+
+
+
+
           }else{
             s = cbind(new.pars[count,] - new.pars[count-1,])
             y =  cbind(grad.vec[count,] - grad.vec[count-1,])
-            #print((B%*%s%*%t(s)%*%B)*(1/(t(s)%*%B%*%s)))
-            #B[count] <- ((y-B[count-1]*s)*(t(y-B[count-1]*s)))/(t(y-B[count-1]*s)*s)
-           # B <- B - (B%*%s%*%t(s)%*%B)/(t(s)%*%B%*%s) + (y%*%t(y))/(t(y)%*%s)
-            #inv.B <- solve(B)
-            #print((t(s)%*%y + t(y)%*%inv.B%*%y))
-            #print((s%*%t(s)))
-            #inv.B <- inv.B + ((t(s)%*%y + t(y)%*%inv.B%*%y) %*%(s%*%t(s)))/((t(s)%*%y)**2) - (inv.B%*%y%*%t(s)+s%*%t(y)%*%inv.B)/(t(s)%*%y)
+
           #http://terminus.sdsu.edu/SDSU/Math693a/Lectures/18/lecture.pdf
             p <- as.numeric(1/(t(y)%*%s))
-            #print(dim(s%*%t(y)))
+
             H <- (diag(length(new.pars[count,])) - p*s%*%t(y))%*%H%*%(diag(length(new.pars[count,]))-p*y%*%t(s)) + p*s%*%t(s)
 
 
             dir <- -H %*% grad.vec[count,]
 
-            delta1 <- function(step){
-              func(new.pars[count,] + step*dir)
+            #cubic interpolation
+
+            if(count==2){
+              alpha.vec[count] <- 0.1
+
+              delta1 <- function(step){
+                func(new.pars[count,] + step*dir)
+              }
+              s1 <- try(uniroot(f=delta1,interval=c(.01,1),f.lower=0,f.upper=vals[count-1]),silent=TRUE)
+
+                phi_grad[count] <- s1$root
+                phi_func[count] <- s1$f.root
+
+
+
+            }else{
+
+
+              delta1 <- function(step){
+                func(new.pars[count,] + step*dir)
+              }
+
+
+
+                s1 <- try(uniroot(f=delta1,interval=c(.01,1),f.lower=0,f.upper=vals[count-1]),silent=TRUE)
+
+                phi_grad[count] <- s1$root
+                phi_func[count] <- s1$f.root
+
+
+
+                d1 <- phi_grad[count-1] + phi_grad[count] -
+                  3*((phi_func[count-1] + phi_func[count])/(alpha.vec[count-1]-alpha.vec[count-2]))
+
+                d2 <- sign(alpha.vec[count-1]-alpha.vec[count-2])*((d1**2 -
+                                                                      phi_grad[count-1] * phi_grad[count]))**.5
+                alpha.vec[count] <- alpha.vec[count-1]-(alpha.vec[count-1]-alpha.vec[count-2])*
+                  (phi_grad[count]+d2-d1)/(phi_grad[count]-phi_grad[count-1]+2*d2)
+
+
+
+
             }
-
-              s <- try(uniroot(f=delta1, c(0.01,1),f.lower=0),silent=TRUE)
-
-             if(inherits(s, "try-error")) {
-                s <- 0.01
-                print(88)
-              }else{
-                print(99)
-                s <- s$root
-               }
-            print(s)
-            alpha=s
 
           }
 
 
 
-
+          alpha <- alpha.vec[count]
+          print(alpha)
           update.pars <- new.pars[count,] + alpha*dir
 
 
@@ -423,8 +463,10 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
     if(inherits(st.crit, "try-error")){
       convergence=99
+      print(9999)
     }else if(is.na(st.crit)==TRUE){
       convergence=99
+      print(8888)
     }else if(any(new.pars[count+1,] > par.lim[2]) | any(new.pars[count+1,] < par.lim[1])){
       break
       convergence=99
