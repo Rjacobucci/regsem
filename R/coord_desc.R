@@ -95,20 +95,20 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           #https://scicomp.stackexchange.com/questions/24460/adaptive-gradient-descent-step-size-when-you-cant-do-a-line-search
 
-          delta1 <- function(step){
-            func(new.pars[count,] + step*dir)
-          }
+         # delta1 <- function(step){
+         #   func(new.pars[count,] + step*dir)
+        #  }
 
-          s1 <- try(uniroot(f=delta1, c(0.01,1),f.lower=0.01),silent=TRUE)
+         # s1 <- try(uniroot(f=delta1, c(0.01,1),f.lower=0.01),silent=TRUE)
 
-          if(inherits(s1, "try-error")) {
-            s1 <- 0.01
-          }else{
-            s1 <- s$root
-          }
+          #if(inherits(s1, "try-error")) {
+           # s1 <- 0.01
+          #}else{
+           # s1 <- s$root
+          #}
 
-          alpha=s1
-          print(alpha)
+          #alpha=s1
+          #print(alpha)
 
           update.pars <- new.pars[count,] - alpha*gg
 
