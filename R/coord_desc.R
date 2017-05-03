@@ -95,9 +95,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           #https://scicomp.stackexchange.com/questions/24460/adaptive-gradient-descent-step-size-when-you-cant-do-a-line-search
 
-         # delta1 <- function(step){
-         #   func(new.pars[count,] + step*dir)
-        #  }
+
 
          # s1 <- try(uniroot(f=delta1, c(0.01,1),f.lower=0.01),silent=TRUE)
 
@@ -110,6 +108,26 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           #alpha=s1
           #print(alpha)
 
+
+
+          delta1 <- function(step,p){
+            func(new.pars[count,] + step*p)
+          }
+
+          # try backtracking
+          c=.0001
+          p=cbind(rep(0.5,length(new.pars[count,])))
+
+          if(count==1){
+            alpha =step =0.1
+#
+          }else{
+            while(delta1(alpha,p) > func(new.pars[count,])+c*alpha*(t(gg)%*%p)){
+              alpha = 0.5*alpha
+            }
+          }
+
+        #print(alpha)
           update.pars <- new.pars[count,] - alpha*gg
 
          # print(round(t(alpha*gg),3))
@@ -155,19 +173,14 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
             if(hessFun != "none"){
               H <- solve(hess(new.pars[count,]))
             }else{
-              H <-  diag(length(new.pars[count,])) #*as.numeric((t(y)%*%s)/t(y)%*%y)
+              H <-  diag(length(new.pars[count,]))#*as.numeric((t(y)%*%s)/t(y)%*%y)
             }
             dir <- -H %*% grad.vec[count,]
-
-
-
-
-
           }else{
             s = cbind(new.pars[count,] - new.pars[count-1,])
             y =  cbind(grad.vec[count,] - grad.vec[count-1,])
 
-          #http://terminus.sdsu.edu/SDSU/Math693a/Lectures/18/lecture.pdf
+            #http://terminus.sdsu.edu/SDSU/Math693a/Lectures/18/lecture.pdf
             p <- as.numeric(1/(t(y)%*%s))
 
             H <- (diag(length(new.pars[count,])) - p*s%*%t(y))%*%H%*%(diag(length(new.pars[count,]))-p*y%*%t(s)) + p*s%*%t(s)
@@ -175,56 +188,31 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
             dir <- -H %*% grad.vec[count,]
 
-            #cubic interpolation
+            # try backtracking
 
-            if(count==2){
-              alpha.vec[count] <- 0.1
+          #  delta1 <- function(step,p){
+          #    func(new.pars[count,] + step*p)
+          #  }
 
-              delta1 <- function(step){
-                func(new.pars[count,] + step*dir)
-              }
-              s1 <- try(uniroot(f=delta1,interval=c(.01,1),f.lower=0,f.upper=vals[count-1]),silent=TRUE)
+            # try backtracking
+          #  c=.0001
+          #  p=cbind(rep(0.5,length(new.pars[count,])))
+          #  alpha=1
 
-                phi_grad[count] <- s1$root
-                phi_func[count] <- s1$f.root
-
-
-
-            }else{
-
-
-              delta1 <- function(step){
-                func(new.pars[count,] + step*dir)
-              }
-
-
-
-                s1 <- try(uniroot(f=delta1,interval=c(.01,1),f.lower=0,f.upper=vals[count-1]),silent=TRUE)
-
-                phi_grad[count] <- s1$root
-                phi_func[count] <- s1$f.root
-
-
-
-                d1 <- phi_grad[count-1] + phi_grad[count] -
-                  3*((phi_func[count-1] + phi_func[count])/(alpha.vec[count-1]-alpha.vec[count-2]))
-
-                d2 <- sign(alpha.vec[count-1]-alpha.vec[count-2])*((d1**2 -
-                                                                      phi_grad[count-1] * phi_grad[count]))**.5
-                alpha.vec[count] <- alpha.vec[count-1]-(alpha.vec[count-1]-alpha.vec[count-2])*
-                  (phi_grad[count]+d2-d1)/(phi_grad[count]-phi_grad[count-1]+2*d2)
-
-
-
-
-            }
+          #    while(delta1(alpha,p) > func(new.pars[count,])+c*alpha*(t(grad.vec[count,])%*%p & alpha > 0.01)){
+                #print(alpha)
+                alpha = 0.5*alpha
+         #     }
 
           }
 
 
 
-          alpha <- alpha.vec[count]
-          print(alpha)
+
+
+
+          #print(alpha)
+          alpha=1
           update.pars <- new.pars[count,] + alpha*dir
 
 
