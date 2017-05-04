@@ -164,11 +164,16 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           grad.vec[count,] <- grad(new.pars[count,])
 
 
+
+          # if not using hessian for first iteration, best to take small step sizes (0.1)
+          # step should be less than 1
+
+
           if(count == 1){
             s = cbind(new.pars[count,])
             y = cbind(grad.vec[count,])
             #alpha = 1 # always use as first step length
-            alpha.vec[count] <- s1 <- alpha<- 1
+            alpha.vec[count] <- s1 <- alpha<- step
 
             if(hessFun != "none"){
               H <- solve(hess(new.pars[count,]))
@@ -193,7 +198,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           #  delta1 <- function(step,p){
           #    func(new.pars[count,] + step*p)
           #  }
-
+            alpha = step
             # try backtracking
           #  c=.0001
           #  p=cbind(rep(0.5,length(new.pars[count,])))
@@ -201,18 +206,15 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
           #    while(delta1(alpha,p) > func(new.pars[count,])+c*alpha*(t(grad.vec[count,])%*%p & alpha > 0.01)){
                 #print(alpha)
-                alpha = 0.5*alpha
+             #   alpha = 0.5*alpha
          #     }
 
           }
 
 
 
-
-
-
           #print(alpha)
-          alpha=1
+
           update.pars <- new.pars[count,] + alpha*dir
 
 
@@ -454,7 +456,9 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       print(9999)
     }else if(is.na(st.crit)==TRUE){
       convergence=99
+      break
       print(8888)
+
     }else if(any(new.pars[count+1,] > par.lim[2]) | any(new.pars[count+1,] < par.lim[1])){
       break
       convergence=99

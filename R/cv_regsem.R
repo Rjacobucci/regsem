@@ -128,6 +128,7 @@ if(parallel == TRUE){
 if(parallel==FALSE){
 par.matrix <- matrix(0,n.lambda,length(extractMatrices(model)$parameters))
 fits <- matrix(NA,n.lambda,length(fit.ret)+2)
+fit.reg <- rep(NA,n.lambda)
 fitt.var <- matrix(NA,n.lambda,length(fit.ret))
 SHRINK2 = lambda.start
 count = 0
@@ -254,6 +255,7 @@ if(mult.start==FALSE){
 
     if(out$convergence==0){
       fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=cov(test))$fits[fit.ret]
+
     }else{
       fitt[i,] = NA
     }
@@ -519,6 +521,7 @@ if(mult.start==FALSE){
   #}else
   if(fit.ret2 == "train"){
     fitt = try(fit_indices(out,CV=FALSE)$fits[fit.ret],silent=T)
+    fit.reg[count] <- out$optim_fit
     if(inherits(fitt, "try-error")) {
       fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)
     }else{
@@ -558,7 +561,7 @@ if(mult.start==FALSE){
 
   colnames(par.matrix) = names(out$coefficients)
   colnames(fits) <- c("lambda","conv",fit.ret)
-  out2 <- list(par.matrix,fits,pars_pen,fitt.var)
+  out2 <- list(par.matrix,fits,pars_pen,fitt.var,fit.reg)
  # ret
 
 }

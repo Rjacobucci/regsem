@@ -140,7 +140,14 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
     ret["ncp"] = ncp
 
 
-    ret["p.chisq"] = 1-pchisq(chisq,df)
+    pp <- try(pchisq(chisq,df))
+    if(inherits(pp, "try-error")) {
+      ret["p.chisq"] <- NA
+    }else{
+      ret["p.chisq"] <- 1-pp
+      }
+
+
 
 
     rmsea = function(ncp,df) sqrt(ncp/df)
@@ -161,7 +168,13 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
 
 
     upper.lambda <- function(lambda) {
-      (pchisq(chisq, df=df, ncp=lambda) - 0.05)
+
+      ppp <- try(pchisq(chisq, df=df, ncp=lambda))
+      if(inherits(pp, "try-error")) {
+        NA
+      }else{
+        ppp-0.05
+      }
     }
 
     lambda.u <- try(uniroot(f=upper.lambda, lower=0,upper=100)$root,
@@ -174,8 +187,13 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
 
 
 
-    ret["rmsea.pval"] = 1 - pchisq(chisq, df=df, ncp=(N*df*0.05^2))
 
+    pppp <- try(pchisq(chisq, df=df, ncp=(N*df*0.05^2)))
+    if(inherits(pp, "try-error")) {
+      ret["rmsea.pval"] <- NA
+    }else{
+      ret["rmsea.pval"] <- 1-pppp
+    }
 
 
     #srmr
