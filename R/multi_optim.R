@@ -52,6 +52,7 @@
 #'        calculating the hessian. This is slower and less accurate.
 #' @param tol Tolerance for coordinate descent
 #' @param solver Whether to use solver for coord_desc
+#' @param quasi Whether to use quasi-Newton
 #' @param solver.maxit Max iterations for solver in coord_desc
 #' @param alpha.inc Whether alpha should increase for coord_desc
 #' @param step Step size
@@ -107,6 +108,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                         hessFun="none",
                         tol=1e-5,
                         solver=FALSE,
+                        quasi=FALSE,
                         solver.maxit=50000,
                         alpha.inc=FALSE,
                         step=.1,
@@ -171,6 +173,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                          full,
                          type,optMethod,warm.start,
                          solver,
+                         quasi,
                          solver.maxit,
                          alpha.inc,
                          step,
@@ -214,6 +217,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                                             Start=start.optim,gradFun=gradFun,hessFun=hessFun,
                                             nlminb.control=nlminb.control,tol=tol,
                                             solver=solver,
+                                            quasi=quasi,
                                             block=block,
                                             par.lim=par.lim,
                                             full=full,
@@ -267,6 +271,7 @@ iter.optim = iter.optim + 1
     ret.mult = mult_run(model,n.try=1,lambda=lambda,alpha=alpha,LB,UB,type,warm.start=warm.start,
                         nlminb.control=nlminb.control,tol=tol,
                         solver=solver,
+                        quasi=quasi,
                         block=block,
                         par.lim=par.lim,
                         full=full,
@@ -329,6 +334,7 @@ iter.optim = iter.optim + 1
                      Start=Start,gradFun=gradFun,hessFun=hessFun,
                      nlminb.control=nlminb.control,tol=tol,
                      solver=solver,
+                     quasi=quasi,
                      block=block,
                      full=full,
                      par.lim=par.lim,

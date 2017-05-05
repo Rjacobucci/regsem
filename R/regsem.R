@@ -67,6 +67,7 @@
 #' @param max.iter Number of iterations for coordinate descent
 #' @param tol Tolerance for coordinate descent
 #' @param solver Whether to use solver for coord_desc
+#' @param quasi Whether to use quasi-Newton
 #' @param solver.maxit Max iterations for solver in coord_desc
 #' @param alpha.inc Whether alpha should increase for coord_desc
 #' @param step Step size
@@ -131,6 +132,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
                  max.iter=500,
                  tol=1e-5,
                  solver=FALSE,
+                 quasi=FALSE,
                  solver.maxit=5,
                  alpha.inc=FALSE,
                  step=.1,
@@ -466,12 +468,12 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
         if(type2==1 | type2==3 | type2 ==4 | type2==6 | type2==7) type2=0
 
 
-        ret = rcpp_grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+        ret = 2*rcpp_grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
                             Sreg=mult$S_est22,A,S,
                             F,lambda,type2=type2,pars_pen,diff_par=0)
       }else{
 
-           ret = rcpp_grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
+           ret = 2*rcpp_grad_ram(par=start,ImpCov=mult$ImpCov,SampCov,Areg = mult$A_est22,
                            Sreg=mult$S_est22,A,S,
                              F,lambda,type2=type2,pars_pen,diff_par=0)
         }
@@ -766,7 +768,7 @@ if(optMethod=="nlminb"){
                    alpha.inc=alpha.inc,step=step,momentum=momentum,
                    e_alpha=e_alpha,gamma=gamma,
                    par.lim=par.lim,
-                   step.ratio=step.ratio,diff_par=diff_par,pen_vec=pen_vec)
+                   step.ratio=step.ratio,diff_par=diff_par,pen_vec=pen_vec,quasi=quasi)
   res$out <- out
   res$optim_fit <- out$value
   #print(out$convergence)
