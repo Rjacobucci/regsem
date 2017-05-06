@@ -118,7 +118,7 @@
 
 
 
-regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optMethod="default",
+regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optMethod="coord_desc",
                  gradFun="ram",hessFun="none",parallel="no",Start="lavaan",
                  subOpt="nlminb",longMod=F,
                  pars_pen=NULL,
@@ -147,19 +147,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
   if(type == "scad" | type == "mcp"){
     warning("this type is currently not working well")
   }
-  if(optMethod=="default" & type=="lasso" | type=="diff_lasso" |
-     type=="enet" | type=="alasso" | type=="scad" | type=="mcp"){
-      optMethod<-"coord_desc"
-  }
 
-  if(optMethod=="default" & type=="ridge" | type=="none"){
-    optMethod <- "nlminb"
-  }
-
-
-  if(optMethod!="nlminb" & optMethod !="coord_desc"){
-    stop("only optmethod==nlminb or coord_desc is currently supported well")
-  }
 
 #  if(optMethod=="nlminb"& type !="ridge" | type != "none"){
 #    stop("Only optMethod=coord_desc is recommended for use")
