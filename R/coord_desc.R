@@ -108,24 +108,24 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           #alpha=s1
           #print(alpha)
 
+        print(9999)
 
-
-        #  delta1 <- function(step,p){
-        #    func(new.pars[count,] + step*p)
-         # }
+          delta1 <- function(step,p){
+            func(new.pars[count,] + step*p)
+          }
 
           # try backtracking
-        #  c=.0001
-        #  p=cbind(rep(0.5,length(new.pars[count,])))
+          c=.0001
+          p=cbind(rep(0.5,length(new.pars[count,])))
 
-        #  if(count==1){
-        #    alpha =step =0.1
+          if(count==1){
+            alpha =step =1
 #
-        #  }else{
-         #   while(delta1(alpha,p) > func(new.pars[count,])+c*alpha*(t(gg)%*%p)){
-         #     alpha = 0.5*alpha
-         #   }
-        #  }
+          }else{
+            while(delta1(alpha,p) > func(new.pars[count,])+c*alpha*(t(gg)%*%p)){
+              alpha = 0.5*alpha
+            }
+          }
 
         #print(alpha)
           update.pars <- new.pars[count,] - alpha*gg
@@ -164,7 +164,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           grad.vec[count,] <- grad(new.pars[count,])
 
 
-
+        print(8888)
           # if not using hessian for first iteration, best to take small step sizes (0.1)
           # step should be less than 1
 
@@ -173,7 +173,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
             s = cbind(new.pars[count,])
             y = cbind(grad.vec[count,])
             #alpha = 1 # always use as first step length
-            alpha.vec[count] <- s1 <- alpha<- step
+            alpha.vec[count] <- s1 <- alpha<- 1
 
             if(hessFun != "none"){
               H <- solve(hess(new.pars[count,]))
@@ -195,19 +195,19 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
             # try backtracking
 
-          #  delta1 <- function(step,p){
-          #    func(new.pars[count,] + step*p)
-          #  }
-            alpha = step
+            delta1 <- function(step,p){
+              func(new.pars[count,] + step*p)
+            }
+           # alpha = step
             # try backtracking
-          #  c=.0001
-          #  p=cbind(rep(0.5,length(new.pars[count,])))
-          #  alpha=1
+            c=.0001
+            p=cbind(rep(0.5,length(new.pars[count,])))
+           alpha=1
 
-          #    while(delta1(alpha,p) > func(new.pars[count,])+c*alpha*(t(grad.vec[count,])%*%p & alpha > 0.01)){
+              while(delta1(alpha,p) > func(new.pars[count,])+c*alpha*(t(grad.vec[count,])%*%p & alpha > 0.01)){
                 #print(alpha)
-             #   alpha = 0.5*alpha
-         #     }
+                alpha = 0.5*alpha
+              }
 
           }
 
