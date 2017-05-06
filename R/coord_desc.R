@@ -11,9 +11,9 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
   phi_grad <- rep(1,max.iter)
 
 
-  if(type=="enet"){
-    step=step*2
-  }
+  #if(type=="enet"){
+ #   step=step*2
+ # }
   line.search=FALSE
 
   if(step.ratio == TRUE){
@@ -81,78 +81,81 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
         if(full==TRUE & quasi == FALSE){
 
-
-
           #print(round(new.pars[count,],3))
           gg <- try(grad(new.pars[count,]),silent=TRUE)
           #print(round(gg,2))
-           if(inherits(gg, "try-error")) {
+          if(inherits(gg, "try-error")) {
             gg <- rnorm(length(new.pars[count,]),0,.01)
-              }else{
-            gg <- gg
-              }
-
-
-          #https://scicomp.stackexchange.com/questions/24460/adaptive-gradient-descent-step-size-when-you-cant-do-a-line-search
-
-
-
-         # s1 <- try(uniroot(f=delta1, c(0.01,1),f.lower=0.01),silent=TRUE)
-
-          #if(inherits(s1, "try-error")) {
-           # s1 <- 0.01
-          #}else{
-           # s1 <- s$root
-          #}
-
-          #alpha=s1
-          #print(alpha)
-
-
-
-          delta1 <- function(step,p){
-            func(new.pars[count,] + step*p)
-          }
-
-          # try backtracking
-          c=.0001
-          p=cbind(rep(0.5,length(new.pars[count,])))
-
-          if(count==1){
-            alpha =step =1
-#
           }else{
-            while(delta1(alpha,p) > func(new.pars[count,])+c*alpha*(t(gg)%*%p)){
-              alpha = 0.5*alpha
-            }
+            gg <- gg
           }
 
-        #print(alpha)
-          update.pars <- new.pars[count,] - alpha*gg
 
-         # print(round(t(alpha*gg),3))
-          if(type == "ridge" | type=="none"){
-            update.pars <- update.pars
-          }else if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
-            for(j in pars_pen){
-              update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
-            }
-          }else if(type=="diff_lasso" & lambda > 0){
-            cc=0
-            for(j in pars_pen){
-              cc <- cc + 1
-              #print(update.pars[j])
-              #print(pen_diff[j])
-              #print(soft(pen_diff[j],lambda,type="lasso",step=alpha1,e_alpha,gamma))
-              update.pars[j] <- update.pars[j] -
-                pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
-            }
-          }else if(type=="alasso" & lambda > 0){
-            for(j in pars_pen){
-              #print(update.pars[j])
-              update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
-            }
-          }
+          delta <- function(alpha){
+
+              update.pars <- new.pars[count,] - alpha*gg
+
+            # print(round(t(alpha*gg),3))
+             if(type == "ridge" | type=="none"){
+              update.pars <- update.pars
+             }else if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
+               for(j in pars_pen){
+                  update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
+                }
+             }else if(type=="diff_lasso" & lambda > 0){
+                cc=0
+                for(j in pars_pen){
+                  cc <- cc + 1
+                  update.pars[j] <- update.pars[j] -
+                   pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
+               }
+             }else if(type=="alasso" & lambda > 0){
+                for(j in pars_pen){
+                 #print(update.pars[j])
+                 update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
+               }
+             }
+
+              func(update.pars)
+          } #end delta
+
+
+         # s1 <- try(uniroot(f=delta,interval=c(-1,1),f.lower=0,f.upper=100),silent=TRUE)
+          #  print(s1)
+          # if(inherits(s1, "try-error")) {
+          #  alpha <- 0.01
+          # }else{
+         #   alpha <- s1$root
+         # }
+         alpha <- optimize(delta,interval=c(0,step),maximum=FALSE)$minimum
+
+
+
+
+
+           update.pars <- new.pars[count,] - alpha*gg
+
+           # print(round(t(alpha*gg),3))
+           if(type == "ridge" | type=="none"){
+             update.pars <- update.pars
+           }else if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
+             for(j in pars_pen){
+               update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
+             }
+           }else if(type=="diff_lasso" & lambda > 0){
+             cc=0
+             for(j in pars_pen){
+               cc <- cc + 1
+               update.pars[j] <- update.pars[j] -
+                 pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
+             }
+           }else if(type=="alasso" & lambda > 0){
+             for(j in pars_pen){
+               #print(update.pars[j])
+               update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
+             }
+           }
+
 
 
 
@@ -187,40 +190,61 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
             #http://terminus.sdsu.edu/SDSU/Math693a/Lectures/18/lecture.pdf
             p <- as.numeric(1/(t(y)%*%s))
-
             H <- (diag(length(new.pars[count,])) - p*s%*%t(y))%*%H%*%(diag(length(new.pars[count,]))-p*y%*%t(s)) + p*s%*%t(s)
-
-
             dir <- -H %*% grad.vec[count,]
-
-            # try backtracking
-
-            delta1 <- function(step,p){
-              func(new.pars[count,] + step*p)
-            }
-           # alpha = step
-            # try backtracking
-            c=.0001
-            p=cbind(rep(0.5,length(new.pars[count,])))
-           alpha=1
-
-              while(delta1(alpha,p) > func(new.pars[count,])+c*alpha*(t(grad.vec[count,])%*%p & alpha > 0.01)){
-                #print(alpha)
-                alpha = 0.5*alpha
-              }
-
           }
 
 
 
-          #print(alpha)
+
+
+
+          delta <- function(alpha){
+
+            update.pars <- new.pars[count,] + alpha*dir
+
+            # print(round(t(alpha*gg),3))
+            if(type == "ridge" | type=="none"){
+              update.pars <- update.pars
+            }else if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
+              for(j in pars_pen){
+                update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
+              }
+            }else if(type=="diff_lasso" & lambda > 0){
+              cc=0
+              for(j in pars_pen){
+                cc <- cc + 1
+                update.pars[j] <- update.pars[j] -
+                  pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
+              }
+            }else if(type=="alasso" & lambda > 0){
+              for(j in pars_pen){
+                #print(update.pars[j])
+                update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
+              }
+            }
+
+            func(update.pars)
+          } #end delta
+
+
+          # s1 <- try(uniroot(f=delta,interval=c(-1,1),f.lower=0,f.upper=100),silent=TRUE)
+          #  print(s1)
+          # if(inherits(s1, "try-error")) {
+          #  alpha <- 0.01
+          # }else{
+          #   alpha <- s1$root
+          # }
+
+          if(count==1){
+            alpha <- 1
+          }else{
+            alpha <- optimize(delta,interval=c(0.01,step),maximum=FALSE)$minimum
+          }
 
           update.pars <- new.pars[count,] + alpha*dir
 
-
-         # print(out$objective)
-          #update.pars <- out$par# - new.pars[count,]) + new.pars[count,]
-
+          # print(round(t(alpha*gg),3))
           if(type == "ridge" | type=="none"){
             update.pars <- update.pars
           }else if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
@@ -231,9 +255,6 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
             cc=0
             for(j in pars_pen){
               cc <- cc + 1
-              #print(update.pars[j])
-              #print(pen_diff[j])
-              #print(soft(pen_diff[j],lambda,type="lasso",step=alpha1,e_alpha,gamma))
               update.pars[j] <- update.pars[j] -
                 pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
             }
@@ -243,6 +264,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
               update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
             }
           }
+
 
 
         }else if(full==FALSE & line.search==FALSE){
