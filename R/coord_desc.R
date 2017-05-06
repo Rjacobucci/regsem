@@ -108,7 +108,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           #alpha=s1
           #print(alpha)
 
-        print(9999)
+
 
           delta1 <- function(step,p){
             func(new.pars[count,] + step*p)
@@ -164,7 +164,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           grad.vec[count,] <- grad(new.pars[count,])
 
 
-        print(8888)
+
           # if not using hessian for first iteration, best to take small step sizes (0.1)
           # step should be less than 1
 
