@@ -120,14 +120,22 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           } #end delta
 
 
-         # s1 <- try(uniroot(f=delta,interval=c(-1,1),f.lower=0,f.upper=100),silent=TRUE)
-          #  print(s1)
-          # if(inherits(s1, "try-error")) {
-          #  alpha <- 0.01
-          # }else{
-         #   alpha <- s1$root
-         # }
-         alpha <- optimize(delta,interval=c(0,step),maximum=FALSE)$minimum
+         c=.5
+          p=update.pars-new.pars[count,]#cbind(rep(0.5,length(new.pars[count,])))
+
+          alpha=1
+          if(count==1){
+            alpha =step =1
+            #
+          }else{
+            while(delta(alpha) > func(update.pars)+c*alpha*(t(gg)%*%p)){
+              alpha = 0.5*alpha
+            }
+          }
+
+
+          # works well with momentum -- delta{only contains func(update.pars)}
+         #alpha <- optimize(delta,interval=c(0,step),maximum=FALSE)$minimum
 
 
 
