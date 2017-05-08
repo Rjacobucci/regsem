@@ -184,12 +184,12 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
             s = cbind(new.pars[count,])
             y = cbind(grad.vec[count,])
             #alpha = 1 # always use as first step length
-            alpha.vec[count] <- s1 <- alpha<- step
+            #alpha.vec[count] <- s1 <- alpha<- step
 
             if(hessFun != "none"){
               H <- solve(hess(new.pars[count,]))
             }else{
-              H <-  diag(length(new.pars[count,]))#as.numeric((t(y)%*%s)/t(y)%*%y)
+              H <-  diag(length(new.pars[count,])) #as.numeric((t(y)%*%s)/t(y)%*%y)
             }
             dir <- -H %*% grad.vec[count,]
           }else{
@@ -204,43 +204,74 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
             dir <- -H %*% grad.vec[count,]
 
-            alpha=step
+            #alpha=step
 
           }
 
 
-          #print(alpha)
 
-          update.pars <- new.pars[count,] + alpha*dir
+          update.pars <- new.pars[count,] + dir
 
 
           # print(out$objective)
           #update.pars <- out$par# - new.pars[count,]) + new.pars[count,]
 
-          if(type == "ridge" | type=="none"){
-            update.pars <- update.pars
-          }else if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
-            for(j in pars_pen){
-              update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
+
+            alpha = 1
+            if(type == "ridge" | type=="none"){
+              update.pars <- update.pars
+            }else if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
+              for(j in pars_pen){
+                update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
+              }
+            }else if(type=="diff_lasso" & lambda > 0){
+              cc=0
+              for(j in pars_pen){
+                cc <- cc + 1
+                #print(update.pars[j])
+                #print(pen_diff[j])
+                #print(soft(pen_diff[j],lambda,type="lasso",step=alpha1,e_alpha,gamma))
+                update.pars[j] <- update.pars[j] -
+                  pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
+              }
+            }else if(type=="alasso" & lambda > 0){
+              for(j in pars_pen){
+                #print(update.pars[j])
+                update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
+              }
             }
-          }else if(type=="diff_lasso" & lambda > 0){
-            cc=0
-            for(j in pars_pen){
-              cc <- cc + 1
-              #print(update.pars[j])
-              #print(pen_diff[j])
-              #print(soft(pen_diff[j],lambda,type="lasso",step=alpha1,e_alpha,gamma))
-              update.pars[j] <- update.pars[j] -
-                pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
-            }
-          }else if(type=="alasso" & lambda > 0){
-            for(j in pars_pen){
-              #print(update.pars[j])
-              update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
-            }
-          }
 
 
+
+            v <- update.pars - new.pars[count,]
+
+          # http://www.stat.cmu.edu/~ryantibs/convexopt-S15/lectures/24-prox-newton.pdf
+
+
+
+            h <- function(pars){
+              0.5*sum(abs(pars[pars_pen])) + 0.5*sqrt(sum(pars[pars_pen]**2))
+            }
+
+
+
+          vv <- t(grad.vec[count,])%*%v
+          fmin.old <-  func(new.pars[count,])
+          soft.old <- h(new.pars[count,])
+          alpha= 1
+          c = 0.001
+
+         # if(count==1){
+        #    alpha =step =1
+            #
+         # }else{
+            while(func(new.pars[count,]+alpha*v) > fmin.old+c*alpha*(vv) + c*((h(new.pars[count,]+alpha*v)-soft.old))){
+              alpha = 0.5*alpha
+            }
+         # }
+
+
+          update.pars <- new.pars[count,] + alpha*(update.pars-new.pars[count,])
 
 
         }else if(full==FALSE & line.search==FALSE){
@@ -476,6 +507,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
     }
   }
   ret$iterations <- count
+  print(count)
   ret$value <- vals[count+1]
   ret$pars <- new.pars[count+1,] #+ rnorm(length(new.pars[count+1,]),0,0.00001)
   ret$convergence <- convergence
