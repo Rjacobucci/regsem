@@ -143,6 +143,8 @@ while(count < counts){
   print(count)
   SHRINK <- SHRINK2 + jump*(count-1) # 0.01 works well & 0.007 as well with 150 iterations
 
+  if(count > 1 & all(abs(par.matrix[count-1,pars_pen])<.001)) break
+
 if(mult.start==FALSE){
 
   if(warm.start==FALSE | count == 1){

@@ -259,7 +259,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           fmin.old <-  func(new.pars[count,])
           soft.old <- h(new.pars[count,])
           alpha= 1
-          c = 0.5 # previously 0.0001 worked well
+          c = 0.5 # previously 0.001 worked well
 
          # if(count==1){
         #    alpha =step =1
@@ -269,9 +269,9 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
             bool=FALSE
             while(bool==FALSE){
 
-              if(is.na(func(new.pars[count,]+alpha*v))) break
-              if(is.na(fmin.old+c*alpha*(vv))) break
-              if(is.na(c*((h(new.pars[count,]+alpha*v)-soft.old)))) break
+              if(is.na(func(new.pars[count,]+alpha*v))) alpha=.1; break
+              if(is.na(fmin.old+c*alpha*(vv))) alpha=.1 ;break
+              if(is.na(c*((h(new.pars[count,]+alpha*v)-soft.old))))alpha=.1; break
 
               if(func(new.pars[count,]+alpha*v) > fmin.old+c*alpha*(vv) + c*((h(new.pars[count,]+alpha*v)-soft.old))){
                 alpha = 0.5*alpha
