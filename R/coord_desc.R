@@ -259,16 +259,27 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           fmin.old <-  func(new.pars[count,])
           soft.old <- h(new.pars[count,])
           alpha= 1
-          c = 0.001
+          c = 0.5 # previously 0.0001 worked well
 
          # if(count==1){
         #    alpha =step =1
             #
          # }else{
-            while(func(new.pars[count,]+alpha*v) > fmin.old+c*alpha*(vv) + c*((h(new.pars[count,]+alpha*v)-soft.old))){
-              alpha = 0.5*alpha
+
+            bool=FALSE
+            while(bool==FALSE){
+
+              if(is.na(func(new.pars[count,]+alpha*v))) break
+              if(is.na(fmin.old+c*alpha*(vv))) break
+              if(is.na(c*((h(new.pars[count,]+alpha*v)-soft.old)))) break
+
+              if(func(new.pars[count,]+alpha*v) > fmin.old+c*alpha*(vv) + c*((h(new.pars[count,]+alpha*v)-soft.old))){
+                alpha = 0.5*alpha
+                bool=FALSE
+              }else{
+                bool=TRUE
+              }
             }
-         # }
 
 
           update.pars <- new.pars[count,] + alpha*(update.pars-new.pars[count,])
@@ -507,7 +518,6 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
     }
   }
   ret$iterations <- count
-  print(count)
   ret$value <- vals[count+1]
   ret$pars <- new.pars[count+1,] #+ rnorm(length(new.pars[count+1,]),0,0.00001)
   ret$convergence <- convergence
