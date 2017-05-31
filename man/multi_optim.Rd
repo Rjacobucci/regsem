@@ -6,12 +6,12 @@
 \usage{
 multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5, LB = -Inf,
   UB = Inf, par.lim = c(-Inf, Inf), block = TRUE, full = TRUE,
-  type = "none", optMethod = "default", gradFun = "ram",
+  type = "none", optMethod = "coord_desc", gradFun = "ram",
   pars_pen = NULL, diff_par = NULL, hessFun = "none", tol = 1e-05,
-  solver = FALSE, solver.maxit = 50000, alpha.inc = FALSE, step = 0.1,
-  momentum = FALSE, step.ratio = FALSE, verbose = FALSE,
-  warm.start = FALSE, Start2 = NULL, nlminb.control = NULL,
-  max.iter = 500)
+  solver = FALSE, quasi = FALSE, solver.maxit = 50000,
+  alpha.inc = FALSE, step = 0.1, momentum = FALSE, step.ratio = FALSE,
+  verbose = FALSE, warm.start = FALSE, Start2 = NULL,
+  nlminb.control = NULL, max.iter = 500)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -79,6 +79,8 @@ calculating the hessian. This is slower and less accurate.}
 \item{tol}{Tolerance for coordinate descent}
 
 \item{solver}{Whether to use solver for coord_desc}
+
+\item{quasi}{Whether to use quasi-Newton}
 
 \item{solver.maxit}{Max iterations for solver in coord_desc}
 

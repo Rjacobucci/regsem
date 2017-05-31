@@ -5,12 +5,13 @@
 \title{Regularized Structural Equation Modeling}
 \usage{
 regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "none",
-  data = NULL, optMethod = "default", gradFun = "ram", hessFun = "none",
-  parallel = "no", Start = "lavaan", subOpt = "nlminb", longMod = F,
-  pars_pen = NULL, diff_par = NULL, LB = -Inf, UB = Inf,
-  par.lim = c(-Inf, Inf), block = TRUE, full = TRUE, calc = "normal",
-  max.iter = 500, tol = 1e-05, solver = FALSE, solver.maxit = 5,
-  alpha.inc = FALSE, step = 0.1, momentum = FALSE, step.ratio = FALSE,
+  data = NULL, optMethod = "coord_desc", gradFun = "ram",
+  hessFun = "none", parallel = "no", Start = "lavaan",
+  subOpt = "nlminb", longMod = F, pars_pen = NULL, diff_par = NULL,
+  LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf), block = TRUE,
+  full = TRUE, calc = "normal", max.iter = 500, tol = 1e-05,
+  solver = FALSE, quasi = FALSE, solver.maxit = 5, alpha.inc = FALSE,
+  step = 0.1, momentum = FALSE, step.ratio = FALSE,
   nlminb.control = list(), missing = "listwise")
 }
 \arguments{
@@ -101,6 +102,8 @@ for use.}
 \item{tol}{Tolerance for coordinate descent}
 
 \item{solver}{Whether to use solver for coord_desc}
+
+\item{quasi}{Whether to use quasi-Newton}
 
 \item{solver.maxit}{Max iterations for solver in coord_desc}
 
