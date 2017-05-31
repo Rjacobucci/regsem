@@ -35,6 +35,18 @@ rcpp_grad_ram <- function(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, typ
     .Call('regsem_rcpp_grad_ram', PACKAGE = 'regsem', par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par)
 }
 
+#' Compute quasi Hessian
+#'
+#' @param I identity matrix.
+#' @param s s vector.
+#' @param p p vector.
+#' @param y y vector.
+#' @param H previous Hessian.
+#'
+rcpp_quasi_calc <- function(I, s, p, y, H) {
+    .Call('regsem_rcpp_quasi_calc', PACKAGE = 'regsem', I, s, p, y, H)
+}
+
 #' Take RAM matrices, multiplies, and returns Implied Covariance matrix.
 #'
 #' @param par parameter estimates.
