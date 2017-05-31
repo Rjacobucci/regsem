@@ -209,15 +209,15 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           }
 
 
-
-          update.pars <- new.pars[count,] + dir
+          alpha = 1
+          update.pars <- new.pars[count,] + alpha*dir
 
 
           # print(out$objective)
           #update.pars <- out$par# - new.pars[count,]) + new.pars[count,]
 
 
-            alpha = 1
+
             if(type == "ridge" | type=="none"){
               update.pars <- update.pars
             }else if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
@@ -258,30 +258,41 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           vv <- t(grad.vec[count,])%*%v
           fmin.old <-  func(new.pars[count,])
           soft.old <- h(new.pars[count,])
-          alpha= 1
-          c = 0.5 # previously 0.001 worked well
+          alpha= alpha
+          c = 0.001 # previously 0.001 worked well; removed 0.5
 
          # if(count==1){
         #    alpha =step =1
             #
          # }else{
 
+
+
+          # not changing alpha
             bool=FALSE
             while(bool==FALSE){
 
-              if(is.na(func(new.pars[count,]+alpha*v))) alpha=.1; break
-              if(is.na(fmin.old+c*alpha*(vv))) alpha=.1 ;break
-              if(is.na(c*((h(new.pars[count,]+alpha*v)-soft.old))))alpha=.1; break
-
-              if(func(new.pars[count,]+alpha*v) > fmin.old+c*alpha*(vv) + c*((h(new.pars[count,]+alpha*v)-soft.old))){
-                alpha = 0.5*alpha
-                bool=FALSE
+              if(is.na(func(new.pars[count,]+alpha*v))){
+                alpha=.1;print(999)
+                break
+              }else if(is.na(fmin.old+c*alpha*(vv))){
+                alpha = .1;print(888)
+                break
+              }else if(is.na(c*((h(new.pars[count,]+alpha*v)-soft.old)))){
+                alpha = .1;print(777)
+                break
               }else{
-                bool=TRUE
+                if(func(new.pars[count,]+alpha*v) > fmin.old+c*alpha*(vv) + c*((h(new.pars[count,]+alpha*v)-soft.old))){
+                  alpha = 0.5*alpha
+                  bool=FALSE
+                }else{
+                  bool=TRUE
+                }
               }
+
+
             }
-
-
+print(alpha)
           update.pars <- new.pars[count,] + alpha*(update.pars-new.pars[count,])
 
 
