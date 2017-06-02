@@ -4,14 +4,12 @@
 \alias{rcpp_quasi_calc}
 \title{Compute quasi Hessian}
 \usage{
-rcpp_quasi_calc(I, s, p, y, H)
+rcpp_quasi_calc(I, s, y, H)
 }
 \arguments{
 \item{I}{identity matrix.}
 
 \item{s}{s vector.}
-
-\item{p}{p vector.}
 
 \item{y}{y vector.}
 

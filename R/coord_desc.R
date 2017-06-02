@@ -199,11 +199,13 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
             #http://terminus.sdsu.edu/SDSU/Math693a/Lectures/18/lecture.pdf
 
 
-            p <- as.numeric(1/(t(y)%*%s)) # add to rcpp
-
-            #H <- (diag(length(new.pars[count,])) - p*s%*%t(y))%*%H%*%(diag(length(new.pars[count,]))-p*y%*%t(s)) + p*s%*%t(s)
+            #p <- as.numeric(1/(t(y)%*%s)) # add to rcpp
             Imat = diag(length(new.pars[count,]))
-            H <- rcpp_quasi_calc(Imat,t(s),p,t(y),H)
+
+            #H <- (Imat - p*s%*%t(y))%*%H%*%(Imat-p*y%*%t(s)) + p*s%*%t(s)
+
+            H <- rcpp_quasi_calc(Imat,s,y,H)$H2
+
 
 
             dir <- -H %*% grad.vec[count,]

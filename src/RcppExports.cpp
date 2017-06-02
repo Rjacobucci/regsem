@@ -47,17 +47,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_quasi_calc
-List rcpp_quasi_calc(NumericMatrix I, NumericVector s, NumericVector p, NumericVector y, NumericMatrix H);
-RcppExport SEXP regsem_rcpp_quasi_calc(SEXP ISEXP, SEXP sSEXP, SEXP pSEXP, SEXP ySEXP, SEXP HSEXP) {
+List rcpp_quasi_calc(NumericMatrix I, NumericVector s, NumericVector y, NumericMatrix H);
+RcppExport SEXP regsem_rcpp_quasi_calc(SEXP ISEXP, SEXP sSEXP, SEXP ySEXP, SEXP HSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type I(ISEXP);
     Rcpp::traits::input_parameter< NumericVector >::type s(sSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type p(pSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type H(HSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_quasi_calc(I, s, p, y, H));
+    rcpp_result_gen = Rcpp::wrap(rcpp_quasi_calc(I, s, y, H));
     return rcpp_result_gen;
 END_RCPP
 }
