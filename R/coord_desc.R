@@ -203,7 +203,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
             #H <- (diag(length(new.pars[count,])) - p*s%*%t(y))%*%H%*%(diag(length(new.pars[count,]))-p*y%*%t(s)) + p*s%*%t(s)
             Imat = diag(length(new.pars[count,]))
-            H <- rcpp_quasi_calc(Imat,s,p,y,H)
+            H <- rcpp_quasi_calc(Imat,t(s),p,t(y),H)
 
 
             dir <- -H %*% grad.vec[count,]

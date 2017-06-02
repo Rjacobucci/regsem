@@ -42,7 +42,6 @@ rcpp_grad_ram <- function(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, typ
 #' @param p p vector.
 #' @param y y vector.
 #' @param H previous Hessian.
-#'
 rcpp_quasi_calc <- function(I, s, p, y, H) {
     .Call('regsem_rcpp_quasi_calc', PACKAGE = 'regsem', I, s, p, y, H)
 }

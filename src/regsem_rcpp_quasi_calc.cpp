@@ -11,7 +11,6 @@ using namespace arma;
 //' @param p p vector.
 //' @param y y vector.
 //' @param H previous Hessian.
-//'
 // [[Rcpp::export]]
 List rcpp_quasi_calc(NumericMatrix I,
                 NumericVector s,
@@ -26,7 +25,7 @@ List rcpp_quasi_calc(NumericMatrix I,
   arma::mat I2 = Rcpp::as<arma::mat>(I);
 
 
-  arma::mat H2 = I2 - (p2*s2*y2.t())*HH*I2 - p2*y2*s2.t() + p2*s2*s2.t();
+  arma::mat H2 = I2 - (p2 = s2.each_row() *y2.t())*HH*I2 - p2 % y2*s2.t() + p2 % s2*s2.t();
 
     return Rcpp::List::create(
       Rcpp::Named("H2") = H2);

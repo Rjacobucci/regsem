@@ -147,7 +147,6 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
     warning("this type is currently not working well")
   }
 
-  print(rcpp_quasi_calc(diag(4),1:4,1:4,1:4,diag(4)))
 
 #  if(optMethod=="nlminb"& type !="ridge" | type != "none"){
 #    stop("Only optMethod=coord_desc is recommended for use")
