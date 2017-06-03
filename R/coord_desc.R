@@ -279,13 +279,13 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
             while(bool==FALSE){
 
               if(is.na(func(new.pars[count,]+alpha*v))){
-                alpha=.1;print(999)
+                alpha=.1
                 break
               }else if(is.na(fmin.old+c*alpha*(vv))){
-                alpha = .1;print(888)
+                alpha = .1
                 break
               }else if(is.na(c*((h(new.pars[count,]+alpha*v)-soft.old)))){
-                alpha = .1;print(777)
+                alpha = .1
                 break
               }else{
                 if(func(new.pars[count,]+alpha*v) > fmin.old+c*alpha*(vv) + c*((h(new.pars[count,]+alpha*v)-soft.old))){
@@ -294,6 +294,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
                 }else{
                   bool=TRUE
                 }
+
               }
 
 
