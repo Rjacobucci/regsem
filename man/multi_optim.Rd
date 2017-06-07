@@ -46,10 +46,11 @@ stop optimization and move to new starting values if violated.}
 
 \item{full}{Whether to do full gradient descent or block}
 
-\item{type}{Penalty type. Options include "none", "lasso", "ridge",
+\item{type}{Penalty type. Options include "none", "lasso",
 "enet" for the elastic net,
 "alasso" for the adaptive lasso
-and "diff_lasso". diff_lasso penalizes the discrepency between
+and "diff_lasso". If ridge penalties are desired, use type="enet" and
+alpha=1. diff_lasso penalizes the discrepency between
 parameter estimates and some pre-specified values. The values
 to take the deviation from are specified in diff_par. Two methods for
 sparser results than lasso are the smooth clipped absolute deviation,

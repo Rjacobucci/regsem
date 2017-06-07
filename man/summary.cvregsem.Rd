@@ -4,7 +4,12 @@
 \alias{summary.cvregsem}
 \title{print information about cvregsem object}
 \usage{
-summary.cvregsem(x, ...)
+\method{summary}{cvregsem}(x, fit = "BIC", ...)
+}
+\arguments{
+\item{x}{cv_regsem}
+
+\item{fit}{Which fit index to use}
 }
 \description{
 print information about cvregsem object
