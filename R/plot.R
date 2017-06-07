@@ -26,7 +26,7 @@ plot.cvregsem <- function(x,..., pars=NULL,col=NULL,type="l",lwd=3,lty=1,xlab=NU
   if (!class(x)=="cvregsem") stop("Specified x is not a x from cv_regsem(.")
 
   if (is.null(xlab)) xlab <- "Penalty"
-  if (is.null(ylab)) ylab <- "Loading"
+  if (is.null(ylab)) ylab <- "Estimate"
   coef.mat <- x[[1]][,pars]
   # determine colors either from rainbow or by repeating given colors
   if(is.null(col)){

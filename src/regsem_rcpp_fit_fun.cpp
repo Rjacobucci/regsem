@@ -59,7 +59,7 @@ arma::mat SampCov2 = Rcpp::as<arma::mat>(SampCov);
   }
   else if (type2 == 4) {
     fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  +
-      2*lambda * (.5*(1-e_alpha)*norm(pen_vec,2) + e_alpha*norm(pen_vec,1)));
+      2*lambda * ((1-e_alpha)*norm(pen_vec,1) + e_alpha*norm(pen_vec,2)));
   }
   else if (type2 == 6) {
     add = 0;

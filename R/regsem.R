@@ -16,12 +16,13 @@
 #' @param lambda Penalty value. Note: higher values will result in additional
 #'        convergence issues. If using values > 0.1, it is recommended to use
 #'        mutli_optim() instead. See \code{\link{multi_optim}} for more detail.
-#' @param alpha Mixture for elastic net.
+#' @param alpha Mixture for elastic net. 1 = ridge, 0 = lasso
 #' @param gamma Additional penalty for MCP and SCAD
-#' @param type Penalty type. Options include "none", "lasso", "ridge",
+#' @param type Penalty type. Options include "none", "lasso",
 #'        "enet" for the elastic net,
 #'        "alasso" for the adaptive lasso
-#'        and "diff_lasso". diff_lasso penalizes the discrepency between
+#'        and "diff_lasso". If ridge penalties are desired, use type="enet" and
+#'        alpha=1. diff_lasso penalizes the discrepency between
 #'        parameter estimates and some pre-specified values. The values
 #'        to take the deviation from are specified in diff_par. Two methods for
 #'        sparser results than lasso are the smooth clipped absolute deviation,
@@ -147,6 +148,10 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
     warning("this type is currently not working well")
   }
 
+  if(type=="ridge"){
+    type="enet";alpha=1
+  }
+
 
 #  if(optMethod=="nlminb"& type !="ridge" | type != "none"){
 #    stop("Only optMethod=coord_desc is recommended for use")
@@ -179,9 +184,9 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
   #    stop("Only recommended grad function is ram or none at this time")
  #   }
 
-  if(type=="ridge" & gradFun != "none"){
-    warning("At this time, only gradFun=none recommended with ridge penalties")
-  }
+#  if(type=="ridge" & gradFun != "none"){
+#    warning("At this time, only gradFun=none recommended with ridge penalties")
+#  }
 
  # if(type=="ridge" & optMethod != "nlminb"){
  #   stop("For ridge, only use optMethod=nlminb and gradFun=none")
@@ -919,7 +924,7 @@ if(optMethod=="nlminb"){
     if(type=="none" | lambda==0){
       res$df = df
       res$npar = npar
-    }else if(type=="lasso" | type=="alasso" | type=="enet" | type=="scad" | type=="mcp"){
+    }else if(type=="lasso" | type=="alasso" | type=="enet" | type=="scad" | type=="mcp" & alpha < 1){
       #A_estim = A != 0
       #pars = A_est[A_estim]
       pars_sum = pars.df[pars_pen]
@@ -927,7 +932,7 @@ if(optMethod=="nlminb"){
       res$df = df + sum(pars_l2 < 0.001)
       res$npar = npar - sum(pars_l2 < 0.001)
 
-    }else if(type=="ridge"){
+    }else if(type=="ridge" | alpha == 1){
       #ratio1 <- sqrt(pars.df[pars_pen]**2)/sqrt(mats$parameters[pars_pen]**2)
       res$df = df #+ length(ratio1) - sum(ratio1)
       res$npar = npar #- sum(ratio1)

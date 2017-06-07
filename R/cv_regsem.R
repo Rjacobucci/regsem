@@ -143,7 +143,9 @@ while(count < counts){
   print(count)
   SHRINK <- SHRINK2 + jump*(count-1) # 0.01 works well & 0.007 as well with 150 iterations
 
-  if(count > 1 & all(abs(par.matrix[count-1,pars_pen])<.001)) break
+  if(count > 1 & all(abs(par.matrix[count-1,pars_pen])<.001)){
+    break
+  }
 
 if(mult.start==FALSE){
 
@@ -153,7 +155,7 @@ if(mult.start==FALSE){
   }else if(fits[count-1,2] == 0){
     itt = 0
     Start = par.matrix[count-1,]
-    Start[pars_pen] = Start[pars_pen]#-step*jump
+    Start[pars_pen] = Start[pars_pen]-step*jump
   }else if(fits[count-1,2] == 99){
     Start="lavaan"
   }else{
@@ -371,6 +373,8 @@ if(mult.start==FALSE){
       Start2 = par.matrix[count-itt-1,]
       Start2[pars_pen] = Start2[pars_pen]-itt*jump
     }
+
+
 
 
     if(fit.ret2 == "train"){

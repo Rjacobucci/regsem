@@ -26,10 +26,11 @@
 #'        stop optimization and move to new starting values if violated.
 #' @param block Whether to use block coordinate descent
 #' @param full Whether to do full gradient descent or block
-#' @param type Penalty type. Options include "none", "lasso", "ridge",
+#' @param type Penalty type. Options include "none", "lasso",
 #'        "enet" for the elastic net,
 #'        "alasso" for the adaptive lasso
-#'        and "diff_lasso". diff_lasso penalizes the discrepency between
+#'        and "diff_lasso". If ridge penalties are desired, use type="enet" and
+#'        alpha=1. diff_lasso penalizes the discrepency between
 #'        parameter estimates and some pre-specified values. The values
 #'        to take the deviation from are specified in diff_par. Two methods for
 #'        sparser results than lasso are the smooth clipped absolute deviation,
@@ -140,6 +141,10 @@ multi_optim <- function(model,max.try=10,lambda=0,
 #  if(type=="lasso" & gradFun != "ram"){
 #    warning("At this time, only gradFun=ram recommended with lasso penalties")
 #  }
+
+  if(type=="ridge"){
+    type="enet";alpha=1
+  }
 
 
 #if(warm.start==TRUE){

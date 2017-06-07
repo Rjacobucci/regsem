@@ -11,9 +11,9 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
   phi_grad <- rep(1,max.iter)
 
 
-  if(type=="enet"){
-    step=step*2
-  }
+ # if(type=="enet"){
+ #   step=step*2
+ # }
   line.search=FALSE
 
   if(step.ratio == TRUE){
@@ -254,9 +254,16 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           # http://www.stat.cmu.edu/~ryantibs/convexopt-S15/lectures/24-prox-newton.pdf
 
 
-
             h <- function(pars){
-              0.5*sum(abs(pars[pars_pen])) + 0.5*sqrt(sum(pars[pars_pen]**2))
+              if(type=="enet"){
+                (1-e_alpha)*sum(abs(pars[pars_pen])) + (e_alpha)*sqrt(sum(pars[pars_pen]**2))
+              }else if(type=="ridge"){
+                1*sqrt(sum(pars[pars_pen]**2))
+              }else if(type=="lasso"){
+                1*sum(abs(pars[pars_pen]))
+              }else{
+                stop("quasi is currently not supported for that type of penalty")
+              }
             }
 
 
@@ -265,7 +272,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           fmin.old <-  func(new.pars[count,])
           soft.old <- h(new.pars[count,])
           alpha= alpha
-          c = 0.001 # previously 0.001 worked well; removed 0.5
+          c = 0.05 # previously 0.001 worked well; removed 0.5
 
          # if(count==1){
         #    alpha =step =1
@@ -516,11 +523,11 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
     if(inherits(st.crit, "try-error")){
       convergence=99
-      print(9999)
+     # print(9999)
     }else if(is.na(st.crit)==TRUE){
       convergence=99
       break
-      print(8888)
+      #print(8888)
 
     }else if(any(new.pars[count+1,] > par.lim[2]) | any(new.pars[count+1,] < par.lim[1])){
       break
