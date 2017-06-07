@@ -77,7 +77,8 @@ the sample covariance used.}
 
 \item{pars_pen}{Parameter indicators to penalize. If left NULL, by default,
 all parameters in the \emph{A} matrix outside of the intercepts are
-penalized when lambda > 0 and type != "none".}
+penalized when lambda > 0 and type != "none". Can use the parameter
+labels from the lavaan model as well.}
 
 \item{diff_par}{Parameter values to deviate from. Only used when
 type="diff_lasso".}
@@ -166,12 +167,14 @@ Regularized Structural Equation Modeling
 library(lavaan)
 HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
 mod <- '
-f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
+f =~ 1*x1 + l1*x2 + l2*x3 + l3*x4 + l4*x5 + l5*x6 + l6*x7 + l7*x8 + l8*x9
 '
 # Recommended to specify meanstructure in lavaan
 outt = cfa(mod,HS,meanstructure=TRUE)
 
-fit1 <- regsem(outt,lambda=0.05,type="lasso",pars_pen=c(1:2,6:8))
+fit1 <- regsem(outt,lambda=0.05,type="lasso",
+  pars_pen=c("l1","l2","l6","l7","l8"))
+#equivalent to pars_pen=c(1:2,6:8)
 #summary(fit1)
 }
 \keyword{calc}

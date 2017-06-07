@@ -3,11 +3,14 @@
 \name{parse_parameters}
 \alias{parse_parameters}
 \title{Takes either a vector of parameter ids or a
-vector of named parameters and returns a vector of parameter ids
-x Parameter labels
-model Lavaan model}
+vector of named parameters and returns a vector of parameter ids}
 \usage{
 parse_parameters(x, model)
+}
+\arguments{
+\item{x}{Parameter labels}
+
+\item{model}{Lavaan model}
 }
 \value{
 NULL if undefined input. Else vector of parameter ids
@@ -15,6 +18,4 @@ NULL if undefined input. Else vector of parameter ids
 \description{
 Takes either a vector of parameter ids or a
 vector of named parameters and returns a vector of parameter ids
-x Parameter labels
-model Lavaan model
 }

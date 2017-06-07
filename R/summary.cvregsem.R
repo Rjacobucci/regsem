@@ -1,15 +1,19 @@
 #'
 #' print information about cvregsem object
-#' @param x cv_regsem
-#' @param fit Which fit index to use
+#' @param object cv_regsem object
+#' @param ... Additional arguments, default fit is fit="BIC"
 #' @export
-summary.cvregsem <- function(x,fit="BIC",...)
+summary.cvregsem <- function(object,...)
 {
-  lowest.id <- which.min(x[[2]][,fit])
-  lenpar <- length(x$pars_pen)
 
-  sm <- list(lowest.id=lowest.id, lenpar=lenpar, min.lambda=min(x[[2]][,1]),
-             max.lambda=max(x[[2]][,1]), lowest.lambda=x[[2]][lowest.id,1])
+  if(is.null(fit)){
+    fit="BIC"
+  }
+  lowest.id <- which.min(object[[2]][,fit])
+  lenpar <- length(object$pars_pen)
+
+  sm <- list(lowest.id=lowest.id, lenpar=lenpar, min.lambda=min(object[[2]][,1]),
+             max.lambda=max(object[[2]][,1]), lowest.lambda=object[[2]][lowest.id,1])
 
   class(sm) <- "summary.cvregsem"
 

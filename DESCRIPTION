@@ -1,7 +1,7 @@
 Package: regsem
 Type: Package
 Title: Regularized Structural Equation Modeling
-Version: 0.7.15
+Version: 0.8.0
 Author: Ross Jacobucci[aut,cre], 
         Kevin J. Grimm [ctb], 
         Andreas M. Brandmaier [ctb]
@@ -17,6 +17,7 @@ Depends:
     Rcpp
 Suggests:
     snowfall,
+    MASS,
     GA,
     rgenoud,
     Rsolnp,

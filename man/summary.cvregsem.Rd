@@ -4,12 +4,12 @@
 \alias{summary.cvregsem}
 \title{print information about cvregsem object}
 \usage{
-\method{summary}{cvregsem}(x, fit = "BIC", ...)
+\method{summary}{cvregsem}(object, ...)
 }
 \arguments{
-\item{x}{cv_regsem}
+\item{object}{cv_regsem object}
 
-\item{fit}{Which fit index to use}
+\item{...}{Additional arguments, default fit is fit="BIC"}
 }
 \description{
 print information about cvregsem object
