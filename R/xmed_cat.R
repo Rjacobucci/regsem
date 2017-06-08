@@ -1,0 +1,185 @@
+#'
+#'
+#' Function to performed exploratory mediation with categorical variables
+#'
+#' @param data Name of the dataset
+#' @param iv Name of independent variable
+#' @param mediators Name of mediators
+#' @param dv Name of dependent variable
+#' @param type What type of penalty. Options include lasso, ridge, and enet.
+#' @param seed Set seed to control CV results
+#' @export
+#' @examples
+#'# example
+#'library(ISLR)
+#'College1 = College[which(College$Private=="Yes"),]
+#'Data = data.frame(scale(College1[c("Grad.Rate","Accept","Outstate","Room.Board","Books","Expend")]))
+#'Data$Grad.Rate <- ifelse(Data$Grad.Rate > 0,1,0)
+#'Data$Grad.Rate <- as.factor(Data$Grad.Rate)
+#'#lavaan model with all mediators
+#'model1 <-
+#'  ' # direct effect (c_prime)
+#'Grad.Rate ~ c_prime*Accept
+#'# mediators
+#'Outstate ~ a1*Accept
+#'Room.Board ~ a2*Accept
+#'Books ~ a3*Accept
+#'Expend ~ a6*Accept
+#'Grad.Rate ~ b1*Outstate + b2*Room.Board + b3*Books + b6*Expend
+#'# indirect effects (a*b)
+#'a1b1 := a1*b1
+#'a2b2 := a2*b2
+#'a3b3 := a3*b3
+#'a6b6 := a6*b6
+#'# total effect (c)
+#'c := c_prime + (a1*b1) + (a2*b2) + (a3*b3) + (a6*b6)
+#''
+#'#p-value approach using delta method standard errors
+#'fit.delta = sem(model1,data=Data,fixed.x=TRUE,ordered="Grad.Rate")
+#'summary(fit.delta)
+#'
+#'#xmed_cat()
+#'
+#'iv <- "Accept"
+#'dv <- "Grad.Rate"
+#'mediators <- c("Outstate","Room.Board","Books","Expend")
+#'
+#'out <- xmed_cat(Data,iv,mediators,dv)
+#'out
+
+
+xmed_cat <- function(data,iv,mediators,dv,type="lasso",seed=1234){
+  res <- list()
+
+  Data <- data
+
+  if(type=="lasso"){
+    alpha=1
+  }else if(type=="ridge"){
+    alpha=0
+  }else if(type=="enet"){
+    alpha=0.5
+  }
+
+
+  var.check = function(data){
+    #2 if factor with >2 categories
+    #1 if exactly 2 response options
+    #0 otherwise
+    data=as.data.frame(data)
+    num.response.options = flag = integer(ncol(data))
+    for(i in 1:ncol(data)){
+      num.response.options[i] = flag[i] = NA
+      num.response.options[i] = length(unique(data[,i]))
+      if(is.factor(data[,i]) & num.response.options[i]>2){
+        flag[i] = 2
+      }
+      else if(num.response.options[i] == 2){
+        flag[i] = 1
+      }
+      else if(num.response.options[i] != 2){
+        flag[i] = 0
+      }
+    }
+    return(flag)
+  }
+
+  check.out <- var.check(data[,c(iv,mediators,dv)])
+  if(any(check.out==2)){
+    stop("Factor variables with > 2 response options need to be recoded as integer or numeric variables")
+  }
+
+  #standardize
+  data.proc <- caret::preProcess(Data[,c(iv,mediators,dv)])
+  data2 <- predict(data.proc,Data[,c(iv,mediators,dv)])
+
+ # iv.proc <- caret::preProcess(Data[,iv])
+ # iv.pred <- predict(iv.proc,Data[,iv])
+
+ # med.proc <- caret::preProcess(Data[,mediators])
+ # med.pred <- predict(med.proc,Data[,mediators])
+
+ # dv.proc <- caret::preProcess(Data[,dv])
+ # dv.pred <- predict(dv.proc,Data[,dv])
+
+
+  iv.mat <- as.matrix(data2[,iv])
+  mediators.mat <- as.matrix(data2[,mediators])
+  dv.mat <- as.matrix(data2[,dv])
+
+  if(sum(is.na(iv.mat)) > 0 |
+     sum(is.na(mediators.mat)) > 0 |
+     sum(is.na(dv.mat)) > 0){
+    stop("Missing values are not allowed")
+  }
+
+  if(var.check(dv.mat)==0){
+    dv.class="gaussian"
+  }else if(var.check(dv.mat)==1){
+    dv.class = "binomial"
+  }
+
+  #b's
+  set.seed(seed)
+  b.cv.lasso = glmnet::cv.glmnet(mediators.mat,dv.mat,alpha=alpha,family=dv.class,standardize=FALSE,
+                         lambda=exp(seq(log(0.001), log(5), length.out=100)),
+                         penalty.factor=c(rep(1,ncol(data)-2),0))
+
+ # b.fit.lasso = glmnet(mediators.mat, dv.mat, alpha=alpha,
+ #                     lambda=exp(seq(log(0.001), log(5), length.out=100)),
+ #                      penalty.factor=c(rep(1,ncol(data)-2),0))
+
+  b.coefs = coef(b.cv.lasso, s=b.cv.lasso$lambda.min)[-1,1]
+  #b.coefs = b.coefs[-length(b.coefs)]  ??????? Why -- Need to include?
+  res$b.coefs <- b.coefs # removed rounding
+
+  # a
+
+  a.cv.lasso = a.fit.lasso = vector("list",ncol(mediators.mat))
+  for(i in 1:ncol(mediators.mat)){
+    if(var.check(mediators.mat[,i])==0){
+      med.class="gaussian"
+    }else if(var.check(mediators.mat[,i])==1){
+      med.class = "binomial"
+    }
+    set.seed(seed)
+    a.cv.lasso[[i]] = glmnet::cv.glmnet(as.matrix(cbind(rnorm(nrow(data),1,0.0001),iv.mat)), mediators.mat[,i],
+                                lambda=exp(seq(log(0.001), log(5), length.out=100)),standardize=FALSE,
+                                alpha=alpha, family=med.class,intercept=F,penalty.factor=c(0,1))
+   # a.fit.lasso[[i]] = glmnet(as.matrix(cbind(rnorm(nrow(data),1,0.0001),iv.mat)), mediators.mat[,i],
+   #                           lambda=exp(seq(log(0.001), log(5), length.out=100)),
+   #                           alpha=alpha, family=med.class,intercept=F,penalty.factor=c(0,1))
+  }
+
+  a.coefs = numeric(length(b.coefs))
+  for(i in 1:length(a.coefs)){
+    if(!is.null(a.cv.lasso[[i]])){
+      a.coefs[i] = coef(a.cv.lasso[[i]], s=a.cv.lasso[[i]]$lambda.min)[-1,1][2]
+    }
+  }
+  names(a.coefs) = mediators
+  res$a.coefs <- a.coefs
+
+  # indirect
+
+  indirect = a.coefs * b.coefs
+
+
+  res$important <- names(indirect[abs(indirect) > 0.001])
+  indirect <- as.data.frame(indirect)
+  indirect = round(indirect,4)
+  indirect[abs(indirect) < 0.001] = 0
+  indirect <- t(indirect)#round(indirect,3)
+  indirect[abs(indirect) >= 0.001] = as.numeric(indirect[abs(indirect) >= 0.001])
+  res$indirect <- indirect
+
+  # add class for summary function
+
+  # return list
+  res$call <- match.call()
+  class(res) <- "xmed_cat"
+  return(res)
+}
+
+
+
