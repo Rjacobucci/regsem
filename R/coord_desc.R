@@ -272,7 +272,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           fmin.old <-  func(new.pars[count,])
           soft.old <- h(new.pars[count,])
           alpha= alpha
-          c = 0.05 # previously 0.001 worked well; removed 0.5
+          c = 0.01 # previously 0.001 worked well; removed 0.5 0.8.1 set at 0.05
 
          # if(count==1){
         #    alpha =step =1
