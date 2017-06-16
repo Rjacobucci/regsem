@@ -285,6 +285,10 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
             bool=FALSE
             while(bool==FALSE){
 
+              if(alpha < 0.1){
+                alpha = 0.1; break
+              }
+
               if(is.na(func(new.pars[count,]+alpha*v))){
                 alpha=.1
                 break
@@ -306,7 +310,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
 
             }
-#print(alpha)
+
           update.pars <- new.pars[count,] + alpha*(update.pars-new.pars[count,])
 
 
