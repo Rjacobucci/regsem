@@ -310,7 +310,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
 
             }
-
+#alpha = .2
           update.pars <- new.pars[count,] + alpha*(update.pars-new.pars[count,])
 
 
