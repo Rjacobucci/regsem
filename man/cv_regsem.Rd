@@ -4,7 +4,7 @@
 \alias{cv_regsem}
 \title{The main function that ties together and runs the models.}
 \usage{
-cv_regsem(model, n.lambda = 100, pars_pen = NULL, mult.start = FALSE,
+cv_regsem(model, n.lambda = 100, pars_pen, mult.start = FALSE,
   multi.iter = 10, jump = 0.002, lambda.start = 0, alpha = 0.5,
   type = "none", fit.ret = c("rmsea", "BIC"), fit.ret2 = "train",
   n.boot = 20, data = NULL, optMethod = "coord_desc", gradFun = "ram",
@@ -13,8 +13,8 @@ cv_regsem(model, n.lambda = 100, pars_pen = NULL, mult.start = FALSE,
   UB = Inf, par.lim = c(-Inf, Inf), block = TRUE, full = TRUE,
   calc = "normal", max.iter = 2000, tol = 1e-05, solver = FALSE,
   quasi = FALSE, solver.maxit = 5, alpha.inc = FALSE, step = 0.1,
-  momentum = FALSE, step.ratio = FALSE, nlminb.control = list(),
-  warm.start = TRUE, missing = "listwise", ...)
+  momentum = FALSE, step.ratio = FALSE, line.search = FALSE,
+  nlminb.control = list(), warm.start = TRUE, missing = "listwise", ...)
 }
 \arguments{
 \item{model}{lavaan output object.}
@@ -103,6 +103,8 @@ for use.}
 
 \item{step.ratio}{Ratio of step size between A and S. Logical}
 
+\item{line.search}{Use line search for optimization. Default is no, use fixed step size}
+
 \item{nlminb.control}{list of control values to pass to nlminb}
 
 \item{warm.start}{Whether start values are based on previous iteration.
@@ -125,7 +127,7 @@ f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 '
 outt = cfa(mod,HS)
 
-cv.out = cv_regsem(outt,type="ridge",gradFun="none",n.lambda=100)
+cv.out = cv_regsem(outt,type="ridge",pars_pen=1:6,n.lambda=100)
 }
 }
 \keyword{calc}

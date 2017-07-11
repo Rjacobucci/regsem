@@ -9,9 +9,9 @@ multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5, LB = -Inf,
   type = "none", optMethod = "coord_desc", gradFun = "ram",
   pars_pen = NULL, diff_par = NULL, hessFun = "none", tol = 1e-05,
   solver = FALSE, quasi = FALSE, solver.maxit = 50000,
-  alpha.inc = FALSE, step = 0.1, momentum = FALSE, step.ratio = FALSE,
-  verbose = FALSE, warm.start = FALSE, Start2 = NULL,
-  nlminb.control = NULL, max.iter = 500)
+  alpha.inc = FALSE, line.search = FALSE, step = 0.1, momentum = FALSE,
+  step.ratio = FALSE, verbose = FALSE, warm.start = FALSE,
+  Start2 = NULL, nlminb.control = NULL, max.iter = 500)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -86,6 +86,8 @@ calculating the hessian. This is slower and less accurate.}
 \item{solver.maxit}{Max iterations for solver in coord_desc}
 
 \item{alpha.inc}{Whether alpha should increase for coord_desc}
+
+\item{line.search}{Use line search for optimization. Default is no, use fixed step size}
 
 \item{step}{Step size}
 
