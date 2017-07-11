@@ -5,7 +5,7 @@
 \title{Plot function for cv_regsem}
 \usage{
 \method{plot}{cvregsem}(x, ..., pars = NULL, col = NULL, type = "l",
-  lwd = 3, lty = 1, xlab = NULL, ylab = NULL)
+  lwd = 3, lty = 1, xlab = NULL, ylab = NULL, show.minimum = NULL)
 }
 \arguments{
 \item{x}{An x from cv_regsem.}
@@ -25,6 +25,8 @@
 \item{xlab}{X axis label}
 
 \item{ylab}{Y axis label}
+
+\item{show.minimum}{What fit index to use}
 }
 \description{
 Plot function for cv_regsem

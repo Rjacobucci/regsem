@@ -51,6 +51,7 @@
 #' @param step Step size
 #' @param momentum Momentum for step sizes
 #' @param step.ratio Ratio of step size between A and S. Logical
+#' @param line.search Use line search for optimization. Default is no, use fixed step size
 #' @param warm.start Whether start values are based on previous iteration.
 #'        This is not recommended.
 #' @param missing How to handle missing data. Current options are "listwise"
@@ -67,14 +68,14 @@
 #' '
 #' outt = cfa(mod,HS)
 #'
-#' cv.out = cv_regsem(outt,type="ridge",gradFun="none",n.lambda=100)
+#' cv.out = cv_regsem(outt,type="ridge",pars_pen=1:6,n.lambda=100)
 #'}
 
 
 
 cv_regsem = function(model,
                      n.lambda=100,
-                     pars_pen=NULL,
+                     pars_pen,
                      mult.start=FALSE,
                      multi.iter=10,
                      jump=0.002,
@@ -109,6 +110,7 @@ cv_regsem = function(model,
                     step=.1,
                     momentum=FALSE,
                     step.ratio=FALSE,
+                    line.search=FALSE,
                     nlminb.control=list(),
                     warm.start=TRUE,
                     missing="listwise",
@@ -121,7 +123,15 @@ cv_regsem = function(model,
 #  dat.test <- dat[-ids,]
 #}
 fits.var=NA
-pars_pen <- parse_parameters(pars_pen, model)
+
+if(is.null(pars_pen) & type!="none"){
+  stop("for cv_regsem(), pars_pen needs to be specified")
+}
+
+if(is.null(pars_pen)==FALSE & is.numeric(pars_pen)==FALSE){
+  pars_pen <- parse_parameters(pars_pen,model)
+}
+
 
 if(parallel == TRUE){
   stop("parallel is not currently supported")
@@ -187,6 +197,7 @@ if(mult.start==FALSE){
                   alpha.inc=alpha.inc,
                   step=step,
                   max.iter=max.iter,
+                  line.search=line.search,
                   momentum=momentum,
                   step.ratio=step.ratio,
                   nlminb.control=nlminb.control,
@@ -216,6 +227,7 @@ if(mult.start==FALSE){
                   alpha.inc=alpha.inc,
                   step=step,
                   max.iter=max.iter,
+                  line.search=line.search,
                   momentum=momentum,
                   step.ratio=step.ratio,
                   nlminb.control=nlminb.control,
@@ -257,6 +269,7 @@ if(mult.start==FALSE){
                   alpha.inc=alpha.inc,
                   step=step,
                   max.iter=max.iter,
+                  line.search=line.search,
                   momentum=momentum,
                   step.ratio=step.ratio,
                   nlminb.control=nlminb.control,
@@ -297,6 +310,7 @@ if(mult.start==FALSE){
                   alpha.inc=alpha.inc,
                   step=step,
                   max.iter=max.iter,
+                  line.search=line.search,
                   momentum=momentum,
                   step.ratio=step.ratio,
                   nlminb.control=nlminb.control,
@@ -338,6 +352,7 @@ if(mult.start==FALSE){
                      solver.maxit=solver.maxit,
                      alpha.inc=alpha.inc,
                      step=step,
+                     line.search=line.search,
                      max.iter=max.iter,
                      momentum=momentum,
                      step.ratio=step.ratio,
@@ -391,6 +406,7 @@ if(mult.start==FALSE){
                       full=full,
                       block=block,
                       alpha.inc=alpha.inc,
+                      line.search=line.search,
                       step=step,
                       momentum=momentum,
                       Start2=Start2,
@@ -413,6 +429,7 @@ if(mult.start==FALSE){
                          full=full,
                          block=block,
                          alpha.inc=alpha.inc,
+                         line.search=line.search,
                          step=step,
                          momentum=momentum,
                          Start2=Start2,
@@ -447,6 +464,7 @@ if(mult.start==FALSE){
                            full=full,
                            block=block,
                            alpha.inc=alpha.inc,
+                           line.search=line.search,
                            step=step,
                            momentum=momentum,
                            Start2=Start2,
@@ -481,6 +499,7 @@ if(mult.start==FALSE){
                          block=block,
                          alpha.inc=alpha.inc,
                          step=step,
+                         line.search=line.search,
                          momentum=momentum,
                          Start2=Start2,
                          step.ratio=step.ratio,nlminb.control=nlminb.control,
@@ -516,6 +535,7 @@ if(mult.start==FALSE){
                             block=block,
                             alpha.inc=alpha.inc,
                             step=step,
+                            line.search=line.search,
                             momentum=momentum,
                             Start2=Start2,
                             step.ratio=step.ratio,nlminb.control=nlminb.control,
@@ -619,6 +639,7 @@ if(mult.start==FALSE){
                     quasi=quasi,
                     solver.maxit=solver.maxit,
                     alpha.inc=alpha.inc,
+                    line.search=line.search,
                     step=step,
                     momentum=momentum,
                     step.ratio=step.ratio,
@@ -638,6 +659,7 @@ if(mult.start==FALSE){
                          solver.maxit=solver.maxit,
                          alpha.inc=alpha.inc,
                          step=step,
+                         line.search=line.search,
                          momentum=momentum,
                          step.ratio=step.ratio,
                          pars_pen=pars_pen,diff_par=NULL,warm.start=warm.start)
@@ -691,6 +713,7 @@ if(mult.start==FALSE){
                      "solver",
                      "quasi",
                      "full",
+                     "line.search",
                      "UB",
                      "calc",
                      "nlminb.control",

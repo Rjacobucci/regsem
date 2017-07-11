@@ -72,6 +72,7 @@
 #' @param quasi Whether to use quasi-Newton
 #' @param solver.maxit Max iterations for solver in coord_desc
 #' @param alpha.inc Whether alpha should increase for coord_desc
+#' @param line.search Use line search for optimization. Default is no, use fixed step size
 #' @param step Step size
 #' @param momentum Momentum for step sizes
 #' @param step.ratio Ratio of step size between A and S. Logical
@@ -139,6 +140,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
                  quasi=FALSE,
                  solver.maxit=5,
                  alpha.inc=FALSE,
+                 line.search=FALSE,
                  step=.1,
                  momentum=FALSE,
                  step.ratio=FALSE,
@@ -160,7 +162,6 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
   # turn parameter labels into numbers
 
   if(is.null(pars_pen)==FALSE & is.numeric(pars_pen)==FALSE){
-    print(parse_parameters(pars_pen,model))
     pars_pen <- parse_parameters(pars_pen,model)
   }
 
@@ -340,7 +341,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
   F <- mats$F
   I <- diag(nrow(A))
 
-  pars_pen <- parse_parameters(pars_pen, model)
+ # pars_pen <- parse_parameters(pars_pen, model)
 
 
     if(is.null(pars_pen) == TRUE){
@@ -775,7 +776,8 @@ if(optMethod=="nlminb"){
                    alpha.inc=alpha.inc,step=step,momentum=momentum,
                    e_alpha=e_alpha,gamma=gamma,
                    par.lim=par.lim,
-                   step.ratio=step.ratio,diff_par=diff_par,pen_vec=pen_vec,quasi=quasi)
+                   step.ratio=step.ratio,diff_par=diff_par,pen_vec=pen_vec,quasi=quasi,
+                   line.search=line.search)
   res$out <- out
   res$optim_fit <- out$value
   #print(out$convergence)

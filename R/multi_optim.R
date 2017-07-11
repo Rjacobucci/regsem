@@ -56,6 +56,7 @@
 #' @param quasi Whether to use quasi-Newton
 #' @param solver.maxit Max iterations for solver in coord_desc
 #' @param alpha.inc Whether alpha should increase for coord_desc
+#' @param line.search Use line search for optimization. Default is no, use fixed step size
 #' @param step Step size
 #' @param momentum Momentum for step sizes
 #' @param step.ratio Ratio of step size between A and S. Logical
@@ -112,6 +113,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                         quasi=FALSE,
                         solver.maxit=50000,
                         alpha.inc=FALSE,
+                        line.search=FALSE,
                         step=.1,
                         momentum=FALSE,
                         step.ratio=FALSE,
@@ -184,6 +186,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                          step,
                          momentum,
                          max.iter,
+                         line.search,
                          step.ratio,
                          gradFun,n.optim,pars_pen,nlminb.control,
                          diff_par,hessFun,Start2){
@@ -229,6 +232,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                                             solver.maxit=solver.maxit,
                                             alpha.inc=alpha.inc,
                                             max.iter=max.iter,
+                                            line.search=line.search,
                                             step=step,
                                             momentum=momentum,
                                             step.ratio=step.ratio,
@@ -283,6 +287,7 @@ iter.optim = iter.optim + 1
                         solver.maxit=solver.maxit,
                         max.iter=max.iter,
                         alpha.inc=alpha.inc,
+                        line.search=line.search,
                         step=step,
                         momentum=momentum,
                         step.ratio=step.ratio,
@@ -347,6 +352,7 @@ iter.optim = iter.optim + 1
                      solver.maxit=solver.maxit,
                      alpha.inc=alpha.inc,
                      step=step,
+                     line.search=line.search,
                      momentum=momentum,
                      step.ratio=step.ratio,
                      LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))
