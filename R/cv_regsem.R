@@ -61,15 +61,26 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' library(lavaan)
+#' library(regsem)
 #' HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
 #' mod <- '
 #' f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 #' '
 #' outt = cfa(mod,HS)
 #'
-#' cv.out = cv_regsem(outt,type="ridge",pars_pen=1:6,n.lambda=100)
-#'}
+#' cv.out = cv_regsem(outt,type="ridge",pars_pen=c(1:2,6:8),n.lambda=100)
+#' # check parameter numbers
+#' extractMatrices(outt)["A"]
+#' # equivalent to
+#' mod <- '
+#' f =~ 1*x1 + l1*x2 + l2*x3 + l3*x4 + l4*x5 + l5*x6 + l6*x7 + l7*x8 + l8*x9
+#' '
+#' outt = cfa(mod,HS)
+#'
+#' cv.out = cv_regsem(outt,type="ridge",pars_pen=c("l1","l2","l6","l7","l8"),
+#'          n.lambda=100)
+#' plot(cv.out,show.minimum="BIC")
+#' }
 
 
 
@@ -81,7 +92,7 @@ cv_regsem = function(model,
                      jump=0.002,
                      lambda.start=0,
                      alpha=.5,
-                     type="none",
+                     type="lasso",
                      fit.ret=c("rmsea","BIC"),
                      fit.ret2 = "train",
                      n.boot=20,
