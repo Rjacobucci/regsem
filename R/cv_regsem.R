@@ -387,13 +387,13 @@ if(mult.start==FALSE){
 
     if(warm.start==FALSE | count == 1 | count == 99){
       itt = 0
-      Start2=NULL
+      Start2="lavaan"
     }else if(fits[count-1,2] == 0){
       itt = 0
       Start2 = par.matrix[count-1,]
       Start2[pars_pen] = Start2[pars_pen]-step*jump
     }else if(fits[count-1,2] == 99){
-      Start="lavaan"
+      Start2="lavaan"
     }else{
       itt = itt + 1
       Start2 = par.matrix[count-itt-1,]
