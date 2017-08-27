@@ -4,7 +4,8 @@
 \alias{xmed_cat}
 \title{Function to performed exploratory mediation with categorical variables}
 \usage{
-xmed_cat(data, iv, mediators, dv, type = "lasso", seed = 1234)
+xmed_cat(data, iv, mediators, dv, type = "lasso", nfolds = 10,
+  epsilon = 0.001, seed = NULL)
 }
 \arguments{
 \item{data}{Name of the dataset}
@@ -16,6 +17,10 @@ xmed_cat(data, iv, mediators, dv, type = "lasso", seed = 1234)
 \item{dv}{Name of dependent variable}
 
 \item{type}{What type of penalty. Options include lasso, ridge, and enet.}
+
+\item{nfolds}{Number of cross-validation folds.}
+
+\item{epsilon}{Threshold for determining whether effect is 0 or not.}
 
 \item{seed}{Set seed to control CV results}
 }

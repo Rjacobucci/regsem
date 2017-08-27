@@ -7,6 +7,8 @@
 #' @param mediators Name of mediators
 #' @param dv Name of dependent variable
 #' @param type What type of penalty. Options include lasso, ridge, and enet.
+#' @param nfolds Number of cross-validation folds.
+#' @param epsilon Threshold for determining whether effect is 0 or not.
 #' @param seed Set seed to control CV results
 #' @export
 #' @examples
@@ -48,135 +50,104 @@
 #'out
 
 
-xmed_cat <- function(data,iv,mediators,dv,type="lasso",seed=1234){
+xmed_cat = function (data, iv, mediators, dv, type = "lasso", nfolds = 10, epsilon = 0.001, seed = NULL)
+{
   res <- list()
-
   Data <- data
-
-  if(type=="lasso"){
-    alpha=1
-  }else if(type=="ridge"){
-    alpha=0
-  }else if(type=="enet"){
-    alpha=0.5
+  if (type == "lasso") {
+    alpha = 1
   }
-
-
-  var.check = function(data){
-    #2 if factor with >2 categories
-    #1 if exactly 2 response options
-    #0 otherwise
-    data=as.data.frame(data)
+  else if (type == "ridge") {
+    alpha = 0
+  }
+  else if (type == "enet") {
+    alpha = 0.5
+  }
+  var.check = function(data) {
+    data = as.data.frame(data)
     num.response.options = flag = integer(ncol(data))
-    for(i in 1:ncol(data)){
+    for (i in 1:ncol(data)) {
       num.response.options[i] = flag[i] = NA
-      num.response.options[i] = length(unique(data[,i]))
-      if(is.factor(data[,i]) & num.response.options[i]>2){
+      num.response.options[i] = length(unique(data[, i]))
+      if (is.factor(data[, i]) & num.response.options[i] >
+          2) {
         flag[i] = 2
       }
-      else if(num.response.options[i] == 2){
+      else if (num.response.options[i] == 2) {
         flag[i] = 1
       }
-      else if(num.response.options[i] != 2){
+      else if (num.response.options[i] != 2) {
         flag[i] = 0
       }
     }
     return(flag)
   }
-
-  check.out <- var.check(data[,c(iv,mediators,dv)])
-  if(any(check.out==2)){
+  check.out <- var.check(data[, c(iv, mediators, dv)])
+  if (any(check.out == 2)) {
     stop("Factor variables with > 2 response options need to be recoded as integer or numeric variables")
   }
-
-  #standardize
-  data.proc <- caret::preProcess(Data[,c(iv,mediators,dv)])
-  data2 <- predict(data.proc,Data[,c(iv,mediators,dv)])
-
- # iv.proc <- caret::preProcess(Data[,iv])
- # iv.pred <- predict(iv.proc,Data[,iv])
-
- # med.proc <- caret::preProcess(Data[,mediators])
- # med.pred <- predict(med.proc,Data[,mediators])
-
- # dv.proc <- caret::preProcess(Data[,dv])
- # dv.pred <- predict(dv.proc,Data[,dv])
-
-
-  iv.mat <- as.matrix(data2[,iv])
-  mediators.mat <- as.matrix(data2[,mediators])
-  dv.mat <- as.matrix(data2[,dv])
-
-  if(sum(is.na(iv.mat)) > 0 |
-     sum(is.na(mediators.mat)) > 0 |
-     sum(is.na(dv.mat)) > 0){
+  data.proc <- caret::preProcess(Data[, c(iv, mediators, dv)])
+  data2 <- predict(data.proc, Data[, c(iv, mediators, dv)])
+  iv.mat <- as.matrix(data2[, iv])
+  mediators.mat <- as.matrix(data2[, mediators])
+  dv.mat <- as.matrix(data2[, dv])
+  if (sum(is.na(iv.mat)) > 0 | sum(is.na(mediators.mat)) > 0 | sum(is.na(dv.mat)) > 0) {
     stop("Missing values are not allowed")
   }
-
-  if(var.check(dv.mat)==0){
-    dv.class="gaussian"
-  }else if(var.check(dv.mat)==1){
+  if (var.check(dv.mat) == 0) {
+    dv.class = "gaussian"
+  }
+  else if (var.check(dv.mat) == 1) {
     dv.class = "binomial"
   }
-
-  #b's
-  set.seed(seed)
-  b.cv.lasso = glmnet::cv.glmnet(mediators.mat,dv.mat,alpha=alpha,family=dv.class,standardize=FALSE,
-                         lambda=exp(seq(log(0.001), log(5), length.out=100)),
-                         penalty.factor=c(rep(1,ncol(data)-2),0))
-
- # b.fit.lasso = glmnet(mediators.mat, dv.mat, alpha=alpha,
- #                     lambda=exp(seq(log(0.001), log(5), length.out=100)),
- #                      penalty.factor=c(rep(1,ncol(data)-2),0))
-
-  b.coefs = coef(b.cv.lasso, s=b.cv.lasso$lambda.min)[-1,1]
-  #b.coefs = b.coefs[-length(b.coefs)]  ??????? Why -- Need to include?
-  res$b.coefs <- b.coefs # removed rounding
-
-  # a
-
-  a.cv.lasso = a.fit.lasso = vector("list",ncol(mediators.mat))
-  for(i in 1:ncol(mediators.mat)){
-    if(var.check(mediators.mat[,i])==0){
-      med.class="gaussian"
-    }else if(var.check(mediators.mat[,i])==1){
+  if(!is.null(seed)){
+    set.seed(seed)
+  }
+  b.cv.lasso = glmnet::cv.glmnet(mediators.mat, dv.mat, alpha = alpha, family = dv.class, standardize = FALSE,
+                                 lambda = exp(seq(log(0.001), log(5), length.out = 100)), nfolds=nfolds,
+                                 penalty.factor = c(rep(1, ncol(data) - 2), 0))
+  b.coefs = coef(b.cv.lasso, s = b.cv.lasso$lambda.min)[-1,1]
+  a.cv.lasso = a.fit.lasso = vector("list", ncol(mediators.mat))
+  a.lambda = numeric(ncol(mediators.mat))
+  for (i in 1:ncol(mediators.mat)) {
+    if (var.check(mediators.mat[, i]) == 0) {
+      med.class = "gaussian"
+    }
+    else if (var.check(mediators.mat[, i]) == 1) {
       med.class = "binomial"
     }
-    set.seed(seed)
-    a.cv.lasso[[i]] = glmnet::cv.glmnet(as.matrix(cbind(rnorm(nrow(data),1,0.0001),iv.mat)), mediators.mat[,i],
-                                lambda=exp(seq(log(0.001), log(5), length.out=100)),standardize=FALSE,
-                                alpha=alpha, family=med.class,intercept=F,penalty.factor=c(0,1))
-   # a.fit.lasso[[i]] = glmnet(as.matrix(cbind(rnorm(nrow(data),1,0.0001),iv.mat)), mediators.mat[,i],
-   #                           lambda=exp(seq(log(0.001), log(5), length.out=100)),
-   #                           alpha=alpha, family=med.class,intercept=F,penalty.factor=c(0,1))
+    if(!is.null(seed)){
+      set.seed(seed)
+    }
+    a.cv.lasso[[i]] = glmnet::cv.glmnet(as.matrix(cbind(rnorm(nrow(data), 1, 1e-04), iv.mat)), mediators.mat[, i],
+                                        alpha = alpha, family = med.class, standardize = FALSE, nfolds=nfolds,
+                                        lambda = exp(seq(log(0.001), log(5), length.out = 100)),
+                                        intercept = F, penalty.factor = c(0, 1))
+    a.lambda[i] = a.cv.lasso[[i]]$lambda.min
   }
-
   a.coefs = numeric(length(b.coefs))
-  for(i in 1:length(a.coefs)){
-    if(!is.null(a.cv.lasso[[i]])){
-      a.coefs[i] = coef(a.cv.lasso[[i]], s=a.cv.lasso[[i]]$lambda.min)[-1,1][2]
+  for (i in 1:length(a.coefs)) {
+    if (!is.null(a.cv.lasso[[i]])) {
+      a.coefs[i] = coef(a.cv.lasso[[i]], s = a.cv.lasso[[i]]$lambda.min)[-1,1][2]
     }
   }
   names(a.coefs) = mediators
   res$a.coefs <- a.coefs
-
-  # indirect
-
+  res$b.coefs <- b.coefs
   indirect = a.coefs * b.coefs
-
-
-  res$important <- names(indirect[abs(indirect) > 0.001])
+  selected <- names(indirect[abs(indirect) > epsilon])
   indirect <- as.data.frame(indirect)
-  indirect = round(indirect,4)
-  indirect[abs(indirect) < 0.001] = 0
-  indirect <- t(indirect)#round(indirect,3)
-  indirect[abs(indirect) >= 0.001] = as.numeric(indirect[abs(indirect) >= 0.001])
+  indirect = round(indirect, 4)
+  indirect[abs(indirect) < epsilon] = 0
+  indirect <- t(indirect)
+  indirect[abs(indirect) >= epsilon] = as.numeric(indirect[abs(indirect) >= epsilon])
+
+  res$a.lambda = a.lambda
+  res$b.lambda = b.cv.lasso$lambda.min
+  res$selected = selected
   res$indirect <- indirect
-
-  # add class for summary function
-
-  # return list
   res$call <- match.call()
+
   class(res) <- "xmed_cat"
   return(res)
 }
