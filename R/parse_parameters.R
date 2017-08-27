@@ -10,7 +10,7 @@ parse_parameters <- function(x, model)
   if (is.numeric(x)) {return (x)}
   else if (is.character(x)) {
     labels <- parTable(model)$label
-    ids <- parTable(model)$id
+    ids <- parTable(model)$free
     matching.ids <- which(labels %in% x)
     if (length(matching.ids)!=length(x)) {
       warning("Not all requested parameters could be matched to the lavaan model parameters.")
