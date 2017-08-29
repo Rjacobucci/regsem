@@ -2,7 +2,8 @@
 % Please edit documentation in R/regsem.R
 \name{regsem}
 \alias{regsem}
-\title{Regularized Structural Equation Modeling}
+\title{Regularized Structural Equation Modeling. Tests a single penalty. For
+testing multiple penalties, see cv_regsem().}
 \usage{
 regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "none",
   data = NULL, optMethod = "coord_desc", gradFun = "ram",
@@ -163,7 +164,8 @@ baseline.chisq Baseline chi-square.
 baseline.df Baseline degrees of freedom.
 }
 \description{
-Regularized Structural Equation Modeling
+Regularized Structural Equation Modeling. Tests a single penalty. For
+testing multiple penalties, see cv_regsem().
 }
 \examples{
 library(lavaan)

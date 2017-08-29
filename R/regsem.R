@@ -1,6 +1,7 @@
 #'
 #'
-#' Regularized Structural Equation Modeling
+#' Regularized Structural Equation Modeling. Tests a single penalty. For
+#' testing multiple penalties, see cv_regsem().
 #'
 #' @param model Lavaan output object. This is a model that was previously
 #'        run with any of the lavaan main functions: cfa(), lavaan(), sem(),
@@ -148,6 +149,10 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
                  missing="listwise"){
 
   e_alpha=alpha
+
+
+
+  if (!is(model,"lavaan")) stop("Input is not a 'lavaan' object")
 
   if(type == "scad" | type == "mcp"){
     warning("this type is currently not working well")

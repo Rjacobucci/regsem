@@ -1,7 +1,20 @@
 #'
 #'
 #' The main function that ties together and runs the models.
-#' @param model lavaan output object.
+#' There are functions for resampling (k-fold or bootstrapping), however, at
+#' this time it is currently recommended to not perform resampling and use
+#' one of the fit indices to choose a final model (1 out of the n.lambda tested.)
+#' @param model Lavaan output object. This is a model that was previously
+#'        run with any of the lavaan main functions: cfa(), lavaan(), sem(),
+#'        or growth(). It also can be from the efaUnrotate() function from
+#'        the semTools package. Currently, the parts of the model which cannot
+#'        be handled in regsem is the use of multiple group models, missing
+#'        other than listwise, thresholds from categorical variable models,
+#'        the use of additional estimators other than
+#'        ML, most notably WLSMV for categorical variables. Note: the model
+#'        does not have to actually run (use do.fit=FALSE), converge etc...
+#'        regsem() uses the lavaan object as more of a parser and to get
+#'        sample covariance matrix.
 #' @param n.lambda number of penalization values to test.
 #' @param pars_pen parameter indicators to penalize.
 #' @param mult.start Logical. Whether to use multi_optim() (TRUE) or
@@ -158,10 +171,16 @@ count = 0
 counts=n.lambda
 #res2 <- data.frame(matrix(NA,counts,3))
 #coefs = rep(1,14)
+pb <- txtProgressBar(min = 0, max = counts, style = 3)
 
 while(count < counts){
   count = count + 1
-  print(count)
+
+  # create progress bar
+
+    setTxtProgressBar(pb, count)
+
+
   SHRINK <- SHRINK2 + jump*(count-1) # 0.01 works well & 0.007 as well with 150 iterations
 
   if(count > 1 & all(abs(par.matrix[count-1,pars_pen])<.001)){
@@ -755,5 +774,7 @@ out2$pars_pen <- pars_pen
 out2$call <- match.call()
 class(out2) <- "cvregsem"
 out2
+
+close(pb)
 
 }

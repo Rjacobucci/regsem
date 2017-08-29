@@ -2,7 +2,10 @@
 % Please edit documentation in R/cv_regsem.R
 \name{cv_regsem}
 \alias{cv_regsem}
-\title{The main function that ties together and runs the models.}
+\title{The main function that ties together and runs the models.
+There are functions for resampling (k-fold or bootstrapping), however, at
+this time it is currently recommended to not perform resampling and use
+one of the fit indices to choose a final model (1 out of the n.lambda tested.)}
 \usage{
 cv_regsem(model, n.lambda = 100, pars_pen, mult.start = FALSE,
   multi.iter = 10, jump = 0.002, lambda.start = 0, alpha = 0.5,
@@ -17,7 +20,17 @@ cv_regsem(model, n.lambda = 100, pars_pen, mult.start = FALSE,
   nlminb.control = list(), warm.start = TRUE, missing = "listwise", ...)
 }
 \arguments{
-\item{model}{lavaan output object.}
+\item{model}{Lavaan output object. This is a model that was previously
+run with any of the lavaan main functions: cfa(), lavaan(), sem(),
+or growth(). It also can be from the efaUnrotate() function from
+the semTools package. Currently, the parts of the model which cannot
+be handled in regsem is the use of multiple group models, missing
+other than listwise, thresholds from categorical variable models,
+the use of additional estimators other than
+ML, most notably WLSMV for categorical variables. Note: the model
+does not have to actually run (use do.fit=FALSE), converge etc...
+regsem() uses the lavaan object as more of a parser and to get
+sample covariance matrix.}
 
 \item{n.lambda}{number of penalization values to test.}
 
@@ -117,6 +130,9 @@ and "fiml".}
 }
 \description{
 The main function that ties together and runs the models.
+There are functions for resampling (k-fold or bootstrapping), however, at
+this time it is currently recommended to not perform resampling and use
+one of the fit indices to choose a final model (1 out of the n.lambda tested.)
 }
 \examples{
 \dontrun{

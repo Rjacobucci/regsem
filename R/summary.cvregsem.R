@@ -6,10 +6,12 @@
 summary.cvregsem <- function(object,...)
 {
 
-  if(is.null(fit)){
+  if(!exists("fit")){
     fit="BIC"
   }
-  lowest.id <- which.min(object[[2]][,fit])
+  fitt = object[[2]][,fit]
+  conv = object[[2]][,"conv"]
+  lowest.id <- which(fitt==min(fitt[conv!=99 & is.na(conv)==FALSE]))
   lenpar <- length(object$pars_pen)
 
   sm <- list(lowest.id=lowest.id, lenpar=lenpar, min.lambda=min(object[[2]][,1]),
