@@ -1,9 +1,7 @@
 #'
 #'
-#' The main function that ties together and runs the models.
-#' There are functions for resampling (k-fold or bootstrapping), however, at
-#' this time it is currently recommended to not perform resampling and use
-#' one of the fit indices to choose a final model (1 out of the n.lambda tested.)
+#' The main function that runs multiple penalty values.
+#'
 #' @param model Lavaan output object. This is a model that was previously
 #'        run with any of the lavaan main functions: cfa(), lavaan(), sem(),
 #'        or growth(). It also can be from the efaUnrotate() function from
@@ -75,13 +73,14 @@
 #' @examples
 #' \dontrun{
 #' library(regsem)
+#' # put variables on same scale for regsem
 #' HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
 #' mod <- '
 #' f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 #' '
-#' outt = cfa(mod,HS)
+#' outt = cfa(mod, HS)
 #'
-#' cv.out = cv_regsem(outt,type="ridge",pars_pen=c(1:2,6:8),n.lambda=100)
+#' cv.out = cv_regsem(outt,type="ridge", pars_pen=c(1:2,6:8), n.lambda=100)
 #' # check parameter numbers
 #' extractMatrices(outt)["A"]
 #' # equivalent to
@@ -90,9 +89,10 @@
 #' '
 #' outt = cfa(mod,HS)
 #'
-#' cv.out = cv_regsem(outt,type="ridge",pars_pen=c("l1","l2","l6","l7","l8"),
+#' cv.out = cv_regsem(outt, type="ridge", pars_pen=c("l1","l2","l6","l7","l8"),
 #'          n.lambda=100)
-#' plot(cv.out,show.minimum="BIC")
+#' summary(cv.out)
+#' plot(cv.out, show.minimum="BIC")
 #' }
 
 
@@ -629,7 +629,7 @@ if(mult.start==FALSE){
 
   colnames(par.matrix) = names(out$coefficients)
   colnames(fits) <- c("lambda","conv",fit.ret)
-  out2 <- list(par.matrix,fits,pars_pen,fitt.var,fit.reg)
+  out2 <- list(par.matrix,fits,pars_pen,fitt.var)
  # ret
 
 }
@@ -770,11 +770,12 @@ if(mult.start==FALSE){
 
 }
 #fits = fit_indices(out,CV=FALSE)
-out2$pars_pen <- pars_pen
+#out2$pars_pen <- pars_pen
 out2$call <- match.call()
 class(out2) <- "cvregsem"
+names(out2) <- c("parameters","fits","pars_pen","fit_variance","call")
 out2
 
-close(pb)
+#close(pb)
 
 }

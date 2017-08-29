@@ -105,19 +105,22 @@
 #' @import lavaan
 #' @importFrom stats cov na.omit nlminb pchisq rnorm runif sd uniroot var weighted.mean cov2cor
 #' @importFrom graphics abline lines plot points
+#' @importFrom utils setTxtProgressBar txtProgressBar
+#' @importFrom methods is
 #' @export
 #' @examples
 #' library(lavaan)
+#' # put variables on same scale for regsem
 #' HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
 #' mod <- '
 #' f =~ 1*x1 + l1*x2 + l2*x3 + l3*x4 + l4*x5 + l5*x6 + l6*x7 + l7*x8 + l8*x9
 #' '
 #' # Recommended to specify meanstructure in lavaan
-#' outt = cfa(mod,HS,meanstructure=TRUE)
+#' outt = cfa(mod, HS, meanstructure=TRUE)
 #'
-#' fit1 <- regsem(outt,lambda=0.05,type="lasso",
-#'   pars_pen=c("l1","l2","l6","l7","l8"))
-#' #equivalent to pars_pen=c(1:2,6:8)
+#' fit1 <- regsem(outt, lambda=0.05, type="lasso",
+#'   pars_pen=c("l1", "l2", "l6", "l7", "l8"))
+#' #equivalent to pars_pen=c(1:2, 6:8)
 #' #summary(fit1)
 
 
@@ -153,6 +156,9 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
 
 
   if (!is(model,"lavaan")) stop("Input is not a 'lavaan' object")
+
+  match.arg(type,c("lasso","none","ridge","scad","alasso","mcp","diff_lasso"))
+
 
   if(type == "scad" | type == "mcp"){
     warning("this type is currently not working well")

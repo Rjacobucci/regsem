@@ -1,7 +1,7 @@
 Package: regsem
 Type: Package
 Title: Regularized Structural Equation Modeling
-Version: 0.8.6
+Version: 0.8.7
 Author: Ross Jacobucci[aut,cre], 
         Kevin J. Grimm [ctb], 
         Andreas M. Brandmaier [ctb],
