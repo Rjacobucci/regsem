@@ -82,7 +82,7 @@ arma::mat SampCov2 = Rcpp::as<arma::mat>(SampCov);
     add = 0;
     for (double i = 0; i < pen_vec.n_elem; i++) {
       if (pen_vec[i] <= lambda*gamma){
-        add = add + (lambda * (abs(pen_vec[i] - (pen_vec[i] - ((pen_vec[i]*pen_vec[i])/2*lambda*gamma)))));
+        add = add + (lambda * (std::abs(pen_vec[i] - (pen_vec[i] - ((pen_vec[i]*pen_vec[i])/2*lambda*gamma)))));
       }
       else if(pen_vec[i] > lambda * gamma){
         add = add + pen_vec[i];
