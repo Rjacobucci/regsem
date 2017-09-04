@@ -106,7 +106,6 @@
 #' @importFrom stats cov na.omit nlminb pchisq rnorm runif sd uniroot var weighted.mean cov2cor
 #' @importFrom graphics abline lines plot points
 #' @importFrom utils setTxtProgressBar txtProgressBar
-#' @importFrom methods is
 #' @export
 #' @examples
 #' library(lavaan)
@@ -155,7 +154,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
 
 
 
-  if (!is(model,"lavaan")) stop("Input is not a 'lavaan' object")
+  if (class(model)!="lavaan") stop("Input is not a 'lavaan' object")
 
   match.arg(type,c("lasso","none","ridge","scad","alasso","mcp","diff_lasso","enet"))
 

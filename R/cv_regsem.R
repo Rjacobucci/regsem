@@ -15,6 +15,9 @@
 #'        sample covariance matrix.
 #' @param n.lambda number of penalization values to test.
 #' @param pars_pen parameter indicators to penalize.
+#' @param metric Which fit index to use to choose a final model?
+#'        Note that it chooses the best fit that also achieves convergence
+#'        (conv=0).
 #' @param mult.start Logical. Whether to use multi_optim() (TRUE) or
 #'         regsem() (FALSE).
 #' @param multi.iter maximum number of random starts for multi_optim
@@ -100,6 +103,7 @@
 cv_regsem = function(model,
                      n.lambda=100,
                      pars_pen,
+                     metric="BIC",
                      mult.start=FALSE,
                      multi.iter=10,
                      jump=0.002,
@@ -629,13 +633,19 @@ if(mult.start==FALSE){
 
   colnames(par.matrix) = names(out$coefficients)
   colnames(fits) <- c("lambda","conv",fit.ret)
-  out2 <- list(par.matrix,fits,pars_pen,fitt.var)
+  fit.index = fits[,metric]
+  conv = fits[,"conv"]
+  loc = which(fit.index==min(fit.index[conv!=99 & is.na(conv)==FALSE]))
+  final_pars = par.matrix[loc,]
+
+
+  out2 <- list(par.matrix,fits,final_pars,pars_pen) #fitt_var
  # ret
 
 }
 }else if(parallel==TRUE){
 
-  stop("Parallel is not currently recommended")
+  stop("Parallel is not currently supported")
 
   par.matrix <- matrix(0,n.lambda,model@Fit@npar)
   fits <- matrix(NA,n.lambda,length(fit.ret)+2)
@@ -769,11 +779,13 @@ if(mult.start==FALSE){
 
 
 }
+
+
 #fits = fit_indices(out,CV=FALSE)
 #out2$pars_pen <- pars_pen
 out2$call <- match.call()
 class(out2) <- "cvregsem"
-names(out2) <- c("parameters","fits","pars_pen","fit_variance","call")
+names(out2) <- c("parameters","fits","final_pars","pars_pen","call")#"fit_variance"
 out2
 
 #close(pb)
