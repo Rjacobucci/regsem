@@ -3,20 +3,21 @@
 #' @param x An x from cv_regsem.
 #' @param ... Other arguments.
 #' @param pars Which parameters to plot
+#' @param show.minimum What fit index to use
 #' @param col A specification for the default plotting color.
 #' @param type what type of plot should be drawn. Possible types are "p" for points, "l" for lines, or "b" for both
 #' @param lwd line width
 #' @param lty line type
 #' @param xlab X axis label
 #' @param ylab Y axis label
-#' @param show.minimum What fit index to use
 #' @method plot cvregsem
 #' @export
 
 
 
-plot.cvregsem <- function (x, ..., pars = NULL, col = NULL, type = "l", lwd = 3,
-                              lty = 1, xlab = NULL, ylab = NULL, show.minimum=NULL)
+plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
+                              col = NULL, type = "l", lwd = 3,
+                              lty = 1, xlab = NULL, ylab = NULL)
 {
   if (is.null(pars))
     pars <- x$pars_pen
@@ -28,7 +29,7 @@ plot.cvregsem <- function (x, ..., pars = NULL, col = NULL, type = "l", lwd = 3,
     xlab <- "Penalty"
   if (is.null(ylab))
     ylab <- "Estimate"
-  coef.mat <- x[[1]][, pars]
+  coef.mat <- x$parameters[, pars]
   if (is.null(col)) {
     colls <- colorspace::rainbow_hcl(length(pars))
   }
@@ -40,8 +41,8 @@ plot.cvregsem <- function (x, ..., pars = NULL, col = NULL, type = "l", lwd = 3,
 
   # filter NA values in fit function
   ydat <- coef.mat[, 1]
-  xdat <- x[[2]][, "lambda"]
-  rm.ids <- which(x[[2]][,"conv"] != 0)
+  xdat <- x$fits[, "lambda"]
+  rm.ids <- which(x$fits[,"conv"] != 0)
   if (length(rm.ids)>0) {
     xdat <- xdat[-rm.ids]
     ydat <- ydat[-rm.ids]
@@ -62,12 +63,12 @@ plot.cvregsem <- function (x, ..., pars = NULL, col = NULL, type = "l", lwd = 3,
 
   # add minimum
   if (!is.null(show.minimum)) {
-    min.id <- which.min(x[[2]][,show.minimum])
-    lambda <- x[[2]][min.id,1]
+    min.id <- which.min(x$fits[,show.minimum])
+    lambda <- x$fits[min.id,1]
 
     abline(v=lambda,lty=2)
 
-    pnts <- x[[1]][min.id,pars]
+    pnts <- x$parameters[min.id,pars]
     points(rep(lambda,length(pnts)),pnts, col=colls,cex=2, pch=19)
     points(rep(lambda,length(pnts)),pnts, col="black",cex=1)
   }

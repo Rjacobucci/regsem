@@ -745,16 +745,15 @@ if(optMethod=="nlminb"){
         res$convergence = out$convergence
         par.ret <- out$pars
 
-}else if(optMethod=="rgenoud"){
-  dom = matrix(c(LB,UB),nrow=length(start),2)
-  suppressWarnings(out <- rgenoud::genoud(calc,starting.values=start,Domains=dom,
-                                      nvars=length(start),print.level=0,gr=grad,
-                                      boundary.enforcement=2,
-                                      wait.generations=3))
-  res$out <- out
+}else if(optMethod=="lbfgs"){
+
+  suppressWarnings(out <- lbfgs::lbfgs(calc,grad,start,orthantwise_c =lambda,
+                                       orthantwise_start=0,orthantwise_end=6))
+  print(out)
+  par.ret <- out$par
   res$optim_fit <- out$value
-  res$convergence = 0
-  res$par.ret <- out$par
+  res$convergence = out$convergence
+
 }else if(optMethod=="GA"){
   calc2 = function(start){
     10-calc(start)

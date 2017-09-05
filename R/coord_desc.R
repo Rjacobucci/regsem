@@ -233,7 +233,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
               update.pars <- update.pars
             }else if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
               for(j in pars_pen){
-                update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
+                update.pars[j] <- soft(update.pars[j],lambda,type,step=1,e_alpha,gamma)
               }
             }else if(type=="diff_lasso" & lambda > 0){
               cc=0
@@ -243,12 +243,12 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
                 #print(pen_diff[j])
                 #print(soft(pen_diff[j],lambda,type="lasso",step=alpha1,e_alpha,gamma))
                 update.pars[j] <- update.pars[j] -
-                  pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
+                  pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=1,e_alpha,gamma)
               }
             }else if(type=="alasso" & lambda > 0){
               for(j in pars_pen){
                 #print(update.pars[j])
-                update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
+                update.pars[j] <- soft(pen_vec[j],lambda,type,step=1,e_alpha,gamma)
               }
             }
 
@@ -279,7 +279,8 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
               fmin.old <-  func(new.pars[count,])
               soft.old <- h(new.pars[count,])
               alpha= alpha
-              c = 0.01 # previously 0.001 worked well; removed 0.5 0.8.1 set at 0.05
+              c = 0.5 # previously 0.001 worked well; removed 0.5 0.8.1 set at 0.05
+              # p. 102 of "sparsity" recommend 0.5, and then 0.8*alpha below
 
 
               # not changing alpha
@@ -301,7 +302,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
                   break
                 }else{
                   if(func(new.pars[count,]+alpha*v) > fmin.old+c*alpha*(vv) + c*((h(new.pars[count,]+alpha*v)-soft.old))){
-                    alpha = 0.5*alpha
+                    alpha = 0.8*alpha
                     bool=FALSE
                   }else{
                     bool=TRUE
@@ -469,6 +470,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
     }else if(solver==TRUE){
 
       out <- nlminb(new.pars[count,],func,grad,control=list(iter.max=1,step.min=alpha,step.max=alpha))
+      #out <- lbfgs::lbfgs(func,grad,new.pars[count,],invisible=1)
       #out <- Rsolnp::solnp(new.pars[count,],func,control=list(trace=0))
       #print(out$objective)
       update.pars <- out$par #new.pars[count,] - alpha*(new.pars[count,] - out$par)

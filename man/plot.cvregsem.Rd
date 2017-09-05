@@ -4,8 +4,9 @@
 \alias{plot.cvregsem}
 \title{Plot function for cv_regsem}
 \usage{
-\method{plot}{cvregsem}(x, ..., pars = NULL, col = NULL, type = "l",
-  lwd = 3, lty = 1, xlab = NULL, ylab = NULL, show.minimum = NULL)
+\method{plot}{cvregsem}(x, ..., pars = NULL, show.minimum = "BIC",
+  col = NULL, type = "l", lwd = 3, lty = 1, xlab = NULL,
+  ylab = NULL)
 }
 \arguments{
 \item{x}{An x from cv_regsem.}
@@ -13,6 +14,8 @@
 \item{...}{Other arguments.}
 
 \item{pars}{Which parameters to plot}
+
+\item{show.minimum}{What fit index to use}
 
 \item{col}{A specification for the default plotting color.}
 
@@ -25,8 +28,6 @@
 \item{xlab}{X axis label}
 
 \item{ylab}{Y axis label}
-
-\item{show.minimum}{What fit index to use}
 }
 \description{
 Plot function for cv_regsem

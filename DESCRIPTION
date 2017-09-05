@@ -23,7 +23,7 @@ Suggests:
     caret,
     glmnet,
     ISLR,
-    rgenoud,
+    lbfgs,
     Rsolnp,
     numDeriv,
     optimx,
