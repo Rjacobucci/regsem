@@ -786,7 +786,7 @@ if(optMethod=="nlminb"){
                    e_alpha=e_alpha,gamma=gamma,
                    par.lim=par.lim,
                    step.ratio=step.ratio,diff_par=diff_par,pen_vec=pen_vec,quasi=quasi,
-                   line.search=line.search)
+                   line.search=line.search,pen_vec_ml)
   res$out <- out
   res$optim_fit <- out$value
   #print(out$convergence)

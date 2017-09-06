@@ -2,7 +2,7 @@
 coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,mats,
                        block,max.iter,tol,full,solver,solver.maxit,alpha.inc,step,
                        step.ratio,diff_par,pen_vec,e_alpha,gamma,momentum,par.lim,quasi,
-                       line.search){
+                       line.search,pen_vec_ml){
   count = 0
   ret <- list()
   max.iter = max.iter
@@ -112,7 +112,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
              }else if(type=="alasso" & lambda > 0){
                 for(j in pars_pen){
                  #print(update.pars[j])
-                 update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
+                 update.pars[j] <- soft(update.pars[j]*(1/pen_vec_ml[j]),lambda,type,step=alpha,e_alpha,gamma)
                }
              }
 
@@ -165,7 +165,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
            }else if(type=="alasso" & lambda > 0){
              for(j in pars_pen){
                #print(update.pars[j])
-               update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
+               update.pars[j] <- soft(update.pars[j]*(1/pen_vec_ml[j]),lambda,type,step=alpha,e_alpha,gamma)
              }
            }
 
@@ -248,7 +248,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
             }else if(type=="alasso" & lambda > 0){
               for(j in pars_pen){
                 #print(update.pars[j])
-                update.pars[j] <- soft(pen_vec[j],lambda,type,step=1,e_alpha,gamma)
+                update.pars[j] <- soft(update.pars[j]*(1/pen_vec_ml[j]),lambda,type,step=1,e_alpha,gamma)
               }
             }
 
@@ -266,6 +266,8 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
                 1*sqrt(sum(pars[pars_pen]**2))
               }else if(type=="lasso"){
                 1*sum(abs(pars[pars_pen]))
+              }else if(type=="alasso"){
+                sum(abs(pars[pars_pen])*abs(1/pen_vec_ml))
               }else{
                 stop("quasi is currently not supported for that type of penalty")
               }
@@ -316,6 +318,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
 
 #alpha = .2
+            print(alpha)
           update.pars <- new.pars[count,] + alpha*(update.pars-new.pars[count,])
 
 
@@ -345,7 +348,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
           }else if(type=="alasso" & lambda > 0){
             for(j in pars_pen){
               #print(update.pars[j])
-              update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha1,e_alpha,gamma)
+              update.pars[j] <- soft(update.pars[j]*(1/pen_vec_ml[j]),lambda,type,step=alpha1,e_alpha,gamma)
             }
           }
 
@@ -448,7 +451,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
      }else if(type=="alasso" & lambda > 0){
        for(j in pars_pen){
          #print(update.pars[j])
-         update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
+         update.pars[j] <- soft(update.pars[j]*(1/pen_vec_ml[j]),lambda,type,step=alpha,e_alpha,gamma)
        }
      }
 
@@ -495,7 +498,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       }else if(type=="alasso" & lambda > 0){
         for(j in pars_pen){
           #print(update.pars[j])
-          update.pars[j] <- soft(pen_vec[j],lambda,type,step=alpha,e_alpha,gamma)
+          update.pars[j] <- soft(update.pars[j]*(1/pen_vec_ml[j]),lambda,type,step=alpha,e_alpha,gamma)
         }
       }
 
