@@ -1,14 +1,14 @@
 #'
 #' print information about cvregsem object
 #' @param object cv_regsem object
-#' @param ... Additional arguments, default fit is fit="BIC"
+#' @param ... Additional arguments
 #' @export
 summary.cvregsem <- function(object,...)
 {
 
-  if(!exists("fit")){
-    fit="BIC"
-  }
+
+    fit=object$metric
+
   fitt = object$fits[,fit]
   conv = object$fits[,"conv"]
   lowest.id <- which(fitt==min(fitt[conv!=99 & is.na(conv)==FALSE]))
@@ -17,7 +17,7 @@ summary.cvregsem <- function(object,...)
 
   sm <- list(lowest.id=lowest.id, lenpar=lenpar, min.lambda=min(object$fits[,1]),
              max.lambda=max(object$fits[,1]), lowest.lambda=object$fits[lowest.id,1],
-             metric=x$metric,
+             metric=fit,
              final_pars=final_pars,
              num.conv = sum(conv==0))
 
