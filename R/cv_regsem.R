@@ -639,7 +639,7 @@ if(mult.start==FALSE){
   final_pars = par.matrix[loc,]
 
 
-  out2 <- list(par.matrix,fits,final_pars,pars_pen) #fitt_var
+  out2 <- list(par.matrix,fits,final_pars,pars_pen,metric) #fitt_var
  # ret
 
 }
@@ -785,7 +785,7 @@ if(mult.start==FALSE){
 #out2$pars_pen <- pars_pen
 out2$call <- match.call()
 class(out2) <- "cvregsem"
-names(out2) <- c("parameters","fits","final_pars","pars_pen","call")#"fit_variance"
+names(out2) <- c("parameters","fits","final_pars","pars_pen","call","metric")#"fit_variance"
 out2
 
 #close(pb)

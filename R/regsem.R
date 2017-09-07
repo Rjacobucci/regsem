@@ -126,7 +126,7 @@
 
 
 
-regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optMethod="coord_desc",
+regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,optMethod="coord_desc",
                  gradFun="ram",hessFun="none",parallel="no",Start="lavaan",
                  subOpt="nlminb",longMod=F,
                  pars_pen=NULL,

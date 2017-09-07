@@ -17,6 +17,7 @@ summary.cvregsem <- function(object,...)
 
   sm <- list(lowest.id=lowest.id, lenpar=lenpar, min.lambda=min(object$fits[,1]),
              max.lambda=max(object$fits[,1]), lowest.lambda=object$fits[lowest.id,1],
+             metric=x$metric,
              final_pars=final_pars,
              num.conv = sum(conv==0))
 
@@ -29,6 +30,7 @@ summary.cvregsem <- function(object,...)
                      " Number of parameters regularized: ",x$lenpar,"\n",
                      " Lambda ranging from ",x$min.lambda," to ",x$max.lambda,"\n",
                      " Lowest Fit Lambda: ", x$lowest.lambda,"\n",
+                     " Metric: ", x$metric,"\n",
                      " Number Converged: ", x$num.conv,"\n\n")
     cat(string)
    # string2 <- paste0(c("Final Parameters: ", names(x$final_pars)))
