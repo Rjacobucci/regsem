@@ -5,7 +5,7 @@
 \title{Regularized Structural Equation Modeling. Tests a single penalty. For
 testing multiple penalties, see cv_regsem().}
 \usage{
-regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "none",
+regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "lasso",
   data = NULL, optMethod = "coord_desc", gradFun = "ram",
   hessFun = "none", parallel = "no", Start = "lavaan",
   subOpt = "nlminb", longMod = F, pars_pen = NULL, diff_par = NULL,

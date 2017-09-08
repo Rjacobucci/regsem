@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{cv_regsem object}
 
-\item{...}{Additional arguments, default fit is fit="BIC"}
+\item{...}{Additional arguments}
 }
 \description{
 print information about cvregsem object

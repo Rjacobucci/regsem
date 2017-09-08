@@ -6,7 +6,7 @@
 \usage{
 multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5, LB = -Inf,
   UB = Inf, par.lim = c(-Inf, Inf), block = TRUE, full = TRUE,
-  type = "none", optMethod = "coord_desc", gradFun = "ram",
+  type = "lasso", optMethod = "coord_desc", gradFun = "ram",
   pars_pen = NULL, diff_par = NULL, hessFun = "none", tol = 1e-05,
   solver = FALSE, quasi = FALSE, solver.maxit = 50000,
   alpha.inc = FALSE, line.search = FALSE, step = 0.1, momentum = FALSE,
