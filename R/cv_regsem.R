@@ -151,6 +151,7 @@ cv_regsem = function(model,
 #  dat.test <- dat[-ids,]
 #}
 fits.var=NA
+mats <- extractMatrices(model)
 
 if(is.null(pars_pen) & type!="none"){
   stop("for cv_regsem(), pars_pen needs to be specified")
@@ -310,7 +311,29 @@ if(mult.start==FALSE){
                   missing=missing)
 
     if(out$convergence==0){
-      fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=cov(test))$fits[fit.ret]
+
+
+      if(mats$mean == TRUE){
+        mm = mats$A[,"1"]
+
+        SampMean <- colMeans(test)
+        ss = match(names(mm[mm > 0]),model@Data@ov$name)
+        SampMean[-c(ss)] = 0
+
+        SampCov=cov(test)
+        SampCov2 <- SampCov + SampMean%*%t(SampMean)
+
+        # try changing size of SampCov
+        SampCov3 = cbind(SampCov2,SampMean)
+        SampCov = rbind(SampCov3,append(SampMean,1))
+
+      }else if(mats$mean == FALSE){
+        # SampCov <- model@SampleStats@cov[][[1]]
+        SampMean = NULL
+        SampCov=cov(test)
+      }
+
+      fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov)$fits[fit.ret]
 
     }else{
       fitt[i,] = NA
@@ -394,7 +417,30 @@ if(mult.start==FALSE){
                      missing=missing)
 
       if(out$convergence==0){
-        fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=cov(test))$fits[fit.ret]
+
+
+        if(mats$mean == TRUE){
+          mm = mats$A[,"1"]
+
+          SampMean <- colMeans(test)
+          ss = match(names(mm[mm > 0]),model@Data@ov$name)
+          SampMean[-c(ss)] = 0
+
+          SampCov=cov(test)
+          SampCov2 <- SampCov + SampMean%*%t(SampMean)
+
+          # try changing size of SampCov
+          SampCov3 = cbind(SampCov2,SampMean)
+          SampCov = rbind(SampCov3,append(SampMean,1))
+
+        }else if(mats$mean == FALSE){
+          # SampCov <- model@SampleStats@cov[][[1]]
+          SampMean = NULL
+          SampCov=cov(test)
+        }
+
+        fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov)$fits[fit.ret]
+
       }else{
         fitt[i,] = NA
       }
@@ -507,7 +553,30 @@ if(mult.start==FALSE){
 
 
         if(out$convergence==0){
-          fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=cov(test))$fits[fit.ret]
+
+
+          if(mats$mean == TRUE){
+            mm = mats$A[,"1"]
+
+            SampMean <- colMeans(test)
+            ss = match(names(mm[mm > 0]),model@Data@ov$name)
+            SampMean[-c(ss)] = 0
+
+            SampCov=cov(test)
+            SampCov2 <- SampCov + SampMean%*%t(SampMean)
+
+            # try changing size of SampCov
+            SampCov3 = cbind(SampCov2,SampMean)
+            SampCov = rbind(SampCov3,append(SampMean,1))
+
+          }else if(mats$mean == FALSE){
+            # SampCov <- model@SampleStats@cov[][[1]]
+            SampMean = NULL
+            SampCov=cov(test)
+          }
+
+          fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov)$fits[fit.ret]
+
         }else{
           fitt[i,] = NA
         }
@@ -576,7 +645,30 @@ if(mult.start==FALSE){
                             pars_pen=pars_pen,diff_par=NULL)
 
         if(out$convergence==0){
-          fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=cov(test))$fits[fit.ret]
+
+
+          if(mats$mean == TRUE){
+            mm = mats$A[,"1"]
+
+            SampMean <- colMeans(test)
+            ss = match(names(mm[mm > 0]),model@Data@ov$name)
+            SampMean[-c(ss)] = 0
+
+            SampCov=cov(test)
+            SampCov2 <- SampCov + SampMean%*%t(SampMean)
+
+            # try changing size of SampCov
+            SampCov3 = cbind(SampCov2,SampMean)
+            SampCov = rbind(SampCov3,append(SampMean,1))
+
+          }else if(mats$mean == FALSE){
+            # SampCov <- model@SampleStats@cov[][[1]]
+            SampMean = NULL
+            SampCov=cov(test)
+          }
+
+          fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov)$fits[fit.ret]
+
         }else{
           fitt[i,] = NA
         }

@@ -268,6 +268,8 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
                 1*sum(abs(pars[pars_pen]))
               }else if(type=="alasso"){
                 sum(abs(pars[pars_pen])*abs(1/pen_vec_ml))
+              }else if(type=="diff_lasso"){
+                sum(abs(pars[pars_pen] - pen_diff))
               }else{
                 stop("quasi is currently not supported for that type of penalty")
               }

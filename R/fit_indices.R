@@ -101,13 +101,14 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.boot=100){
   chisq = fit*N*2
   ret["chisq"] = chisq
 
-  lav.fits <- fitmeasures(model$lav.model)
+
 
 
   if(model$lav.model@Fit@converged == FALSE){
     baseline.chisq = NA
     baseline.df = NA
   }else{
+    lav.fits <- fitmeasures(model$lav.model)
     baseline.chisq = lav.fits["baseline.chisq"]
     baseline.df = lav.fits["baseline.df"]
   }

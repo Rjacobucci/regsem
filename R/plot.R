@@ -7,6 +7,7 @@
 #' @param col A specification for the default plotting color.
 #' @param type what type of plot should be drawn. Possible types are "p" for points, "l" for lines, or "b" for both
 #' @param lwd line width
+#' @param h_line Where to draw horizontal line
 #' @param lty line type
 #' @param xlab X axis label
 #' @param ylab Y axis label
@@ -16,7 +17,7 @@
 
 
 plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
-                              col = NULL, type = "l", lwd = 3,
+                              col = NULL, type = "l", lwd = 3,h_line=0,
                               lty = 1, xlab = NULL, ylab = NULL)
 {
   if (is.null(pars))
@@ -59,7 +60,8 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
     if (type == "p" || type == "b")
       points(xdat, coef.mat[, i])
   }
-  abline(a = 0, b = 0)
+
+  abline(a=h_line,b=0)
 
   # add minimum
   if (!is.null(show.minimum)) {
