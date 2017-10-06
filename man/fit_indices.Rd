@@ -4,19 +4,21 @@
 \alias{fit_indices}
 \title{Calculates the fit indices}
 \usage{
-fit_indices(model, CV = F, CovMat = NULL, data = NULL, n.boot = 100)
+fit_indices(model, CV = F, CovMat = NULL, data = NULL)
 }
 \arguments{
 \item{model}{regsem model object.}
 
-\item{CV}{cross-validation.}
+\item{CV}{cross-validation. Note that this requires splitting the dataset
+into a training and test set prior to running the model. The
+model should be run on the training set, with the test set
+held out and then passed to CovMat=.}
 
 \item{CovMat}{If CV=T then test covariance matrix must be supplied. Note
-That this should be done before running the lavaan model.}
+That this should be done before running the lavaan model and should
+not overlap with the data or covariance matrix used to run the model.}
 
 \item{data}{supply the dataset?}
-
-\item{n.boot}{number of bootstrap samples to take.}
 }
 \description{
 Calculates the fit indices
