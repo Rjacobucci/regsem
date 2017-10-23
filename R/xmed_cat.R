@@ -6,6 +6,7 @@
 #' @param iv Name of independent variable
 #' @param mediators Name of mediators
 #' @param dv Name of dependent variable
+#' @param covariates Name of covariates to be included in model.
 #' @param type What type of penalty. Options include lasso, ridge, and enet.
 #' @param nfolds Number of cross-validation folds.
 #' @param epsilon Threshold for determining whether effect is 0 or not.
@@ -50,7 +51,8 @@
 #'out
 
 
-xmed_cat = function (data, iv, mediators, dv, type = "lasso", nfolds = 10, epsilon = 0.001, seed = NULL)
+xmed_cat = function (data, iv, mediators, dv, covariates=NULL, type = "lasso", nfolds = 10,
+                     epsilon = 0.001, seed = NULL)
 {
   res <- list()
   Data <- data

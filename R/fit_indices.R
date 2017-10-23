@@ -21,9 +21,9 @@
 fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL){
 
   res <- list()
-  ret <- as.vector(rep(0,25))
+  ret <- as.vector(rep(0,24))
 
-  names(ret) <- c("Fmin","varFit","p","chisq","p.chisq","nfac","df","npar","N","baseline.chisq","baseline.df",
+  names(ret) <- c("Fmin","p","chisq","p.chisq","nfac","df","npar","N","baseline.chisq","baseline.df",
                   "logl","ncp","rmsea","rmsea.lower","rmsea.upper","rmsea.pval","srmr",
                   "CFI","TLI","BIC","AIC",
                   "CAIC","EBIC.5","EBIC.25")
@@ -95,11 +95,11 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL){
 
   ret["Fmin"] = fit
 
-  if(CV=="boot"){
-    ret["varFit"] = varFit
-  }else{
-    ret["varFit"] = 0
-  }
+ # if(CV=="boot"){
+ #   ret["varFit"] = varFit
+ # }else{
+ #   ret["varFit"] = 0
+ # }
 
   chisq = fit*N*2
   ret["chisq"] = chisq
