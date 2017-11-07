@@ -12,6 +12,20 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
   phi_grad <- rep(1,max.iter)
 
 
+
+
+
+
+  ## remove !!!!!!!!!!!!!!
+
+  # !!!!!!!!!!!!!!!!!!
+
+  solver="gen_alg"
+
+
+
+
+
  # if(type=="enet"){
  #   step=step*2
  # }
@@ -36,6 +50,20 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
  # B <- matrix(NA,2,2)
   new.pars[1,] <- start
  # print(new.pars[1,])
+
+
+
+
+  if(solver=="gen_alg"){
+    out <- Rsolnp::solnp(start,func,control=list(trace=0))
+    out.solution <- out$pars
+    print(out.solution)
+  }
+
+
+
+
+
 
   while(count < max.iter){
     count=count+1
@@ -505,6 +533,89 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       }
 
       # S
+
+
+
+    }else if(solver=="gen_alg"){
+
+
+     # calc2 = function(start){
+      #  10-calc(start)
+     # }
+      #out = GA::ga("real-valued", fitness = func,min=0,max=1000, nBits = length(start),maxiter=30)
+
+
+      gg <- try(grad(out.solution),silent=TRUE)
+      #print(round(gg,2))
+      if(inherits(gg, "try-error")) {
+        gg <- rnorm(length(new.pars[count,]),0,.01)
+      }else{
+        gg <- gg
+      }
+
+
+      delta <- function(alpha){
+
+        update.pars <- out.solution - alpha*gg
+
+        # print(round(t(alpha*gg),3))
+        if(type == "ridge" | type=="none"){
+          update.pars <- update.pars
+        }else if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
+          for(j in pars_pen){
+            update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
+          }
+        }else if(type=="diff_lasso" & lambda > 0){
+          cc=0
+          for(j in pars_pen){
+            cc <- cc + 1
+            update.pars[j] <- update.pars[j] -
+              pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
+          }
+        }else if(type=="alasso" & lambda > 0){
+          for(j in pars_pen){
+            #print(update.pars[j])
+            update.pars[j] <- soft(update.pars[j]*(1/pen_vec_ml[j]),lambda,type,step=alpha,e_alpha,gamma)
+          }
+        }
+
+        func(update.pars)
+      } #end delta
+
+
+
+
+
+
+      # works well with momentum -- delta{only contains func(update.pars)}
+      #alpha <- optimize(delta,interval=c(0,step),maximum=FALSE)$minimum
+
+
+
+
+
+      update.pars <- out.solution - alpha*gg
+
+      # print(round(t(alpha*gg),3))
+      if(type == "ridge" | type=="none"){
+        update.pars <- update.pars
+      }else if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
+        for(j in pars_pen){
+          update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
+        }
+      }else if(type=="diff_lasso" & lambda > 0){
+        cc=0
+        for(j in pars_pen){
+          cc <- cc + 1
+          update.pars[j] <- update.pars[j] -
+            pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
+        }
+      }else if(type=="alasso" & lambda > 0){
+        for(j in pars_pen){
+          #print(update.pars[j])
+          update.pars[j] <- soft(update.pars[j]*(1/pen_vec_ml[j]),lambda,type,step=alpha,e_alpha,gamma)
+        }
+      }
 
 
 
