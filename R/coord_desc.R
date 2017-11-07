@@ -2,7 +2,7 @@
 coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,mats,
                        block,max.iter,tol,full,solver,solver.maxit,alpha.inc,step,
                        step.ratio,diff_par,pen_vec,e_alpha,gamma,momentum,par.lim,quasi,
-                       line.search,pen_vec_ml){
+                       line.search,pen_vec_ml,prerun){
   count = 0
   ret <- list()
   max.iter = max.iter
@@ -19,11 +19,6 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
   ## remove !!!!!!!!!!!!!!
 
   # !!!!!!!!!!!!!!!!!!
-
-  solver="gen_alg"
-
-
-
 
 
  # if(type=="enet"){
@@ -54,10 +49,9 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
 
 
-  if(solver=="gen_alg"){
+  if(prerun==TRUE){
     out <- Rsolnp::solnp(start,func,control=list(trace=0))
     out.solution <- out$pars
-    print(out.solution)
   }
 
 
@@ -92,7 +86,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       #s.pars <- update.pars[min(mats$S != 0):max(mats$S)]
     # gg <- grad(new.pars[count,])
 
-    if(solver==FALSE){
+    if(solver==FALSE & prerun==FALSE){
       if(block == FALSE){
         for(j in 1:length(update.pars)){ # update A
 
@@ -449,7 +443,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
             update.pars[min(mats$S[mats$S !=0]):max(mats$S)] - s*gg2[min(mats$S[mats$S !=0]):max(mats$S)]
         }
       }
-    }else if(hessFun!="none" & solver==FALSE){
+    }else if(hessFun!="none" & solver==FALSE & prerun==FALSE){
       #alpha <- .1 + .01*count
      # alpha <- 1
       #print(new.pars[count,])
@@ -500,7 +494,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
      # print(max(mats$S))
 
 
-    }else if(solver==TRUE){
+    }else if(solver==TRUE & prerun==FALSE){
 
       out <- nlminb(new.pars[count,],func,grad,control=list(iter.max=1,step.min=alpha,step.max=alpha))
       #out <- lbfgs::lbfgs(func,grad,new.pars[count,],invisible=1)
@@ -536,9 +530,9 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
 
 
-    }else if(solver=="gen_alg"){
+    }else if(prerun==TRUE){
 
-
+#print(out.solution)
      # calc2 = function(start){
       #  10-calc(start)
      # }

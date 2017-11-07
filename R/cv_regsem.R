@@ -23,7 +23,7 @@
 #' @param multi.iter maximum number of random starts for multi_optim
 #' @param jump Amount to increase penalization each iteration.
 #' @param lambda.start What value to start the penalty at
-#' @param alpha Mixing for elastic net
+#' @param alpha Mixture for elastic net. 1 = ridge, 0 = lasso
 #' @param type Penalty type. Options include "none", "lasso", "ridge",
 #'        "enet" for the elastic net,
 #'        "alasso" for the adaptive lasso
@@ -41,6 +41,8 @@
 #' @param gradFun gradient function to use.
 #' @param hessFun hessian function to use.
 #' @param test.cov Covariance matrix from test dataset. Necessary for CV=T
+#' @param prerun Logical. Use rsolnp to first optimize before passing to
+#'        gradient descent?
 #' @param parallel Logical. whether to parallelize the processes running models for all
 #'        values of lambda.
 #' @param ncore Number of cores to use when parallel=TRUE
@@ -118,6 +120,7 @@ cv_regsem = function(model,
                     gradFun="ram",
                     hessFun="none",
                     test.cov=NULL,
+                    prerun=FALSE,
                     parallel=FALSE,
                     ncore=2,
                     Start="lavaan",
@@ -221,6 +224,7 @@ if(mult.start==FALSE){
                   diff_par=diff_par,
                   LB=LB,
                   UB=UB,
+                  prerun=prerun,
                   par.lim=par.lim,
                   block=block,
                   full=full,
@@ -249,7 +253,7 @@ if(mult.start==FALSE){
                   alpha=alpha,
                   pars_pen=pars_pen,
                   diff_par=diff_par,
-                  LB=LB,
+                  LB=LB,prerun=prerun,
                   UB=UB,
                   par.lim=par.lim,
                   block=block,
@@ -288,7 +292,7 @@ if(mult.start==FALSE){
                   gradFun=gradFun,hessFun=hessFun,
                   parallel=parallel,Start=Start,
                   subOpt=subOpt,
-                  alpha=alpha,
+                  alpha=alpha,prerun=prerun,
                   pars_pen=pars_pen,
                   diff_par=diff_par,
                   LB=LB,
@@ -355,7 +359,7 @@ if(mult.start==FALSE){
                   pars_pen=pars_pen,
                   diff_par=diff_par,
                   LB=LB,
-                  UB=UB,
+                  UB=UB,prerun=prerun,
                   par.lim=par.lim,
                   block=block,
                   full=full,
@@ -400,7 +404,7 @@ if(mult.start==FALSE){
                      LB=LB,
                      UB=UB,
                      par.lim=par.lim,
-                     block=block,
+                     block=block,prerun=prerun,
                      full=full,
                      calc=calc,
                      tol=tol,
@@ -483,7 +487,7 @@ if(mult.start==FALSE){
                       quasi=quasi,
                       solver.maxit=solver.maxit,
                       max.iter=max.iter,
-                      full=full,
+                      full=full,prerun=prerun,
                       block=block,
                       alpha.inc=alpha.inc,
                       line.search=line.search,
@@ -502,7 +506,7 @@ if(mult.start==FALSE){
                          gradFun=gradFun,hessFun=hessFun,
                          tol=tol,
                          alpha=alpha,
-                         solver=solver,
+                         solver=solver,prerun=prerun,
                          quasi=quasi,
                          solver.maxit=solver.maxit,
                          max.iter=max.iter,
@@ -536,7 +540,7 @@ if(mult.start==FALSE){
                            type=type,optMethod=optMethod,
                            gradFun=gradFun,hessFun=hessFun,
                            tol=tol,
-                           alpha=alpha,
+                           alpha=alpha,prerun=prerun,
                            solver=solver,
                            quasi=quasi,
                            solver.maxit=solver.maxit,
@@ -595,7 +599,7 @@ if(mult.start==FALSE){
                          tol=tol,
                          alpha=alpha,
                          solver=solver,
-                         quasi=quasi,
+                         quasi=quasi,prerun=prerun,
                          solver.maxit=solver.maxit,
                          max.iter=max.iter,
                          full=full,
@@ -629,7 +633,7 @@ if(mult.start==FALSE){
                             type=type,optMethod=optMethod,
                             gradFun=gradFun,hessFun=hessFun,
                             tol=tol,
-                            alpha=alpha,
+                            alpha=alpha,prerun=prerun,
                             solver=solver,
                             quasi=quasi,
                             solver.maxit=solver.maxit,
@@ -760,7 +764,7 @@ if(mult.start==FALSE){
                     diff_par=diff_par,
                     LB=LB,
                     alpha=alpha,
-                    UB=UB,
+                    UB=UB,prerun=prerun,
                     calc=calc,
                     nlminb.control=nlminb.control,
                     tol=tol,
@@ -784,7 +788,7 @@ if(mult.start==FALSE){
                          tol=tol,
                          full=full,
                          alpha=alpha,
-                         block=block,
+                         block=block,prerun=prerun,
                          solver=solver,
                          quasi=quasi,
                          solver.maxit=solver.maxit,

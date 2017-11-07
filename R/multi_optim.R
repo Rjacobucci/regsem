@@ -51,6 +51,8 @@
 #'        which refers to the method specified in von Oertzen & Brick (2014).
 #'        The "norm" procedure uses the forward difference method for
 #'        calculating the hessian. This is slower and less accurate.
+#' @param prerun Logical. Use rsolnp to first optimize before passing to
+#'        gradient descent?
 #' @param tol Tolerance for coordinate descent
 #' @param solver Whether to use solver for coord_desc
 #' @param quasi Whether to use quasi-Newton
@@ -115,6 +117,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                         solver.maxit=50000,
                         alpha.inc=FALSE,
                         line.search=FALSE,
+                        prerun=FALSE,
                         step=.1,
                         momentum=FALSE,
                         step.ratio=FALSE,
@@ -185,7 +188,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                          solver.maxit,
                          alpha.inc,
                          step,
-                         momentum,
+                         momentum,prerun,
                          max.iter,
                          line.search,
                          step.ratio,
@@ -229,7 +232,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                                             quasi=quasi,
                                             block=block,
                                             par.lim=par.lim,
-                                            full=full,
+                                            full=full,prerun=prerun,
                                             solver.maxit=solver.maxit,
                                             alpha.inc=alpha.inc,
                                             max.iter=max.iter,
@@ -284,7 +287,7 @@ iter.optim = iter.optim + 1
                         quasi=quasi,
                         block=block,
                         par.lim=par.lim,
-                        full=full,
+                        full=full,prerun=prerun,
                         solver.maxit=solver.maxit,
                         max.iter=max.iter,
                         alpha.inc=alpha.inc,
@@ -348,7 +351,7 @@ iter.optim = iter.optim + 1
                      quasi=quasi,
                      block=block,
                      full=full,
-                     par.lim=par.lim,
+                     par.lim=par.lim,prerun=prerun,
                      max.iter=max.iter,
                      solver.maxit=solver.maxit,
                      alpha.inc=alpha.inc,
