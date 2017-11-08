@@ -9,13 +9,13 @@ cv_regsem(model, n.lambda = 100, pars_pen, metric = "BIC",
   alpha = 0.5, type = "lasso", fit.ret = c("rmsea", "BIC"),
   fit.ret2 = "train", n.boot = 20, data = NULL,
   optMethod = "coord_desc", gradFun = "ram", hessFun = "none",
-  test.cov = NULL, parallel = FALSE, ncore = 2, Start = "lavaan",
-  subOpt = "nlminb", diff_par = NULL, LB = -Inf, UB = Inf,
-  par.lim = c(-Inf, Inf), block = TRUE, full = TRUE, calc = "normal",
-  max.iter = 2000, tol = 1e-05, solver = FALSE, quasi = FALSE,
-  solver.maxit = 5, alpha.inc = FALSE, step = 0.1, momentum = FALSE,
-  step.ratio = FALSE, line.search = FALSE, nlminb.control = list(),
-  warm.start = TRUE, missing = "listwise", ...)
+  test.cov = NULL, prerun = FALSE, parallel = FALSE, ncore = 2,
+  Start = "lavaan", subOpt = "nlminb", diff_par = NULL, LB = -Inf,
+  UB = Inf, par.lim = c(-Inf, Inf), block = TRUE, full = TRUE,
+  calc = "normal", max.iter = 2000, tol = 1e-05, solver = FALSE,
+  quasi = FALSE, solver.maxit = 5, alpha.inc = FALSE, step = 0.1,
+  momentum = FALSE, step.ratio = FALSE, line.search = FALSE,
+  nlminb.control = list(), warm.start = TRUE, missing = "listwise", ...)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -47,7 +47,7 @@ regsem() (FALSE).}
 
 \item{lambda.start}{What value to start the penalty at}
 
-\item{alpha}{Mixing for elastic net}
+\item{alpha}{Mixture for elastic net. 1 = ridge, 0 = lasso}
 
 \item{type}{Penalty type. Options include "none", "lasso", "ridge",
 "enet" for the elastic net,
@@ -74,6 +74,9 @@ do 2 sample CV manually.}
 \item{hessFun}{hessian function to use.}
 
 \item{test.cov}{Covariance matrix from test dataset. Necessary for CV=T}
+
+\item{prerun}{Logical. Use rsolnp to first optimize before passing to
+gradient descent?}
 
 \item{parallel}{Logical. whether to parallelize the processes running models for all
 values of lambda.}

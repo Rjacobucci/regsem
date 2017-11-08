@@ -739,11 +739,12 @@ if(optMethod=="nlminb"){
 }else if(optMethod=="rsolnp"){
        # if(UB == Inf) UB=NULL
        # if(LB == -Inf) LB=NULL
-        suppressWarnings(out <- Rsolnp::solnp(start,calc,LB=LB,UB=UB,
-                                              control=list(trace=0,tol=1e-16)))#tol=1e-16
+        suppressWarnings(out <- Rsolnp::solnp(start,calc,#LB=LB,UB=UB,
+                                              control=list(trace=0)))#tol=1e-16
         #out <- optim(par=start,fn=calc,gr=grad)
         res$out <- out
         #res$iterations <- out$nfunevals
+        res$optim_fit <- out$values[length(out$values)]
         res$convergence = out$convergence
         par.ret <- out$pars
 

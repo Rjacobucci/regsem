@@ -7,7 +7,7 @@ testing multiple penalties, see cv_regsem().}
 \usage{
 regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "lasso",
   data = NULL, optMethod = "coord_desc", gradFun = "ram",
-  hessFun = "none", parallel = "no", Start = "lavaan",
+  hessFun = "none", prerun = FALSE, parallel = "no", Start = "lavaan",
   subOpt = "nlminb", longMod = F, pars_pen = NULL, diff_par = NULL,
   LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf), block = TRUE,
   full = TRUE, calc = "normal", max.iter = 500, tol = 1e-05,
@@ -62,6 +62,9 @@ calculating the hessian. This is slower and less accurate.}
 which refers to the method specified in von Oertzen & Brick (2014).
 The "norm" procedure uses the forward difference method for
 calculating the hessian. This is slower and less accurate.}
+
+\item{prerun}{Logical. Use rsolnp to first optimize before passing to
+gradient descent?}
 
 \item{parallel}{Logical. Whether to parallelize the processes?}
 

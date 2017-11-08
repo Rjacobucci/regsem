@@ -50,8 +50,20 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
 
 
   if(prerun==TRUE){
-    out <- Rsolnp::solnp(start,func,control=list(trace=0))
-    out.solution <- out$pars
+
+
+     out <- try(Rsolnp::solnp(start,func,control=list(trace=0)),silent=TRUE)
+     if(inherits(out, "try-error")){
+       out.solution <- start
+     }else{
+       out.solution <- out$pars
+     }
+
+
+
+   # out <- hydroPSO::hydroPSO(start,fn=func,lower=start-5,upper=start+5,
+   #                           control=list(verbose=FALSE,write2disk=FALSE))
+   # out.solution <- out$par
   }
 
 
@@ -546,43 +558,6 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       }else{
         gg <- gg
       }
-
-
-      delta <- function(alpha){
-
-        update.pars <- out.solution - alpha*gg
-
-        # print(round(t(alpha*gg),3))
-        if(type == "ridge" | type=="none"){
-          update.pars <- update.pars
-        }else if(type!="none" & type!="ridge" & type!="diff_lasso" & lambda > 0){
-          for(j in pars_pen){
-            update.pars[j] <- soft(update.pars[j],lambda,type,step=alpha,e_alpha,gamma)
-          }
-        }else if(type=="diff_lasso" & lambda > 0){
-          cc=0
-          for(j in pars_pen){
-            cc <- cc + 1
-            update.pars[j] <- update.pars[j] -
-              pen_diff[cc] - soft(pen_diff[cc],lambda,type="lasso",step=alpha,e_alpha,gamma)
-          }
-        }else if(type=="alasso" & lambda > 0){
-          for(j in pars_pen){
-            #print(update.pars[j])
-            update.pars[j] <- soft(update.pars[j]*(1/pen_vec_ml[j]),lambda,type,step=alpha,e_alpha,gamma)
-          }
-        }
-
-        func(update.pars)
-      } #end delta
-
-
-
-
-
-
-      # works well with momentum -- delta{only contains func(update.pars)}
-      #alpha <- optimize(delta,interval=c(0,step),maximum=FALSE)$minimum
 
 
 
