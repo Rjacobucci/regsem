@@ -100,6 +100,7 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
     if(solver==FALSE & prerun==FALSE){
 
         if(full==TRUE & quasi == FALSE & hessFun=="none"){
+
           #print(round(new.pars[count,],3))
           gg <- try(grad(new.pars[count,]),silent=TRUE)
           #print(round(gg,2))
@@ -604,7 +605,9 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
     }else if(any(new.pars[count+1,] > par.lim[2]) | any(new.pars[count+1,] < par.lim[1])){
       break
       convergence=99
-    }else{
+    }else if(abs(vals[count+1])>100){
+      convergence=99
+      }else{
       if(st.crit==TRUE){
         convergence = 0
         #print(convergence)
@@ -614,7 +617,6 @@ coord_desc <- function(start,func,type,grad,hess,hessFun,pars_pen,model,lambda,m
       }
     }
   }
-  print(vals[count+1])
   ret$iterations <- count
   ret$value <- vals[count+1]
   ret$pars <- new.pars[count+1,] #+ rnorm(length(new.pars[count+1,]),0,0.00001)

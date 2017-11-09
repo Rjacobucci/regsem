@@ -82,7 +82,7 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
 
   # add minimum
   if (!is.null(show.minimum)) {
-    min.id <- which.min(x$fits[,show.minimum])
+    min.id <- which.min(abs(x$fits[,show.minimum]))
     lambda <- x$fits[min.id,1]
 
     abline(v=lambda,lty=2)
