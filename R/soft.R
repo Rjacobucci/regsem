@@ -3,7 +3,9 @@
 soft <- function(par,lambda,type,step,e_alpha,gamma){
   if(type=="lasso"){
     lambda <- lambda*step
+   # print(par)
       ret.val <- sign(par)*max(abs(par)-lambda,0)
+     # print(ret.val)
   }else if(type=="enet"){
     #http://www.stat.washington.edu/courses/stat527/s13/readings/zouhastie05.pdf ****p. 305****
       lambda <- lambda*step

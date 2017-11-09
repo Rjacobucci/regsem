@@ -49,17 +49,17 @@ arma::mat SampCov2 = Rcpp::as<arma::mat>(SampCov);
     fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m);
   }
   else if (type2 == 1) {
-    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  + 2*lambda * norm(pen_vec,1));
+    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  + lambda * norm(pen_vec,1));
   }
   else if (type2 == 2) {
-    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  + 2*lambda * norm(pen_vec,2));
+    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  + lambda * norm(pen_vec,2));
   }
   else if (type2 == 3) {
-    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  + 2*lambda * norm(pen_diff,1));
+    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  + lambda * norm(pen_diff,1));
   }
   else if (type2 == 4) {
     fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  +
-      2*lambda * ((1-e_alpha)*norm(pen_vec,1) + e_alpha*norm(pen_vec,2)));
+      lambda * ((1-e_alpha)*norm(pen_vec,1) + e_alpha*norm(pen_vec,2)));
   }
   else if (type2 == 6) {
     add = 0;

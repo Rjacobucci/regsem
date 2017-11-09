@@ -565,7 +565,6 @@ stop("gradFun = auto is not supported at this time")
 }
 
     res <- list()
-
 if(optMethod=="nlminb"){
     if(gradFun=="norm"){
       if(hessFun=="norm"){
@@ -746,6 +745,8 @@ if(optMethod=="nlminb"){
         #res$iterations <- out$nfunevals
         res$optim_fit <- out$values[length(out$values)]
         res$convergence = out$convergence
+
+        print(res$optim_fit)
         par.ret <- out$pars
 
 }else if(optMethod=="lbfgs"){
@@ -769,7 +770,6 @@ if(optMethod=="nlminb"){
   res$convergence = 0
   res$par.ret <- summary(out)$solution
 }else if(optMethod=="coord_desc"){
-
 
   if(type=="alasso"){
     mult = rcpp_RAMmult(par=start,A,S,S_fixed,A_fixed,A_est,S_est,F,I)
