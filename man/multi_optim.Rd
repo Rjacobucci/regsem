@@ -9,7 +9,7 @@ multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5, LB = -Inf,
   type = "lasso", optMethod = "coord_desc", gradFun = "ram",
   pars_pen = NULL, diff_par = NULL, hessFun = "none", tol = 1e-05,
   solver = FALSE, quasi = FALSE, solver.maxit = 50000,
-  alpha.inc = FALSE, line.search = FALSE, prerun = FALSE, step = 0.1,
+  alpha.inc = FALSE, line.search = FALSE, prerun = TRUE, step = 0.1,
   momentum = FALSE, step.ratio = FALSE, verbose = FALSE,
   warm.start = FALSE, Start2 = NULL, nlminb.control = NULL,
   max.iter = 500)

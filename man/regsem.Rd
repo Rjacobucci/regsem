@@ -7,7 +7,7 @@ testing multiple penalties, see cv_regsem().}
 \usage{
 regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "lasso",
   data = NULL, optMethod = "coord_desc", gradFun = "ram",
-  hessFun = "none", prerun = FALSE, parallel = "no", Start = "lavaan",
+  hessFun = "none", prerun = TRUE, parallel = "no", Start = "lavaan",
   subOpt = "nlminb", longMod = F, pars_pen = NULL, diff_par = NULL,
   LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf), block = TRUE,
   full = TRUE, calc = "normal", max.iter = 500, tol = 1e-05,

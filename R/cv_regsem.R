@@ -116,11 +116,11 @@ cv_regsem = function(model,
                      fit.ret2 = "train",
                      n.boot=20,
                      data=NULL,
-                     optMethod="coord_desc",
+                     optMethod="rsolnp",
                     gradFun="ram",
                     hessFun="none",
                     test.cov=NULL,
-                    prerun=FALSE,
+                    prerun=TRUE,
                     parallel=FALSE,
                     ncore=2,
                     Start="lavaan",
@@ -163,7 +163,9 @@ if(is.null(pars_pen) & type!="none"){
 if(is.null(pars_pen)==FALSE & is.numeric(pars_pen)==FALSE){
   pars_pen <- parse_parameters(pars_pen,model)
 }
-
+if(quasi==TRUE){
+  warnings("The quasi-Newton method is currently not recommended")
+}
 
 if(parallel == TRUE){
   stop("parallel is not currently supported")

@@ -106,7 +106,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                         block=TRUE,
                         full=TRUE,
                         type="lasso",
-                        optMethod="coord_desc",
+                        optMethod="rsolnp",
                         gradFun="ram",
                         pars_pen=NULL,
                         diff_par=NULL,
@@ -117,7 +117,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                         solver.maxit=50000,
                         alpha.inc=FALSE,
                         line.search=FALSE,
-                        prerun=FALSE,
+                        prerun=TRUE,
                         step=.1,
                         momentum=FALSE,
                         step.ratio=FALSE,
@@ -152,7 +152,9 @@ multi_optim <- function(model,max.try=10,lambda=0,
     type="enet";alpha=1
   }
 
-
+  if(quasi==TRUE){
+    warnings("The quasi-Newton method is currently not recommended")
+  }
 #if(warm.start==TRUE){
 #  stop("warm start not currently functioning")
 #}

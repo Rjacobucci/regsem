@@ -128,8 +128,8 @@
 
 
 
-regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,optMethod="coord_desc",
-                 gradFun="ram",hessFun="none",prerun=FALSE,parallel="no",Start="lavaan",
+regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,optMethod="rsolnp",
+                 gradFun="ram",hessFun="none",prerun=TRUE,parallel="no",Start="lavaan",
                  subOpt="nlminb",longMod=F,
                  pars_pen=NULL,
                  diff_par=NULL,
@@ -154,6 +154,9 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
 
   e_alpha=alpha
 
+  if(quasi==TRUE){
+    warnings("The quasi-Newton method is currently not recommended")
+  }
 
 
   if (class(model)!="lavaan") stop("Input is not a 'lavaan' object")
