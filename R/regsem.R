@@ -45,7 +45,7 @@
 #'        which refers to the method specified in von Oertzen & Brick (2014).
 #'        This is currently not recommended.
 #' @param prerun Logical. Use rsolnp to first optimize before passing to
-#'        gradient descent?
+#'        gradient descent? Only for use with coord_desc.
 #' @param parallel Logical. Whether to parallelize the processes?
 #' @param Start type of starting values to use. Only recommended to use
 #'        "default". This sets factor loadings and variances to 0.5.
@@ -132,7 +132,7 @@
 
 
 regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,optMethod="rsolnp",
-                 gradFun="ram",hessFun="none",prerun=TRUE,parallel="no",Start="lavaan",
+                 gradFun="ram",hessFun="none",prerun=FALSE,parallel="no",Start="lavaan",
                  subOpt="nlminb",longMod=F,
                  pars_pen=NULL,
                  diff_par=NULL,

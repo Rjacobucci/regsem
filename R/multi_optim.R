@@ -53,7 +53,7 @@
 #'        type="diff_lasso".
 #' @param hessFun Hessian function to use. Currently not recommended.
 #' @param prerun Logical. Use rsolnp to first optimize before passing to
-#'        gradient descent?
+#'        gradient descent? Only for use with coord_desc.
 #' @param tol Tolerance for coordinate descent
 #' @param solver Whether to use solver for coord_desc
 #' @param quasi Whether to use quasi-Newton. Currently not recommended.
@@ -118,7 +118,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                         solver.maxit=50000,
                         alpha.inc=FALSE,
                         line.search=FALSE,
-                        prerun=TRUE,
+                        prerun=FALSE,
                         step=.1,
                         momentum=FALSE,
                         step.ratio=FALSE,

@@ -51,7 +51,7 @@
 #' @param hessFun hessian function to use. Currently not recommended.
 #' @param test.cov Covariance matrix from test dataset. Necessary for CV=T
 #' @param prerun Logical. Use rsolnp to first optimize before passing to
-#'        gradient descent?
+#'        gradient descent? Only for use with coord_desc
 #' @param parallel Logical. whether to parallelize the processes running models for all
 #'        values of lambda.
 #' @param ncore Number of cores to use when parallel=TRUE
@@ -129,7 +129,7 @@ cv_regsem = function(model,
                     gradFun="ram",
                     hessFun="none",
                     test.cov=NULL,
-                    prerun=TRUE,
+                    prerun=FALSE,
                     parallel=FALSE,
                     ncore=2,
                     Start="lavaan",
@@ -152,7 +152,7 @@ cv_regsem = function(model,
                     step.ratio=FALSE,
                     line.search=FALSE,
                     nlminb.control=list(),
-                    warm.start=TRUE,
+                    warm.start=FALSE,
                     missing="listwise",
                     ...){
 
