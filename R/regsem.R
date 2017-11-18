@@ -30,17 +30,20 @@
 #'        "scad", and the minimum concave penalty, "mcp".
 #' @param data Optional dataframe. Only required for missing="fiml" which
 #'        is not currently working.
-#' @param optMethod Solver to use. Recommended options include "nlminb" and
-#'        "optimx". Note: for "optimx", the default method is to use nlminb.
-#'        This can be changed in subOpt.
+#' @param optMethod Solver to use. Two main options for use: rsoolnp and coord_desc.
+#'        Although slightly slower, rsolnp works much better for complex models.
+#'        coord_desc uses gradient descent with soft thresholding for the type of
+#'        of penalty. Rsolnp is a nonlinear solver that doesn't rely on gradient
+#'        information. There is a similar type of solver also available for use,
+#'        slsqp from the nloptr package. coord_desc can also be used with hessian
+#'        information, either through the use of quasi=TRUE, or specifying a hess_fun.
+#'        However, this option is not recommended at this time.
 #' @param gradFun Gradient function to use. Recommended to use "ram",
 #'        which refers to the method specified in von Oertzen & Brick (2014).
-#'        The "norm" procedure uses the forward difference method for
-#'        calculating the hessian. This is slower and less accurate.
+#'        Only for use with optMethod="coord_desc".
 #' @param hessFun Hessian function to use. Recommended to use "ram",
 #'        which refers to the method specified in von Oertzen & Brick (2014).
-#'        The "norm" procedure uses the forward difference method for
-#'        calculating the hessian. This is slower and less accurate.
+#'        This is currently not recommended.
 #' @param prerun Logical. Use rsolnp to first optimize before passing to
 #'        gradient descent?
 #' @param parallel Logical. Whether to parallelize the processes?
@@ -756,6 +759,14 @@ if(optMethod=="nlminb"){
         }
 
         par.ret <- out$pars
+
+}else if(optMethod=="slsqp"){
+
+  out <- nloptr::slsqp(start,calc)
+
+    par.ret <- out$par
+   res$optim_fit <- out$value
+   res$convergence = ifelse(out$convergence>1,0,1)
 
 }else if(optMethod=="lbfgs"){
 

@@ -37,9 +37,18 @@
 #'        do 2 sample CV manually.
 #' @param n.boot Number of bootstrap samples if fit.ret2="boot"
 #' @param data Optional dataframe. Only required for missing="fiml".
-#' @param optMethod solver to use.
-#' @param gradFun gradient function to use.
-#' @param hessFun hessian function to use.
+#' @param optMethod Solver to use. Two main options for use: rsoolnp and coord_desc.
+#'        Although slightly slower, rsolnp works much better for complex models.
+#'        coord_desc uses gradient descent with soft thresholding for the type of
+#'        of penalty. Rsolnp is a nonlinear solver that doesn't rely on gradient
+#'        information. There is a similar type of solver also available for use,
+#'        slsqp from the nloptr package. coord_desc can also be used with hessian
+#'        information, either through the use of quasi=TRUE, or specifying a hess_fun.
+#'        However, this option is not recommended at this time.
+#' @param gradFun Gradient function to use. Recommended to use "ram",
+#'        which refers to the method specified in von Oertzen & Brick (2014).
+#'        Only for use with optMethod="coord_desc".
+#' @param hessFun hessian function to use. Currently not recommended.
 #' @param test.cov Covariance matrix from test dataset. Necessary for CV=T
 #' @param prerun Logical. Use rsolnp to first optimize before passing to
 #'        gradient descent?

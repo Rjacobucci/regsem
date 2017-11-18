@@ -6,7 +6,7 @@
 \usage{
 multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5, LB = -Inf,
   UB = Inf, par.lim = c(-Inf, Inf), block = TRUE, full = TRUE,
-  type = "lasso", optMethod = "coord_desc", gradFun = "ram",
+  type = "lasso", optMethod = "rsolnp", gradFun = "ram",
   pars_pen = NULL, diff_par = NULL, hessFun = "none", tol = 1e-05,
   solver = FALSE, quasi = FALSE, solver.maxit = 50000,
   alpha.inc = FALSE, line.search = FALSE, prerun = TRUE, step = 0.1,
@@ -57,14 +57,18 @@ to take the deviation from are specified in diff_par. Two methods for
 sparser results than lasso are the smooth clipped absolute deviation,
 "scad", and the minimum concave penalty, "mcp".}
 
-\item{optMethod}{Solver to use. Recommended options include "nlminb" and
-"optimx". Note: for "optimx", the default method is to use nlminb.
-This can be changed in subOpt.}
+\item{optMethod}{Solver to use. Two main options for use: rsoolnp and coord_desc.
+Although slightly slower, rsolnp works much better for complex models.
+coord_desc uses gradient descent with soft thresholding for the type of
+of penalty. Rsolnp is a nonlinear solver that doesn't rely on gradient
+information. There is a similar type of solver also available for use,
+slsqp from the nloptr package. coord_desc can also be used with hessian
+information, either through the use of quasi=TRUE, or specifying a hess_fun.
+However, this option is not recommended at this time.}
 
 \item{gradFun}{Gradient function to use. Recommended to use "ram",
 which refers to the method specified in von Oertzen & Brick (2014).
-The "norm" procedure uses the forward difference method for
-calculating the hessian. This is slower and less accurate.}
+Only for use with optMethod="coord_desc".}
 
 \item{pars_pen}{Parameter indicators to penalize. If left NULL, by default,
 all parameters in the \emph{A} matrix outside of the intercepts are
@@ -73,16 +77,13 @@ penalized when lambda > 0 and type != "none".}
 \item{diff_par}{Parameter values to deviate from. Only used when
 type="diff_lasso".}
 
-\item{hessFun}{Hessian function to use. Recommended to use "ram",
-which refers to the method specified in von Oertzen & Brick (2014).
-The "norm" procedure uses the forward difference method for
-calculating the hessian. This is slower and less accurate.}
+\item{hessFun}{Hessian function to use. Currently not recommended.}
 
 \item{tol}{Tolerance for coordinate descent}
 
 \item{solver}{Whether to use solver for coord_desc}
 
-\item{quasi}{Whether to use quasi-Newton}
+\item{quasi}{Whether to use quasi-Newton. Currently not recommended.}
 
 \item{solver.maxit}{Max iterations for solver in coord_desc}
 

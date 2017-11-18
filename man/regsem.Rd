@@ -6,14 +6,14 @@
 testing multiple penalties, see cv_regsem().}
 \usage{
 regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "lasso",
-  data = NULL, optMethod = "coord_desc", gradFun = "ram",
-  hessFun = "none", prerun = TRUE, parallel = "no", Start = "lavaan",
-  subOpt = "nlminb", longMod = F, pars_pen = NULL, diff_par = NULL,
-  LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf), block = TRUE,
-  full = TRUE, calc = "normal", max.iter = 500, tol = 1e-05,
-  solver = FALSE, quasi = FALSE, solver.maxit = 5, alpha.inc = FALSE,
-  line.search = FALSE, step = 0.1, momentum = FALSE, step.ratio = FALSE,
-  nlminb.control = list(), missing = "listwise")
+  data = NULL, optMethod = "rsolnp", gradFun = "ram", hessFun = "none",
+  prerun = TRUE, parallel = "no", Start = "lavaan", subOpt = "nlminb",
+  longMod = F, pars_pen = NULL, diff_par = NULL, LB = -Inf, UB = Inf,
+  par.lim = c(-Inf, Inf), block = TRUE, full = TRUE, calc = "normal",
+  max.iter = 500, tol = 1e-05, solver = FALSE, quasi = FALSE,
+  solver.maxit = 5, alpha.inc = FALSE, line.search = FALSE, step = 0.1,
+  momentum = FALSE, step.ratio = FALSE, nlminb.control = list(),
+  missing = "listwise")
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -49,19 +49,22 @@ sparser results than lasso are the smooth clipped absolute deviation,
 \item{data}{Optional dataframe. Only required for missing="fiml" which
 is not currently working.}
 
-\item{optMethod}{Solver to use. Recommended options include "nlminb" and
-"optimx". Note: for "optimx", the default method is to use nlminb.
-This can be changed in subOpt.}
+\item{optMethod}{Solver to use. Two main options for use: rsoolnp and coord_desc.
+Although slightly slower, rsolnp works much better for complex models.
+coord_desc uses gradient descent with soft thresholding for the type of
+of penalty. Rsolnp is a nonlinear solver that doesn't rely on gradient
+information. There is a similar type of solver also available for use,
+slsqp from the nloptr package. coord_desc can also be used with hessian
+information, either through the use of quasi=TRUE, or specifying a hess_fun.
+However, this option is not recommended at this time.}
 
 \item{gradFun}{Gradient function to use. Recommended to use "ram",
 which refers to the method specified in von Oertzen & Brick (2014).
-The "norm" procedure uses the forward difference method for
-calculating the hessian. This is slower and less accurate.}
+Only for use with optMethod="coord_desc".}
 
 \item{hessFun}{Hessian function to use. Recommended to use "ram",
 which refers to the method specified in von Oertzen & Brick (2014).
-The "norm" procedure uses the forward difference method for
-calculating the hessian. This is slower and less accurate.}
+This is currently not recommended.}
 
 \item{prerun}{Logical. Use rsolnp to first optimize before passing to
 gradient descent?}

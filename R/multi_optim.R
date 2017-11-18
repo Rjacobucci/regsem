@@ -35,27 +35,28 @@
 #'        to take the deviation from are specified in diff_par. Two methods for
 #'        sparser results than lasso are the smooth clipped absolute deviation,
 #'        "scad", and the minimum concave penalty, "mcp".
-#' @param optMethod Solver to use. Recommended options include "nlminb" and
-#'        "optimx". Note: for "optimx", the default method is to use nlminb.
-#'        This can be changed in subOpt.
+#' @param optMethod Solver to use. Two main options for use: rsoolnp and coord_desc.
+#'        Although slightly slower, rsolnp works much better for complex models.
+#'        coord_desc uses gradient descent with soft thresholding for the type of
+#'        of penalty. Rsolnp is a nonlinear solver that doesn't rely on gradient
+#'        information. There is a similar type of solver also available for use,
+#'        slsqp from the nloptr package. coord_desc can also be used with hessian
+#'        information, either through the use of quasi=TRUE, or specifying a hess_fun.
+#'        However, this option is not recommended at this time.
 #' @param gradFun Gradient function to use. Recommended to use "ram",
 #'        which refers to the method specified in von Oertzen & Brick (2014).
-#'        The "norm" procedure uses the forward difference method for
-#'        calculating the hessian. This is slower and less accurate.
+#'        Only for use with optMethod="coord_desc".
 #' @param pars_pen Parameter indicators to penalize. If left NULL, by default,
 #'        all parameters in the \emph{A} matrix outside of the intercepts are
 #'        penalized when lambda > 0 and type != "none".
 #' @param diff_par Parameter values to deviate from. Only used when
 #'        type="diff_lasso".
-#' @param hessFun Hessian function to use. Recommended to use "ram",
-#'        which refers to the method specified in von Oertzen & Brick (2014).
-#'        The "norm" procedure uses the forward difference method for
-#'        calculating the hessian. This is slower and less accurate.
+#' @param hessFun Hessian function to use. Currently not recommended.
 #' @param prerun Logical. Use rsolnp to first optimize before passing to
 #'        gradient descent?
 #' @param tol Tolerance for coordinate descent
 #' @param solver Whether to use solver for coord_desc
-#' @param quasi Whether to use quasi-Newton
+#' @param quasi Whether to use quasi-Newton. Currently not recommended.
 #' @param solver.maxit Max iterations for solver in coord_desc
 #' @param alpha.inc Whether alpha should increase for coord_desc
 #' @param line.search Use line search for optimization. Default is no, use fixed step size
