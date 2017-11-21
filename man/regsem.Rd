@@ -7,7 +7,7 @@ testing multiple penalties, see cv_regsem().}
 \usage{
 regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "lasso",
   data = NULL, optMethod = "rsolnp", gradFun = "ram", hessFun = "none",
-  prerun = TRUE, parallel = "no", Start = "lavaan", subOpt = "nlminb",
+  prerun = FALSE, parallel = "no", Start = "lavaan", subOpt = "nlminb",
   longMod = F, pars_pen = NULL, diff_par = NULL, LB = -Inf, UB = Inf,
   par.lim = c(-Inf, Inf), block = TRUE, full = TRUE, calc = "normal",
   max.iter = 500, tol = 1e-05, solver = FALSE, quasi = FALSE,
@@ -67,7 +67,7 @@ which refers to the method specified in von Oertzen & Brick (2014).
 This is currently not recommended.}
 
 \item{prerun}{Logical. Use rsolnp to first optimize before passing to
-gradient descent?}
+gradient descent? Only for use with coord_desc.}
 
 \item{parallel}{Logical. Whether to parallelize the processes?}
 

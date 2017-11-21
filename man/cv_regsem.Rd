@@ -8,13 +8,13 @@ cv_regsem(model, n.lambda = 100, pars_pen, metric = "BIC",
   mult.start = FALSE, multi.iter = 10, jump = 0.002, lambda.start = 0,
   alpha = 0.5, type = "lasso", fit.ret = c("rmsea", "BIC"),
   fit.ret2 = "train", n.boot = 20, data = NULL, optMethod = "rsolnp",
-  gradFun = "ram", hessFun = "none", test.cov = NULL, prerun = TRUE,
+  gradFun = "ram", hessFun = "none", test.cov = NULL, prerun = FALSE,
   parallel = FALSE, ncore = 2, Start = "lavaan", subOpt = "nlminb",
   diff_par = NULL, LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf),
   block = TRUE, full = TRUE, calc = "normal", max.iter = 2000,
   tol = 1e-05, solver = FALSE, quasi = FALSE, solver.maxit = 5,
   alpha.inc = FALSE, step = 0.1, momentum = FALSE, step.ratio = FALSE,
-  line.search = FALSE, nlminb.control = list(), warm.start = TRUE,
+  line.search = FALSE, nlminb.control = list(), warm.start = FALSE,
   missing = "listwise", ...)
 }
 \arguments{
@@ -85,7 +85,7 @@ Only for use with optMethod="coord_desc".}
 \item{test.cov}{Covariance matrix from test dataset. Necessary for CV=T}
 
 \item{prerun}{Logical. Use rsolnp to first optimize before passing to
-gradient descent?}
+gradient descent? Only for use with coord_desc}
 
 \item{parallel}{Logical. whether to parallelize the processes running models for all
 values of lambda.}

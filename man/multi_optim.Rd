@@ -9,7 +9,7 @@ multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5, LB = -Inf,
   type = "lasso", optMethod = "rsolnp", gradFun = "ram",
   pars_pen = NULL, diff_par = NULL, hessFun = "none", tol = 1e-05,
   solver = FALSE, quasi = FALSE, solver.maxit = 50000,
-  alpha.inc = FALSE, line.search = FALSE, prerun = TRUE, step = 0.1,
+  alpha.inc = FALSE, line.search = FALSE, prerun = FALSE, step = 0.1,
   momentum = FALSE, step.ratio = FALSE, verbose = FALSE,
   warm.start = FALSE, Start2 = NULL, nlminb.control = NULL,
   max.iter = 500)
@@ -92,7 +92,7 @@ type="diff_lasso".}
 \item{line.search}{Use line search for optimization. Default is no, use fixed step size}
 
 \item{prerun}{Logical. Use rsolnp to first optimize before passing to
-gradient descent?}
+gradient descent? Only for use with coord_desc.}
 
 \item{step}{Step size}
 

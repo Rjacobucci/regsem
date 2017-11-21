@@ -1118,8 +1118,7 @@ if(optMethod=="nlminb"){
     res$lav.model <- model
 
     if(res$convergence != 0){
-      warning("WARNING: Model did not converge! It is recommended to try multi_optim() or
-              change step.ratio=TRUE")
+      warning("WARNING: Model did not converge! It is recommended to try multi_optim()")
     }
 
     res$call <- match.call()
