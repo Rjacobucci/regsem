@@ -11,15 +11,15 @@ summary.cvregsem <- function(object,...)
 
   fitt = object$fits[,fit]
   conv = object$fits[,"conv"]
-  lowest.id <- which(fitt==min(fitt[conv!=99 & is.na(conv)==FALSE]))
+  lowest.id <- which(fitt==min(fitt[conv==0 & is.na(conv)==FALSE]))
   lenpar <- length(object$pars_pen)
   final_pars <- object$final_pars
 
-  sm <- list(lowest.id=lowest.id, lenpar=lenpar, min.lambda=min(object$fits[,1]),
-             max.lambda=max(object$fits[,1]), lowest.lambda=object$fits[lowest.id,1],
+  sm <- list(lowest.id=lowest.id, lenpar=lenpar, min.lambda=min(object$fits[,1],na.rm=TRUE),
+             max.lambda=max(object$fits[,1],na.rm=TRUE), lowest.lambda=object$fits[lowest.id,1],
              metric=fit,
              final_pars=final_pars,
-             num.conv = sum(conv==0))
+             num.conv = sum(conv==0,na.rm=TRUE))
 
   class(sm) <- "summary.cvregsem"
 
