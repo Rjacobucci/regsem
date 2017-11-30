@@ -742,7 +742,12 @@ if(mult.start==FALSE){
   colnames(fits) <- c("lambda","conv",fit.ret)
   fit.index = fits[,metric]
   conv = fits[,"conv"]
-  loc = which(fit.index==min(abs(fit.index[conv!=99 & is.na(conv)==FALSE])))
+  if(metric=="TLI" | metric=="CFI"){
+    loc = which(abs(fit.index)==max(abs(fit.index[conv==0 & is.nan(fit.index) == FALSE & is.na(conv)==FALSE])))
+  }else{
+    loc = which(abs(fit.index)==min(abs(fit.index[conv==0 & is.nan(fit.index) == FALSE & is.na(conv)==FALSE])))
+  }
+
   final_pars = par.matrix[loc,]
 
   out2 <- list(par.matrix,fits,final_pars,pars_pen,metric) #fitt_var
