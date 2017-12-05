@@ -30,6 +30,7 @@ xmed_cat(data, iv, mediators, dv, covariates = NULL, type = "lasso",
 Function to performed exploratory mediation with categorical variables
 }
 \examples{
+\dontrun{
 # example
 library(ISLR)
 College1 = College[which(College$Private=="Yes"),]
@@ -66,4 +67,5 @@ mediators <- c("Outstate","Room.Board","Books","Expend")
 
 out <- xmed_cat(Data,iv,mediators,dv)
 out
+}
 }

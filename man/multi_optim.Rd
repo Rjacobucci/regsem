@@ -116,7 +116,7 @@ Multiple starts for Regularized Structural Equation Modeling
 }
 \examples{
 \dontrun{
-# Note that this is not currently recommend. Use regsem() instead
+# Note that this is not currently recommended. Use cv_regsem() instead
 library(regsem)
 # put variables on same scale for regsem
 HS <- data.frame(scale(HolzingerSwineford1939[ ,7:15]))
@@ -126,8 +126,7 @@ f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 outt = cfa(mod, HS, meanstructure=TRUE)
 
 fit1 <- multi_optim(outt, max.try=40,
-                   lambda=0.1, type="lasso",
-                   gradFun="ram")
+                   lambda=0.1, type="lasso")
 
 
 # growth model
@@ -136,7 +135,7 @@ model <- ' i =~ 1*t1 + 1*t2 + 1*t3 + 1*t4
 fit <- growth(model, data=Demo.growth)
 summary(fit)
 fitmeasures(fit)
-fit3 <- multi_optim(fit, lambda=0.2, type="lasso", gradFun="none")
+fit3 <- multi_optim(fit, lambda=0.2, type="lasso")
 summary(fit3)
 }
 }

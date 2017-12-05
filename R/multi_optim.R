@@ -73,7 +73,7 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' # Note that this is not currently recommend. Use regsem() instead
+#' # Note that this is not currently recommended. Use cv_regsem() instead
 #' library(regsem)
 #' # put variables on same scale for regsem
 #' HS <- data.frame(scale(HolzingerSwineford1939[ ,7:15]))
@@ -83,8 +83,7 @@
 #' outt = cfa(mod, HS, meanstructure=TRUE)
 #'
 #' fit1 <- multi_optim(outt, max.try=40,
-#'                    lambda=0.1, type="lasso",
-#'                    gradFun="ram")
+#'                    lambda=0.1, type="lasso")
 #'
 #'
 #'# growth model
@@ -94,7 +93,7 @@
 #'summary(fit)
 #'fitmeasures(fit)
 
-#'fit3 <- multi_optim(fit, lambda=0.2, type="lasso", gradFun="none")
+#'fit3 <- multi_optim(fit, lambda=0.2, type="lasso")
 #'summary(fit3)
 #'}
 

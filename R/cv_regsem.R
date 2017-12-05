@@ -94,7 +94,8 @@
 #' '
 #' outt = cfa(mod, HS)
 #'
-#' cv.out = cv_regsem(outt,type="ridge", pars_pen=c(1:2,6:8), n.lambda=100)
+#' cv.out = cv_regsem(outt,type="lasso", pars_pen=c(1:2,6:8),
+#'           n.lambda=30,jump=0.01)
 #' # check parameter numbers
 #' extractMatrices(outt)["A"]
 #' # equivalent to
@@ -103,8 +104,8 @@
 #' '
 #' outt = cfa(mod,HS)
 #'
-#' cv.out = cv_regsem(outt, type="ridge", pars_pen=c("l1","l2","l6","l7","l8"),
-#'          n.lambda=100)
+#' cv.out = cv_regsem(outt, type="lasso", pars_pen=c("l1","l2","l6","l7","l8"),
+#'          n.lambda=30,jump=0.01)
 #' summary(cv.out)
 #' plot(cv.out, show.minimum="BIC")
 #' }

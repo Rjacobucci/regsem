@@ -13,6 +13,7 @@
 #' @param seed Set seed to control CV results
 #' @export
 #' @examples
+#' \dontrun{
 #'# example
 #'library(ISLR)
 #'College1 = College[which(College$Private=="Yes"),]
@@ -49,6 +50,7 @@
 #'
 #'out <- xmed_cat(Data,iv,mediators,dv)
 #'out
+#'}
 
 
 xmed_cat = function (data, iv, mediators, dv, covariates=NULL, type = "lasso", nfolds = 10,
