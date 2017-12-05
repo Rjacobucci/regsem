@@ -11,7 +11,7 @@ summary.cvregsem <- function(object,...)
 
   fitt = object$fits[,fit]
   conv = object$fits[,"conv"]
-  lowest.id <- which(fitt==min(fitt[conv==0 & is.na(conv)==FALSE]))
+  lowest.id <- which(fitt==min(fitt[conv==0 & is.nan(fitt)==FALSE & is.na(conv)==FALSE]))
   lenpar <- length(object$pars_pen)
   final_pars <- object$final_pars
 
@@ -31,7 +31,7 @@ summary.cvregsem <- function(object,...)
                      " Lambda ranging from ",x$min.lambda," to ",x$max.lambda,"\n",
                      " Lowest Fit Lambda: ", x$lowest.lambda,"\n",
                      " Metric: ", x$metric,"\n",
-                     " Number Converged: ", x$num.conv,"\n\n")
+                     " Number Converged: ", x$num.conv,"\n\n",collapse=", ")
     cat(string)
    # string2 <- paste0(c("Final Parameters: ", names(x$final_pars)))
    # cat(string2)

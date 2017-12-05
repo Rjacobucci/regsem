@@ -268,8 +268,8 @@ multi_optim <- function(model,max.try=10,lambda=0,
             mtt[n.optim,2] = fit1$out$convergence
           }else{
             #print(fit1$out$value)
-            mtt[n.optim,1] = fit1$out$value
-            mtt[n.optim,2] = fit1$out$convergence
+            mtt[n.optim,1] = fit1$optim_fit
+            mtt[n.optim,2] = fit1$convergence
           }
         }
     }
