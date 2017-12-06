@@ -93,9 +93,9 @@
 #' f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 #' '
 #' outt = cfa(mod, HS)
-#'
+#' # increase to > 25
 #' cv.out = cv_regsem(outt,type="lasso", pars_pen=c(1:2,6:8),
-#'           n.lambda=30,jump=0.01)
+#'           n.lambda=5,jump=0.01)
 #' # check parameter numbers
 #' extractMatrices(outt)["A"]
 #' # equivalent to
@@ -103,9 +103,9 @@
 #' f =~ 1*x1 + l1*x2 + l2*x3 + l3*x4 + l4*x5 + l5*x6 + l6*x7 + l7*x8 + l8*x9
 #' '
 #' outt = cfa(mod,HS)
-#'
+#' # increase to > 25
 #' cv.out = cv_regsem(outt, type="lasso", pars_pen=c("l1","l2","l6","l7","l8"),
-#'          n.lambda=30,jump=0.01)
+#'          n.lambda=5,jump=0.01)
 #' summary(cv.out)
 #' plot(cv.out, show.minimum="BIC")
 #' }
