@@ -1,7 +1,7 @@
 Package: regsem
 Type: Package
 Title: Regularized Structural Equation Modeling
-Version: 1.0.6
+Version: 1.0.8
 Author: Ross Jacobucci[aut,cre], 
         Kevin J. Grimm [ctb], 
         Andreas M. Brandmaier [ctb],
@@ -27,6 +27,7 @@ Suggests:
     Rsolnp,
     numDeriv,
     nloptr,
+    NlcOptim,
     optimx,
     semPlot,
     colorspace

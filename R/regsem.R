@@ -168,9 +168,15 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
   match.arg(type,c("lasso","none","ridge","scad","alasso","mcp","diff_lasso","enet"))
 
 
-  if(type == "scad" | type == "mcp"){
-    warning("this type is currently not working well")
+  if(type == "mcp" & optMethod!= "coord_desc"){
+    stop("For both scad and mcp must use optMethod=coord_desc")
   }
+
+  if(type == "scad" & optMethod != "coord_desc"){
+    stop("For both scad and mcp must use optMethod=coord_desc")
+  }
+
+
 
   if(type=="ridge"){
     type="enet";alpha=1
@@ -415,11 +421,13 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
          }
 
          if(calc_fit=="cov"){
+
            #fit = fit_fun(ImpCov=mult$ImpCov,SampCov,Areg=mult$A_est22,lambda,alpha,type,pen_vec)
            fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,gamma,pen_vec,pen_diff,e_alpha)
            #print(fit)
           # print(type2)
            #print(round(fit,3))#;print(pen_diff)
+           #print(fit)
            fit
          }else if(calc_fit=="ind"){
            stop("Not currently supported")
@@ -760,6 +768,7 @@ if(optMethod=="nlminb"){
         }
 
         par.ret <- out$pars
+       # print(par.ret)
 
 }else if(optMethod=="slsqp"){
 
@@ -768,6 +777,14 @@ if(optMethod=="nlminb"){
     par.ret <- out$par
    res$optim_fit <- out$value
    res$convergence = ifelse(out$convergence>1,0,1)
+
+}else if(optMethod=="NlcOptim"){
+
+  out <- NlcOptim::solnl(start,calc)
+
+  par.ret <- out$par
+  res$optim_fit <- out$fn
+  res$convergence = 0#ifelse(out$convergence>1,0,1)
 
 }else if(optMethod=="lbfgs"){
 
