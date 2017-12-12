@@ -82,6 +82,7 @@
 #'        This is not recommended.
 #' @param missing How to handle missing data. Current options are "listwise"
 #'        and "fiml".
+#' @param verbose Print progress bar?
 #' @param ... Any additional arguments to pass to regsem() or multi_optim().
 #' @keywords optim calc
 #' @export
@@ -157,6 +158,7 @@ cv_regsem = function(model,
                     nlminb.control=list(),
                     warm.start=FALSE,
                     missing="listwise",
+                    verbose=TRUE,
                     ...){
 
 
@@ -197,14 +199,19 @@ count = 0
 counts=n.lambda
 #res2 <- data.frame(matrix(NA,counts,3))
 #coefs = rep(1,14)
-pb <- txtProgressBar(min = 0, max = counts, style = 3)
+if(verbose==TRUE){
+  pb <- txtProgressBar(min = 0, max = counts, style = 3)
+}
+
 
 while(count < counts){
   count = count + 1
 
   # create progress bar
+if(verbose==TRUE){
+  setTxtProgressBar(pb, count)
+}
 
-    setTxtProgressBar(pb, count)
 
 
   SHRINK <- SHRINK2 + jump*(count-1) # 0.01 works well & 0.007 as well with 150 iterations
@@ -760,9 +767,9 @@ if(mult.start==FALSE){
   fit.index = fits[,metric]
   conv = fits[,"conv"]
   if(metric=="TLI" | metric=="CFI"){
-    loc = which(abs(fit.index)==max(abs(fit.index[conv==0 & is.nan(fit.index) == FALSE & is.na(conv)==FALSE])))
+    loc = which(abs(fit.index)==max(abs(fit.index[conv==0 & is.nan(fit.index) == FALSE & is.na(conv)==FALSE])))[1]
   }else{
-    loc = which(abs(fit.index)==min(abs(fit.index[conv==0 & is.nan(fit.index) == FALSE & is.na(conv)==FALSE])))
+    loc = which(abs(fit.index)==min(abs(fit.index[conv==0 & is.nan(fit.index) == FALSE & is.na(conv)==FALSE])))[1]
   }
 
   final_pars = par.matrix[loc,]

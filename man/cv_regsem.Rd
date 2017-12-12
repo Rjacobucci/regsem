@@ -6,7 +6,7 @@
 \usage{
 cv_regsem(model, n.lambda = 100, pars_pen, metric = "BIC",
   mult.start = FALSE, multi.iter = 10, jump = 0.002, lambda.start = 0,
-  alpha = 0.5, type = "lasso", fit.ret = c("rmsea", "BIC"),
+  alpha = 0.5, gamma = 3.7, type = "lasso", fit.ret = c("rmsea", "BIC"),
   fit.ret2 = "train", n.boot = 20, data = NULL, optMethod = "rsolnp",
   gradFun = "ram", hessFun = "none", test.cov = NULL, prerun = FALSE,
   parallel = FALSE, ncore = 2, Start = "lavaan", subOpt = "nlminb",
@@ -15,7 +15,7 @@ cv_regsem(model, n.lambda = 100, pars_pen, metric = "BIC",
   tol = 1e-05, solver = FALSE, quasi = FALSE, solver.maxit = 5,
   alpha.inc = FALSE, step = 0.1, momentum = FALSE, step.ratio = FALSE,
   line.search = FALSE, nlminb.control = list(), warm.start = FALSE,
-  missing = "listwise", ...)
+  missing = "listwise", verbose = TRUE, ...)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -48,6 +48,8 @@ regsem() (FALSE).}
 \item{lambda.start}{What value to start the penalty at}
 
 \item{alpha}{Mixture for elastic net. 1 = ridge, 0 = lasso}
+
+\item{gamma}{Additional penalty for MCP and SCAD}
 
 \item{type}{Penalty type. Options include "none", "lasso", "ridge",
 "enet" for the elastic net,
@@ -139,6 +141,8 @@ This is not recommended.}
 
 \item{missing}{How to handle missing data. Current options are "listwise"
 and "fiml".}
+
+\item{verbose}{Print progress bar?}
 
 \item{...}{Any additional arguments to pass to regsem() or multi_optim().}
 }

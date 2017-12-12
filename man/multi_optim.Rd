@@ -4,9 +4,9 @@
 \alias{multi_optim}
 \title{Multiple starts for Regularized Structural Equation Modeling}
 \usage{
-multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5, LB = -Inf,
-  UB = Inf, par.lim = c(-Inf, Inf), block = TRUE, full = TRUE,
-  type = "lasso", optMethod = "rsolnp", gradFun = "ram",
+multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5, gamma = 3.7,
+  LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf), block = TRUE,
+  full = TRUE, type = "lasso", optMethod = "rsolnp", gradFun = "ram",
   pars_pen = NULL, diff_par = NULL, hessFun = "none", tol = 1e-05,
   solver = FALSE, quasi = FALSE, solver.maxit = 50000,
   alpha.inc = FALSE, line.search = FALSE, prerun = FALSE, step = 0.1,
@@ -33,6 +33,8 @@ sample covariance matrix.}
 convergence issues.}
 
 \item{alpha}{Mixture for elastic net.}
+
+\item{gamma}{Additional penalty for MCP and SCAD}
 
 \item{LB}{lower bound vector. Note: This is very important to specify
 when using regularization. It greatly increases the chances of
