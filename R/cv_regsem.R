@@ -526,7 +526,7 @@ if(mult.start==FALSE){
                       momentum=momentum,
                       Start2=Start2,
                       step.ratio=step.ratio,nlminb.control=nlminb.control,
-                      pars_pen=pars_pen,diff_par=NULL)
+                      pars_pen=pars_pen,diff_par=diff_par)
 
     }else if(fit.ret2=="boot"){
       fitt <- matrix(NA,n.boot,length(fit.ret))
@@ -550,7 +550,7 @@ if(mult.start==FALSE){
                          momentum=momentum,
                          Start2=Start2,
                          step.ratio=step.ratio,nlminb.control=nlminb.control,
-                         pars_pen=pars_pen,diff_par=NULL)
+                         pars_pen=pars_pen,diff_par=diff_par)
 
 
       for(i in 1:n.boot){
@@ -564,6 +564,7 @@ if(mult.start==FALSE){
 
         colnames(train) <- model@pta$vnames$ov[[1]]
         colnames(test) <- model@pta$vnames$ov[[1]]
+
 
         mod1 <- lavaan(parTable(model),train)
 
@@ -586,7 +587,7 @@ if(mult.start==FALSE){
                            momentum=momentum,
                            Start2=Start2,
                            step.ratio=step.ratio,nlminb.control=nlminb.control,
-                           pars_pen=pars_pen,diff_par=NULL)
+                           pars_pen=pars_pen,diff_par=diff_par)
 
 
         if(out$convergence==0){
