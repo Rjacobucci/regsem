@@ -224,13 +224,13 @@ if(mult.start==FALSE){
 
   if(warm.start==FALSE | count == 1){
     itt = 0
-    Start="lavaan"
+    Start=Start
   }else if(fits[count-1,2] == 0){
     itt = 0
     Start = par.matrix[count-1,]
     Start[pars_pen] = Start[pars_pen]-step*jump
   }else if(fits[count-1,2] == 99){
-    Start="lavaan"
+    Start=Start
   }else{
     itt = itt + 1
     Start = par.matrix[count-itt-1,]
@@ -274,13 +274,14 @@ if(mult.start==FALSE){
     out <- regsem(model=model,lambda=SHRINK,type=type,data=NULL,
                   optMethod=optMethod,
                   gradFun=gradFun,hessFun=hessFun,
-                  parallel=parallel,Start=Start,
+                  parallel=parallel,
                   subOpt=subOpt,
                   alpha=alpha,
                   gamma=gamma,
                   pars_pen=pars_pen,
                   diff_par=diff_par,
                   LB=LB,prerun=prerun,
+                  Start=Start,
                   UB=UB,
                   par.lim=par.lim,
                   block=block,
@@ -317,7 +318,7 @@ if(mult.start==FALSE){
     out2 <- regsem(model=mod1,lambda=SHRINK,type=type,data=NULL,
                   optMethod=optMethod,
                   gradFun=gradFun,hessFun=hessFun,
-                  parallel=parallel,Start=Start,
+                  parallel=parallel,
                   subOpt=subOpt,
                   gamma=gamma,
                   alpha=alpha,prerun=prerun,
@@ -325,6 +326,7 @@ if(mult.start==FALSE){
                   diff_par=diff_par,
                   LB=LB,
                   UB=UB,
+                  Start=Start,
                   par.lim=par.lim,
                   block=block,
                   full=full,
