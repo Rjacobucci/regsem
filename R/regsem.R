@@ -183,6 +183,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
   }
 
 
+
   # turn parameter labels into numbers
 
   if(is.null(pars_pen)==FALSE & is.numeric(pars_pen)==FALSE){

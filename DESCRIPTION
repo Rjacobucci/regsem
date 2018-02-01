@@ -5,8 +5,7 @@ Version: 1.0.10
 Author: Ross Jacobucci[aut,cre], 
         Kevin J. Grimm [ctb], 
         Andreas M. Brandmaier [ctb],
-        Sarfaraz Serang [ctb],
-        Rogier A. Kievit
+        Sarfaraz Serang [ctb]
 Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
 Description: Uses both ridge and lasso penalties (and extensions) to penalize
     specific parameters in structural equation models. The package offers additional

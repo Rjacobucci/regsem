@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // rcpp_fit_fun
 double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov, Rcpp::NumericMatrix SampCov, int type2, double lambda, double gamma, arma::vec pen_vec, arma::vec pen_diff, double e_alpha);
-RcppExport SEXP _regsem_rcpp_fit_fun(SEXP ImpCovSEXP, SEXP SampCovSEXP, SEXP type2SEXP, SEXP lambdaSEXP, SEXP gammaSEXP, SEXP pen_vecSEXP, SEXP pen_diffSEXP, SEXP e_alphaSEXP) {
+RcppExport SEXP regsem_rcpp_fit_fun(SEXP ImpCovSEXP, SEXP SampCovSEXP, SEXP type2SEXP, SEXP lambdaSEXP, SEXP gammaSEXP, SEXP pen_vecSEXP, SEXP pen_diffSEXP, SEXP e_alphaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -26,7 +26,7 @@ END_RCPP
 }
 // rcpp_grad_ram
 arma::vec rcpp_grad_ram(arma::vec par, arma::mat ImpCov, arma::mat SampCov, arma::mat Areg, arma::mat Sreg, arma::mat A, arma::mat S, arma::mat F, double lambda, int type2, arma::vec pen_vec, arma::vec diff_par);
-RcppExport SEXP _regsem_rcpp_grad_ram(SEXP parSEXP, SEXP ImpCovSEXP, SEXP SampCovSEXP, SEXP AregSEXP, SEXP SregSEXP, SEXP ASEXP, SEXP SSEXP, SEXP FSEXP, SEXP lambdaSEXP, SEXP type2SEXP, SEXP pen_vecSEXP, SEXP diff_parSEXP) {
+RcppExport SEXP regsem_rcpp_grad_ram(SEXP parSEXP, SEXP ImpCovSEXP, SEXP SampCovSEXP, SEXP AregSEXP, SEXP SregSEXP, SEXP ASEXP, SEXP SSEXP, SEXP FSEXP, SEXP lambdaSEXP, SEXP type2SEXP, SEXP pen_vecSEXP, SEXP diff_parSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -48,7 +48,7 @@ END_RCPP
 }
 // rcpp_quasi_calc
 List rcpp_quasi_calc(NumericMatrix I, NumericVector s, NumericVector y, NumericMatrix H);
-RcppExport SEXP _regsem_rcpp_quasi_calc(SEXP ISEXP, SEXP sSEXP, SEXP ySEXP, SEXP HSEXP) {
+RcppExport SEXP regsem_rcpp_quasi_calc(SEXP ISEXP, SEXP sSEXP, SEXP ySEXP, SEXP HSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -62,7 +62,7 @@ END_RCPP
 }
 // rcpp_RAMmult
 List rcpp_RAMmult(NumericVector par, NumericMatrix A, NumericMatrix S, LogicalMatrix S_fixed, LogicalMatrix A_fixed, NumericMatrix A_est, NumericMatrix S_est, IntegerMatrix F, IntegerMatrix I);
-RcppExport SEXP _regsem_rcpp_RAMmult(SEXP parSEXP, SEXP ASEXP, SEXP SSEXP, SEXP S_fixedSEXP, SEXP A_fixedSEXP, SEXP A_estSEXP, SEXP S_estSEXP, SEXP FSEXP, SEXP ISEXP) {
+RcppExport SEXP regsem_rcpp_RAMmult(SEXP parSEXP, SEXP ASEXP, SEXP SSEXP, SEXP S_fixedSEXP, SEXP A_fixedSEXP, SEXP A_estSEXP, SEXP S_estSEXP, SEXP FSEXP, SEXP ISEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
