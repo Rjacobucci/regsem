@@ -13,7 +13,7 @@
 #' @param e_alpha Alpha for elastic net
 #'
 rcpp_fit_fun <- function(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha) {
-    .Call(regsem_rcpp_fit_fun, ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha)
+    .Call(`_regsem_rcpp_fit_fun`, ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha)
 }
 
 #' Calculates the gradient vector based on Von Oertzen \& Brick, 2014
@@ -32,7 +32,7 @@ rcpp_fit_fun <- function(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_dif
 #' @param diff_par parameter values to take deviations from.
 #'
 rcpp_grad_ram <- function(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par) {
-    .Call(regsem_rcpp_grad_ram, par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par)
+    .Call(`_regsem_rcpp_grad_ram`, par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par)
 }
 
 #' Compute quasi Hessian
@@ -42,7 +42,7 @@ rcpp_grad_ram <- function(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, typ
 #' @param y y vector.
 #' @param H previous Hessian.
 rcpp_quasi_calc <- function(I, s, y, H) {
-    .Call(regsem_rcpp_quasi_calc, I, s, y, H)
+    .Call(`_regsem_rcpp_quasi_calc`, I, s, y, H)
 }
 
 #' Take RAM matrices, multiplies, and returns Implied Covariance matrix.
@@ -59,6 +59,6 @@ rcpp_quasi_calc <- function(I, s, y, H) {
 #'
 #'
 rcpp_RAMmult <- function(par, A, S, S_fixed, A_fixed, A_est, S_est, F, I) {
-    .Call(regsem_rcpp_RAMmult, par, A, S, S_fixed, A_fixed, A_est, S_est, F, I)
+    .Call(`_regsem_rcpp_RAMmult`, par, A, S, S_fixed, A_fixed, A_est, S_est, F, I)
 }
 
