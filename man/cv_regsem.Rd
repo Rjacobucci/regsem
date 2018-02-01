@@ -4,8 +4,8 @@
 \alias{cv_regsem}
 \title{The main function that runs multiple penalty values.}
 \usage{
-cv_regsem(model, n.lambda = 100, pars_pen, metric = "BIC",
-  mult.start = FALSE, multi.iter = 10, jump = 0.002, lambda.start = 0,
+cv_regsem(model, n.lambda = 40, pars_pen = "regressions", metric = "BIC",
+  mult.start = FALSE, multi.iter = 10, jump = 0.01, lambda.start = 0,
   alpha = 0.5, gamma = 3.7, type = "lasso", fit.ret = c("rmsea", "BIC"),
   fit.ret2 = "train", n.boot = 20, data = NULL, optMethod = "rsolnp",
   gradFun = "ram", hessFun = "none", test.cov = NULL, prerun = FALSE,
@@ -32,7 +32,12 @@ sample covariance matrix.}
 
 \item{n.lambda}{number of penalization values to test.}
 
-\item{pars_pen}{parameter indicators to penalize.}
+\item{pars_pen}{Parameter indicators to penalize. There are multiple ways to specify.
+The default is to penalize all regression parameters ("regressions"). Additionally,
+one can specify all loadings ("loadings"), or both c("regressions","loadings").
+Next, parameter labels can be assigned in the lavaan syntax and passed to pars_pen.
+See the example.Finally, one can take the parameter numbers from the A or S matrices and pass these
+directly. See extractMatrices(lav.object)$A.}
 
 \item{metric}{Which fit index to use to choose a final model?
 Note that it chooses the best fit that also achieves convergence

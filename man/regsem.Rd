@@ -8,12 +8,12 @@ testing multiple penalties, see cv_regsem().}
 regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "lasso",
   data = NULL, optMethod = "rsolnp", gradFun = "ram", hessFun = "none",
   prerun = FALSE, parallel = "no", Start = "lavaan", subOpt = "nlminb",
-  longMod = F, pars_pen = NULL, diff_par = NULL, LB = -Inf, UB = Inf,
-  par.lim = c(-Inf, Inf), block = TRUE, full = TRUE, calc = "normal",
-  max.iter = 500, tol = 1e-05, solver = FALSE, quasi = FALSE,
-  solver.maxit = 5, alpha.inc = FALSE, line.search = FALSE, step = 0.1,
-  momentum = FALSE, step.ratio = FALSE, nlminb.control = list(),
-  missing = "listwise")
+  longMod = F, pars_pen = "regressions", diff_par = NULL, LB = -Inf,
+  UB = Inf, par.lim = c(-Inf, Inf), block = TRUE, full = TRUE,
+  calc = "normal", max.iter = 500, tol = 1e-05, solver = FALSE,
+  quasi = FALSE, solver.maxit = 5, alpha.inc = FALSE,
+  line.search = FALSE, step = 0.1, momentum = FALSE, step.ratio = FALSE,
+  nlminb.control = list(), missing = "listwise")
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -82,10 +82,12 @@ chances in getting stuck at the previous parameter estimates.}
 \item{longMod}{If TRUE, the model is using longitudinal data? This changes
 the sample covariance used.}
 
-\item{pars_pen}{Parameter indicators to penalize. If left NULL, by default,
-all parameters in the \emph{A} matrix outside of the intercepts are
-penalized when lambda > 0 and type != "none". Can use the parameter
-labels from the lavaan model as well.}
+\item{pars_pen}{Parameter indicators to penalize. There are multiple ways to specify.
+The default is to penalize all regression parameters ("regressions"). Additionally,
+one can specify all loadings ("loadings"), or both c("regressions","loadings").
+Next, parameter labels can be assigned in the lavaan syntax and passed to pars_pen.
+See the example.Finally, one can take the parameter numbers from the A or S matrices and pass these
+directly. See extractMatrices(lav.object)$A.}
 
 \item{diff_par}{Parameter values to deviate from. Only used when
 type="diff_lasso".}

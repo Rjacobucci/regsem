@@ -55,10 +55,12 @@
 #' @param subOpt Type of optimization to use in the optimx package.
 #' @param longMod If TRUE, the model is using longitudinal data? This changes
 #'        the sample covariance used.
-#' @param pars_pen Parameter indicators to penalize. If left NULL, by default,
-#'        all parameters in the \emph{A} matrix outside of the intercepts are
-#'        penalized when lambda > 0 and type != "none". Can use the parameter
-#'        labels from the lavaan model as well.
+#' @param pars_pen Parameter indicators to penalize. There are multiple ways to specify.
+#'        The default is to penalize all regression parameters ("regressions"). Additionally,
+#'        one can specify all loadings ("loadings"), or both c("regressions","loadings").
+#'        Next, parameter labels can be assigned in the lavaan syntax and passed to pars_pen.
+#'        See the example.Finally, one can take the parameter numbers from the A or S matrices and pass these
+#'        directly. See extractMatrices(lav.object)$A.
 #' @param diff_par Parameter values to deviate from. Only used when
 #'        type="diff_lasso".
 #' @param LB lower bound vector. Note: This is very important to specify
@@ -135,7 +137,7 @@
 regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,optMethod="rsolnp",
                  gradFun="ram",hessFun="none",prerun=FALSE,parallel="no",Start="lavaan",
                  subOpt="nlminb",longMod=F,
-                 pars_pen=NULL,
+                 pars_pen="regressions",
                  diff_par=NULL,
                  LB=-Inf,
                  UB=Inf,
@@ -183,16 +185,67 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
   }
 
 
+  mats = extractMatrices(model)
+
+
+  # ------------------------------
+
+  # create pars_pen
+
+  # ------------------------------
 
   # turn parameter labels into numbers
 
-  if(is.null(pars_pen)==FALSE & is.numeric(pars_pen)==FALSE){
-    pars_pen <- parse_parameters(pars_pen,model)
-  }
+  pars_pen2 = NULL
+
+  if(any(pars_pen == "loadings")){
+    # inds = mats$A[,mats$name.factors]
+    # pars_pen2 = c(inds[inds != 0],pars_pen2)
+    pars_pen2 = mats$loadings
+  }else if(any(pars_pen == "regressions") | is.null(pars_pen)){
+    pars_pen2 = c(pars_pen2,mats$regressions)
+    # if(is.na(mats$name.factors)==TRUE){
+    #   if(any(colnames(mats$A) == "1")){
+    #    IntCol = which(colnames(mats$A) == "1")
+    #    A_minusInt = mats$A[,-IntCol]
+    #    A_pen = A_minusInt != 0
+    #    pars_pen2 = c(A_minusInt[A_pen],pars_pen2)
+    #  }else{
+    #    A_pen = mats$A != 0
+    #    pars_pen2 = c(mats$A[A_pen],pars_pen2)
+    #  }
+    # }else{
+    # remove factor loadings
+    #   if(any(colnames(mats$A) == "1")){
+    #     IntCol = which(colnames(A) == "1" | colnames(mats$A) != mats$name.factors)
+    #     A_minusInt = mats$A[,-IntCol]
+    #    A_pen = A_minusInt != 0
+    #    pars_pen2 = c(A_minusInt[A_pen],pars_pen2)
+    #  }else{
+    #    inds2 = mats$A[,colnames(mats$A) != mats$name.factors]
+    #
+    #   pars_pen2 = c(inds2[inds2 != 0],pars_pen2)
+    #  }
+    # }
+  }else if(is.null(pars_pen)==FALSE & is.numeric(pars_pen)==FALSE){
+    pars_pen2 <- parse_parameters(pars_pen,model)
+  }else if(is.numeric(pars_pen)){
+    pars_pen2 = pars_pen
+  }#else if(is.null(pars_pen)==TRUE){
+  #  if(any(colnames(mats$A) == "1")){
+  #    IntCol = which(colnames(mats$A) == "1")
+  #    A_minusInt = mats$A[,-IntCol]
+  #    A_pen = A_minusInt != 0
+  #    pars_pen2 = A_minusInt[A_pen]
+  #  }else{
+  #    A_pen = mats$A != 0
+  #    pars_pen2 = mats$A[A_pen]
+  #  }
+  #}
 
 
 
-
+pars_pen = as.numeric(pars_pen2)
 
 #  if(optMethod=="nlminb"& type !="ridge" | type != "none"){
 #    stop("Only optMethod=coord_desc is recommended for use")
@@ -263,7 +316,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
 
 
 
-    mats = extractMatrices(model)
+
     nvar = model@pta$nvar[[1]][1]
     nfac = model@pta$nfac[[1]][1]
 
@@ -369,17 +422,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
  # pars_pen <- parse_parameters(pars_pen, model)
 
 
-    if(is.null(pars_pen) == TRUE){
-      if(any(colnames(A) == "1")){
-        IntCol = which(colnames(A) == "1")
-        A_minusInt = A[,-IntCol]
-        A_pen = A_minusInt != 0
-        pars_pen = A_minusInt[A_pen]
-      }else{
-        A_pen = A != 0
-        pars_pen = A[A_pen]
-      }
-    }
+
 
 
    if(class(Start)=="numeric"){

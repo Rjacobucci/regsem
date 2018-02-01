@@ -7,8 +7,8 @@
 multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5, gamma = 3.7,
   LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf), block = TRUE,
   full = TRUE, type = "lasso", optMethod = "rsolnp", gradFun = "ram",
-  pars_pen = NULL, diff_par = NULL, hessFun = "none", tol = 1e-05,
-  solver = FALSE, quasi = FALSE, solver.maxit = 50000,
+  pars_pen = "regressions", diff_par = NULL, hessFun = "none",
+  tol = 1e-05, solver = FALSE, quasi = FALSE, solver.maxit = 50000,
   alpha.inc = FALSE, line.search = FALSE, prerun = FALSE, step = 0.1,
   momentum = FALSE, step.ratio = FALSE, verbose = FALSE,
   warm.start = FALSE, Start2 = NULL, nlminb.control = NULL,
@@ -72,9 +72,12 @@ However, this option is not recommended at this time.}
 which refers to the method specified in von Oertzen & Brick (2014).
 Only for use with optMethod="coord_desc".}
 
-\item{pars_pen}{Parameter indicators to penalize. If left NULL, by default,
-all parameters in the \emph{A} matrix outside of the intercepts are
-penalized when lambda > 0 and type != "none".}
+\item{pars_pen}{Parameter indicators to penalize. There are multiple ways to specify.
+The default is to penalize all regression parameters ("regressions"). Additionally,
+one can specify all loadings ("loadings"), or both c("regressions","loadings").
+Next, parameter labels can be assigned in the lavaan syntax and passed to pars_pen.
+See the example.Finally, one can take the parameter numbers from the A or S matrices and pass these
+directly. See extractMatrices(lav.object)$A.}
 
 \item{diff_par}{Parameter values to deviate from. Only used when
 type="diff_lasso".}

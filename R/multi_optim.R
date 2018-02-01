@@ -47,9 +47,12 @@
 #' @param gradFun Gradient function to use. Recommended to use "ram",
 #'        which refers to the method specified in von Oertzen & Brick (2014).
 #'        Only for use with optMethod="coord_desc".
-#' @param pars_pen Parameter indicators to penalize. If left NULL, by default,
-#'        all parameters in the \emph{A} matrix outside of the intercepts are
-#'        penalized when lambda > 0 and type != "none".
+#' @param pars_pen Parameter indicators to penalize. There are multiple ways to specify.
+#'        The default is to penalize all regression parameters ("regressions"). Additionally,
+#'        one can specify all loadings ("loadings"), or both c("regressions","loadings").
+#'        Next, parameter labels can be assigned in the lavaan syntax and passed to pars_pen.
+#'        See the example.Finally, one can take the parameter numbers from the A or S matrices and pass these
+#'        directly. See extractMatrices(lav.object)$A.
 #' @param diff_par Parameter values to deviate from. Only used when
 #'        type="diff_lasso".
 #' @param hessFun Hessian function to use. Currently not recommended.
@@ -110,7 +113,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                         type="lasso",
                         optMethod="rsolnp",
                         gradFun="ram",
-                        pars_pen=NULL,
+                        pars_pen="regressions",
                         diff_par=NULL,
                         hessFun="none",
                         tol=1e-5,
