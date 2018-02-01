@@ -79,3 +79,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_regsem_rcpp_fit_fun", (DL_FUNC) &_regsem_rcpp_fit_fun, 8},
+    {"_regsem_rcpp_grad_ram", (DL_FUNC) &_regsem_rcpp_grad_ram, 12},
+    {"_regsem_rcpp_quasi_calc", (DL_FUNC) &_regsem_rcpp_quasi_calc, 4},
+    {"_regsem_rcpp_RAMmult", (DL_FUNC) &_regsem_rcpp_RAMmult, 9},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_regsem(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}

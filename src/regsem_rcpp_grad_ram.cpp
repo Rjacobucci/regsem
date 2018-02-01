@@ -37,8 +37,8 @@ arma::vec rcpp_grad_ram(arma::vec par,
                   arma::vec diff_par) {
 
     double add = 0;
-    double m;
-    m = ImpCov.n_rows;
+   // double m;
+    //m = ImpCov.n_rows;
     arma::vec grad_out; grad_out.zeros(par.n_elem);
     //double deriv15;
     arma::mat deriv15;
