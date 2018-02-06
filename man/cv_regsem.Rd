@@ -178,6 +178,29 @@ cv.out = cv_regsem(outt, type="lasso", pars_pen=c("l1","l2","l6","l7","l8"),
          n.lambda=5,jump=0.01)
 summary(cv.out)
 plot(cv.out, show.minimum="BIC")
+
+mod <- '
+f =~ x1 + x2 + x3 + x4 + x5 + x6
+'
+outt = cfa(mod, HS)
+# can penalize all loadings
+cv.out = cv_regsem(outt,type="lasso", pars_pen="loadings",
+                  n.lambda=5,jump=0.01)
+
+mod2 <- '
+f =~ x4+x5+x3
+#x1 ~ x7 + x8 + x9 + x2
+x1 ~ f
+x2 ~ f
+'
+outt2 = cfa(mod2, HS)
+extractMatrices(outt2)$A
+# if no pars_pen specification, defaults to all
+# regressions
+cv.out = cv_regsem(outt2,type="lasso",
+                  n.lambda=15,jump=0.03)
+# check
+cv.out$pars_pen
 }
 }
 \keyword{calc}

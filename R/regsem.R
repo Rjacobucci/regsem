@@ -197,6 +197,9 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
   # turn parameter labels into numbers
 
   pars_pen2 = NULL
+  if(any(pars_pen=="regressions") & is.null(mats$regressions)){
+    stop("No regression parameters to regularize")
+  }
 
   if(any(pars_pen == "loadings")){
     # inds = mats$A[,mats$name.factors]
