@@ -116,6 +116,7 @@
 #' @export
 #' @examples
 #' # Note that this is not currently recommended. Use cv_regsem() instead
+#' # vignette("overview",package="regsem")
 #' library(lavaan)
 #' # put variables on same scale for regsem
 #' HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))

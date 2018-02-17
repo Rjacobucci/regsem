@@ -94,6 +94,7 @@
 #' @examples
 #' \dontrun{
 #' library(regsem)
+#' vignette("overview",package="regsem")
 #' # put variables on same scale for regsem
 #' HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
 #' mod <- '

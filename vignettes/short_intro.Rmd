@@ -66,6 +66,8 @@ In specifying this model, we use the parameter labels to tell *cv_regsem* which 
 extractMatrices(lav.out)["A"]
 ```
 
+Additionally, we can specify which parameters are penalized by type: "regressions", "loadings", or both c("regressions","loadings"). Note though that this penalizes *all* parameters of this type. If you desire to penalize a subset of parameters, use either the parameter name or number format for pars_pen.
+
 Next, we can get a summary of the models tested.
 
 ```{r}

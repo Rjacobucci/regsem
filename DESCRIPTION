@@ -28,6 +28,7 @@ Suggests:
     lbfgs,
     Rsolnp,
     numDeriv,
+    psych,
     knitr,
     nloptr,
     NlcOptim,
