@@ -13,7 +13,7 @@ parse_parameters <- function(x, model)
     ids <- parTable(model)$free
     matching.ids <- which(labels %in% x)
     if (length(matching.ids)!=length(x)) {
-      warning("Not all requested parameters could be matched to the lavaan model parameters.")
+      stop("Have to specify parameter number in pars_pen for equality constrained labels")
     }
     return(ids[matching.ids])
 
