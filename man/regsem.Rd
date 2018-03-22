@@ -6,14 +6,14 @@
 testing multiple penalties, see cv_regsem().}
 \usage{
 regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "lasso",
-  data = NULL, optMethod = "rsolnp", gradFun = "ram", hessFun = "none",
-  prerun = FALSE, parallel = "no", Start = "lavaan", subOpt = "nlminb",
-  longMod = F, pars_pen = "regressions", diff_par = NULL, LB = -Inf,
-  UB = Inf, par.lim = c(-Inf, Inf), block = TRUE, full = TRUE,
-  calc = "normal", max.iter = 500, tol = 1e-05, solver = FALSE,
-  quasi = FALSE, solver.maxit = 5, alpha.inc = FALSE,
-  line.search = FALSE, step = 0.1, momentum = FALSE, step.ratio = FALSE,
-  nlminb.control = list(), missing = "listwise")
+  data = NULL, optMethod = "rsolnp", estimator = "ML", gradFun = "ram",
+  hessFun = "none", prerun = FALSE, parallel = "no", Start = "lavaan",
+  subOpt = "nlminb", longMod = F, pars_pen = "regressions",
+  diff_par = NULL, LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf),
+  block = TRUE, full = TRUE, calc = "normal", max.iter = 500,
+  tol = 1e-05, solver = FALSE, quasi = FALSE, solver.maxit = 5,
+  alpha.inc = FALSE, line.search = FALSE, step = 0.1, momentum = FALSE,
+  step.ratio = FALSE, nlminb.control = list(), missing = "listwise")
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -57,6 +57,9 @@ information. There is a similar type of solver also available for use,
 slsqp from the nloptr package. coord_desc can also be used with hessian
 information, either through the use of quasi=TRUE, or specifying a hess_fun.
 However, this option is not recommended at this time.}
+
+\item{estimator}{Whether to use maximum likelihood (ML) or unweighted least squares
+(ULS) as a base estimator.}
 
 \item{gradFun}{Gradient function to use. Recommended to use "ram",
 which refers to the method specified in von Oertzen & Brick (2014).

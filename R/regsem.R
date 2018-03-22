@@ -38,6 +38,8 @@
 #'        slsqp from the nloptr package. coord_desc can also be used with hessian
 #'        information, either through the use of quasi=TRUE, or specifying a hess_fun.
 #'        However, this option is not recommended at this time.
+#' @param estimator Whether to use maximum likelihood (ML) or unweighted least squares
+#'        (ULS) as a base estimator.
 #' @param gradFun Gradient function to use. Recommended to use "ram",
 #'        which refers to the method specified in von Oertzen & Brick (2014).
 #'        Only for use with optMethod="coord_desc".
@@ -136,6 +138,7 @@
 
 
 regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,optMethod="rsolnp",
+                  estimator="ML",
                  gradFun="ram",hessFun="none",prerun=FALSE,parallel="no",Start="lavaan",
                  subOpt="nlminb",longMod=F,
                  pars_pen="regressions",
@@ -187,6 +190,12 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
 
 
   mats = extractMatrices(model)
+
+  if(estimator=="ML"){
+    estimator2 = 1
+  }else if(estimator=="ULS"){
+    estimator2 = 2
+  }
 
 
   # ------------------------------
@@ -384,6 +393,12 @@ pars_pen = as.numeric(pars_pen2)
     #SampCov <- fitted(model)$cov
     #SampMean <- rep(0,nvar)
 
+
+    if(estimator=="ULS"){
+      poly_vec = SampCov[lower.tri(SampCov)]
+    }
+
+
     type2 = 0
     if(type=="lasso"){
       type2 = 1
@@ -470,7 +485,12 @@ pars_pen = as.numeric(pars_pen2)
          if(calc_fit=="cov"){
 
            #fit = fit_fun(ImpCov=mult$ImpCov,SampCov,Areg=mult$A_est22,lambda,alpha,type,pen_vec)
-           fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,gamma,pen_vec,pen_diff,e_alpha)
+           if(estimator=="ULS"){
+             imp_vec = mult$ImpCov[lower.tri(mult$ImpCov)]
+           }
+           fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,gamma,
+                              pen_vec,pen_diff,e_alpha,estimator2,poly_vec,imp_vec)
+           print(fit)
            #print(fit)
           # print(type2)
            #print(round(fit,3))#;print(pen_diff)
@@ -1076,7 +1096,12 @@ if(optMethod=="nlminb"){
       }else{
         pen_diff=0
       }
-      res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,pen_diff=pen_diff,e_alpha=0,gamma=0)
+      if(estimator=="ULS"){
+        imp_vec = Imp_Cov1[lower.tri(Imp_Cov1)]
+      }
+      res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,
+                             pen_diff=pen_diff,e_alpha=0,gamma=0,
+                             estimator2,poly_vec,imp_vec)
     }else if(missing == "fiml" & type == "none"){
       #print(res$optim_fit)
       res$fit = (optFit/nobs)*.5
@@ -1085,8 +1110,14 @@ if(optMethod=="nlminb"){
       #SampCov <- model@implied$cov[[i]]
       #res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,pen_diff=0)
     }else if(missing=="fiml" & type != "none"){
+      if(estimator=="ULS"){
+        imp_vec = Imp_Cov[lower.tri(Imp_Cov)]
+      }
+
       res$fit = rcpp_fit_fun(ImpCov=Imp_Cov,SampCov,
-                             type2,lambda,pen_vec=0,pen_diff=0,e_alpha=0,gamma=0)
+                             type2,lambda,pen_vec=0,
+                             pen_diff=0,e_alpha=0,gamma=0,
+                             estimator2,poly_vec,imp_vec)
 
     }
     SampCov2 <- SampCov
