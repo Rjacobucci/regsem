@@ -1,7 +1,7 @@
 Package: regsem
 Type: Package
 Title: Regularized Structural Equation Modeling
-Version: 1.1.3
+Version: 1.1.4
 Author: Ross Jacobucci[aut,cre], 
         Kevin J. Grimm [ctb], 
         Andreas M. Brandmaier [ctb],
@@ -17,7 +17,8 @@ LazyData: TRUE
 VignetteBuilder: knitr
 Depends:
     lavaan,
-    Rcpp
+    Rcpp,
+    Rsolnp
 Suggests:
     snowfall,
     MASS,
@@ -26,7 +27,6 @@ Suggests:
     glmnet,
     ISLR,
     lbfgs,
-    Rsolnp,
     numDeriv,
     psych,
     knitr,

@@ -394,9 +394,9 @@ pars_pen = as.numeric(pars_pen2)
     #SampMean <- rep(0,nvar)
 
 
-    if(estimator=="ULS"){
-      poly_vec = SampCov[lower.tri(SampCov)]
-    }
+  #  if(estimator=="ULS"){
+   #   poly_vec = SampCov[lower.tri(SampCov)]
+  #  }
 
 
     type2 = 0
