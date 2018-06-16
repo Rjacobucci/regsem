@@ -4,9 +4,10 @@
 \alias{cv_regsem}
 \title{The main function that runs multiple penalty values.}
 \usage{
-cv_regsem(model, n.lambda = 40, pars_pen = "regressions", metric = "BIC",
-  mult.start = FALSE, multi.iter = 10, jump = 0.01, lambda.start = 0,
-  alpha = 0.5, gamma = 3.7, type = "lasso", fit.ret = c("rmsea", "BIC"),
+cv_regsem(model, n.lambda = 40, pars_pen = "regressions",
+  metric = ifelse(fit.ret2 == "train", "BIC", "chisq"), mult.start = FALSE,
+  multi.iter = 10, jump = 0.01, lambda.start = 0, alpha = 0.5,
+  gamma = 3.7, type = "lasso", fit.ret = c("rmsea", "BIC", "chisq"),
   fit.ret2 = "train", n.boot = 20, data = NULL, optMethod = "rsolnp",
   gradFun = "ram", hessFun = "none", test.cov = NULL, prerun = FALSE,
   parallel = FALSE, ncore = 2, Start = "lavaan", subOpt = "nlminb",

@@ -491,7 +491,7 @@ pars_pen = as.numeric(pars_pen2)
            }
            fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,gamma,
                               pen_vec,pen_diff,e_alpha)#,estimator2,poly_vec,imp_vec)
-           print(fit)
+          # print(fit)
            #print(fit)
           # print(type2)
            #print(round(fit,3))#;print(pen_diff)
