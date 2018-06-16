@@ -24,10 +24,10 @@ double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov,
                  double gamma,
                  arma::vec pen_vec,
                  arma::vec pen_diff,
-                 double e_alpha,
-                 int estimator2,
-                 arma::vec poly_vec,
-                 arma::vec imp_vec){
+                 double e_alpha){//,
+                 //int estimator2,
+                // arma::vec poly_vec,
+                // arma::vec imp_vec){
            //      int alpha,
 
 
@@ -48,12 +48,12 @@ arma::mat SampCov2 = Rcpp::as<arma::mat>(SampCov);
 //NumericMatrix S2;
 //S2 = clone(S);
 
-if (estimator2 == 1) { // ML
+//if (estimator2 == 1) { // ML
   fit_base = log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m;
-}
-else if (estimator2 == 2) {
-   fit_base = as_scalar((poly_vec - imp_vec).t() * (poly_vec - imp_vec));
-}
+//}
+//else if (estimator2 == 2) {
+//   fit_base = as_scalar((poly_vec - imp_vec).t() * (poly_vec - imp_vec));
+//}
 
 
 

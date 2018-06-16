@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // rcpp_fit_fun
-double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov, Rcpp::NumericMatrix SampCov, int type2, double lambda, double gamma, arma::vec pen_vec, arma::vec pen_diff, double e_alpha, int estimator2, arma::vec poly_vec, arma::vec imp_vec);
-RcppExport SEXP _regsem_rcpp_fit_fun(SEXP ImpCovSEXP, SEXP SampCovSEXP, SEXP type2SEXP, SEXP lambdaSEXP, SEXP gammaSEXP, SEXP pen_vecSEXP, SEXP pen_diffSEXP, SEXP e_alphaSEXP, SEXP estimator2SEXP, SEXP poly_vecSEXP, SEXP imp_vecSEXP) {
+double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov, Rcpp::NumericMatrix SampCov, int type2, double lambda, double gamma, arma::vec pen_vec, arma::vec pen_diff, double e_alpha);
+RcppExport SEXP _regsem_rcpp_fit_fun(SEXP ImpCovSEXP, SEXP SampCovSEXP, SEXP type2SEXP, SEXP lambdaSEXP, SEXP gammaSEXP, SEXP pen_vecSEXP, SEXP pen_diffSEXP, SEXP e_alphaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,10 +20,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type pen_vec(pen_vecSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type pen_diff(pen_diffSEXP);
     Rcpp::traits::input_parameter< double >::type e_alpha(e_alphaSEXP);
-    Rcpp::traits::input_parameter< int >::type estimator2(estimator2SEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type poly_vec(poly_vecSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type imp_vec(imp_vecSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_fit_fun(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha, estimator2, poly_vec, imp_vec));
+    rcpp_result_gen = Rcpp::wrap(rcpp_fit_fun(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -84,7 +81,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_regsem_rcpp_fit_fun", (DL_FUNC) &_regsem_rcpp_fit_fun, 11},
+    {"_regsem_rcpp_fit_fun", (DL_FUNC) &_regsem_rcpp_fit_fun, 8},
     {"_regsem_rcpp_grad_ram", (DL_FUNC) &_regsem_rcpp_grad_ram, 12},
     {"_regsem_rcpp_quasi_calc", (DL_FUNC) &_regsem_rcpp_quasi_calc, 4},
     {"_regsem_rcpp_RAMmult", (DL_FUNC) &_regsem_rcpp_RAMmult, 9},

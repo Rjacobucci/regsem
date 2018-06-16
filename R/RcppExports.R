@@ -12,8 +12,8 @@
 #' @param pen_diff Vector of values to take deviation from.
 #' @param e_alpha Alpha for elastic net
 #'
-rcpp_fit_fun <- function(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha, estimator2, poly_vec, imp_vec) {
-    .Call(`_regsem_rcpp_fit_fun`, ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha, estimator2, poly_vec, imp_vec)
+rcpp_fit_fun <- function(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha) {
+    .Call(`_regsem_rcpp_fit_fun`, ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha)
 }
 
 #' Calculates the gradient vector based on Von Oertzen \& Brick, 2014
