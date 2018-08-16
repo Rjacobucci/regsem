@@ -4,7 +4,7 @@
 \alias{fit_indices}
 \title{Calculates the fit indices}
 \usage{
-fit_indices(model, CV = F, CovMat = NULL, data = NULL)
+fit_indices(model, CV = F, CovMat = NULL, data = NULL, n.obs = NULL)
 }
 \arguments{
 \item{model}{regsem model object.}
@@ -19,6 +19,8 @@ That this should be done before running the lavaan model and should
 not overlap with the data or covariance matrix used to run the model.}
 
 \item{data}{supply the dataset?}
+
+\item{n.obs}{Number of observations in the test set for CV.}
 }
 \description{
 Calculates the fit indices

@@ -10,6 +10,7 @@
 #'        That this should be done before running the lavaan model and should
 #'        not overlap with the data or covariance matrix used to run the model.
 #' @param data supply the dataset?
+#' @param n.obs Number of observations in the test set for CV.
 #' @keywords fit chisq ncp rmsea
 #' @export
 #' @examples
@@ -18,7 +19,7 @@
 #' }
 
 
-fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL){
+fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.obs=NULL){
 
   res <- list()
   ret <- as.vector(rep(0,24))
@@ -40,8 +41,18 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL){
   ret["df"] = df
   npar = model$npar
   ret["npar"] = npar
-  N = model$N
-  ret["N"] = N
+
+  if(CV==F){
+    N = model$N
+    ret["N"] = N
+  }else{
+    if(is.null(n.obs)){
+      stop("For CV, need to provide sample size of test data")
+    }
+    N = n.obs
+    ret["N"] = N
+  }
+
 
   if(CV==F){
     fit = model$fit
