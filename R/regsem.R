@@ -257,6 +257,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="none",data=NULL,optM
 
         SampMean <- model@SampleStats@mean[][[1]]
         ss = match(names(mm[mm > 0]),model@Data@ov$name)
+        ss <- ss[!is.na(ss)] # NAs may arise from fixed means
         SampMean[-c(ss)] = 0
 
 
