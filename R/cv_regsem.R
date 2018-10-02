@@ -1,15 +1,35 @@
 #'
 #'
-#' The main function that ties together and runs the models.
-#' @param model lavaan output object.
+#' The main function that runs multiple penalty values.
+#'
+#' @param model Lavaan output object. This is a model that was previously
+#'        run with any of the lavaan main functions: cfa(), lavaan(), sem(),
+#'        or growth(). It also can be from the efaUnrotate() function from
+#'        the semTools package. Currently, the parts of the model which cannot
+#'        be handled in regsem is the use of multiple group models, missing
+#'        other than listwise, thresholds from categorical variable models,
+#'        the use of additional estimators other than
+#'        ML, most notably WLSMV for categorical variables. Note: the model
+#'        does not have to actually run (use do.fit=FALSE), converge etc...
+#'        regsem() uses the lavaan object as more of a parser and to get
+#'        sample covariance matrix.
 #' @param n.lambda number of penalization values to test.
-#' @param pars_pen parameter indicators to penalize.
+#' @param pars_pen Parameter indicators to penalize. There are multiple ways to specify.
+#'        The default is to penalize all regression parameters ("regressions"). Additionally,
+#'        one can specify all loadings ("loadings"), or both c("regressions","loadings").
+#'        Next, parameter labels can be assigned in the lavaan syntax and passed to pars_pen.
+#'        See the example.Finally, one can take the parameter numbers from the A or S matrices and pass these
+#'        directly. See extractMatrices(lav.object)$A.
+#' @param metric Which fit index to use to choose a final model?
+#'        Note that it chooses the best fit that also achieves convergence
+#'        (conv=0).
 #' @param mult.start Logical. Whether to use multi_optim() (TRUE) or
 #'         regsem() (FALSE).
 #' @param multi.iter maximum number of random starts for multi_optim
 #' @param jump Amount to increase penalization each iteration.
 #' @param lambda.start What value to start the penalty at
-#' @param alpha Mixing for elastic net
+#' @param alpha Mixture for elastic net. 1 = ridge, 0 = lasso
+#' @param gamma Additional penalty for MCP and SCAD
 #' @param type Penalty type. Options include "none", "lasso", "ridge",
 #'        "enet" for the elastic net,
 #'        "alasso" for the adaptive lasso
@@ -21,11 +41,23 @@
 #' @param fit.ret Fit indices to return.
 #' @param fit.ret2 Return fits using only dataset "train" or bootstrap "boot"? Have to
 #'        do 2 sample CV manually.
+#' @param n.boot Number of bootstrap samples if fit.ret2="boot"
 #' @param data Optional dataframe. Only required for missing="fiml".
-#' @param optMethod solver to use.
-#' @param gradFun gradient function to use.
-#' @param hessFun hessian function to use.
+#' @param optMethod Solver to use. Two main options for use: rsoolnp and coord_desc.
+#'        Although slightly slower, rsolnp works much better for complex models.
+#'        coord_desc uses gradient descent with soft thresholding for the type of
+#'        of penalty. Rsolnp is a nonlinear solver that doesn't rely on gradient
+#'        information. There is a similar type of solver also available for use,
+#'        slsqp from the nloptr package. coord_desc can also be used with hessian
+#'        information, either through the use of quasi=TRUE, or specifying a hess_fun.
+#'        However, this option is not recommended at this time.
+#' @param gradFun Gradient function to use. Recommended to use "ram",
+#'        which refers to the method specified in von Oertzen & Brick (2014).
+#'        Only for use with optMethod="coord_desc".
+#' @param hessFun hessian function to use. Currently not recommended.
 #' @param test.cov Covariance matrix from test dataset. Necessary for CV=T
+#' @param prerun Logical. Use rsolnp to first optimize before passing to
+#'        gradient descent? Only for use with coord_desc
 #' @param parallel Logical. whether to parallelize the processes running models for all
 #'        values of lambda.
 #' @param ncore Number of cores to use when parallel=TRUE
@@ -44,48 +76,93 @@
 #' @param max.iter Number of iterations for coordinate descent
 #' @param tol Tolerance for coordinate descent
 #' @param solver Whether to use solver for coord_desc
+#' @param quasi Whether to use quasi-Newton
 #' @param solver.maxit Max iterations for solver in coord_desc
 #' @param alpha.inc Whether alpha should increase for coord_desc
 #' @param step Step size
 #' @param momentum Momentum for step sizes
 #' @param step.ratio Ratio of step size between A and S. Logical
+#' @param line.search Use line search for optimization. Default is no, use fixed step size
 #' @param warm.start Whether start values are based on previous iteration.
 #'        This is not recommended.
 #' @param missing How to handle missing data. Current options are "listwise"
 #'        and "fiml".
+#' @param verbose Print progress bar?
 #' @param ... Any additional arguments to pass to regsem() or multi_optim().
 #' @keywords optim calc
 #' @export
 #' @examples
 #' \dontrun{
-#' library(lavaan)
+#' library(regsem)
+#' vignette("overview",package="regsem")
+#' # put variables on same scale for regsem
 #' HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
 #' mod <- '
 #' f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 #' '
+#' outt = cfa(mod, HS)
+#' # increase to > 25
+#' cv.out = cv_regsem(outt,type="lasso", pars_pen=c(1:2,6:8),
+#'           n.lambda=5,jump=0.01)
+#' # check parameter numbers
+#' extractMatrices(outt)["A"]
+#' # equivalent to
+#' mod <- '
+#' f =~ 1*x1 + l1*x2 + l2*x3 + l3*x4 + l4*x5 + l5*x6 + l6*x7 + l7*x8 + l8*x9
+#' '
 #' outt = cfa(mod,HS)
+#' # increase to > 25
+#' cv.out = cv_regsem(outt, type="lasso", pars_pen=c("l1","l2","l6","l7","l8"),
+#'          n.lambda=5,jump=0.01)
+#' summary(cv.out)
+#' plot(cv.out, show.minimum="BIC")
 #'
-#' cv.out = cv_regsem(outt,type="ridge",gradFun="none",n.lambda=100)
-#'}
+#' mod <- '
+#'f =~ x1 + x2 + x3 + x4 + x5 + x6
+#''
+#'outt = cfa(mod, HS)
+#'# can penalize all loadings
+#'cv.out = cv_regsem(outt,type="lasso", pars_pen="loadings",
+#'                   n.lambda=5,jump=0.01)
+#'
+#'mod2 <- '
+#'f =~ x4+x5+x3
+#'#x1 ~ x7 + x8 + x9 + x2
+#'x1 ~ f
+#'x2 ~ f
+#''
+#'outt2 = cfa(mod2, HS)
+#'extractMatrices(outt2)$A
+#' # if no pars_pen specification, defaults to all
+#' # regressions
+#'cv.out = cv_regsem(outt2,type="lasso",
+#'                   n.lambda=15,jump=0.03)
+#'# check
+#'cv.out$pars_pen
+#' }
 
 
 
 cv_regsem = function(model,
-                     n.lambda=100,
-                     pars_pen=NULL,
-                     mult.start=TRUE,
-                     multi.iter=100,
-                     jump=0.002,
+                     n.lambda=40,
+                     pars_pen="regressions",
+                     metric=ifelse(fit.ret2=="train","BIC","chisq"),
+                     mult.start=FALSE,
+                     multi.iter=10,
+                     jump=0.01,
                      lambda.start=0,
                      alpha=.5,
-                     type="none",
-                     fit.ret=c("rmsea","BIC"),
+                     gamma=3.7,
+                     type="lasso",
+                     fit.ret=c("rmsea","BIC","chisq"),
                      fit.ret2 = "train",
+                     n.boot=20,
                      data=NULL,
-                     optMethod="default",
+                     optMethod="rsolnp",
                     gradFun="ram",
                     hessFun="none",
                     test.cov=NULL,
+                    prerun=FALSE,
                     parallel=FALSE,
                     ncore=2,
                     Start="lavaan",
@@ -100,14 +177,17 @@ cv_regsem = function(model,
                     max.iter=2000,
                     tol=1e-5,
                     solver=FALSE,
+                    quasi=FALSE,
                     solver.maxit=5,
                     alpha.inc=FALSE,
                     step=.1,
                     momentum=FALSE,
                     step.ratio=FALSE,
+                    line.search=FALSE,
                     nlminb.control=list(),
-                    warm.start=TRUE,
+                    warm.start=FALSE,
                     missing="listwise",
+                    verbose=TRUE,
                     ...){
 
 
@@ -116,38 +196,129 @@ cv_regsem = function(model,
 #  dat.train <- dat[ids,]
 #  dat.test <- dat[-ids,]
 #}
+fits.var=NA
+mats <- extractMatrices(model)
 
-pars_pen <- parse_parameters(pars_pen, model)
+if(metric %in% fit.ret == FALSE){
+  stop("Need to specify metric= to match one index in fit.ret")
+}
+
+pars_pen2 = NULL
+
+if(any(pars_pen=="regressions") & is.null(mats$regressions)){
+  stop("No regression parameters to regularize")
+}
+
+if(any(pars_pen == "loadings")){
+  pars_pen2 = mats$loadings
+}else if(any(pars_pen == "regressions") | is.null(pars_pen)){
+  pars_pen2 = c(pars_pen2,mats$regressions)
+ # if(is.na(mats$name.factors)==TRUE){
+ #   if(any(colnames(mats$A) == "1")){
+  #    IntCol = which(colnames(mats$A) == "1")
+  #    A_minusInt = mats$A[,-IntCol]
+  #    A_pen = A_minusInt != 0
+  #    pars_pen2 = c(A_minusInt[A_pen],pars_pen2)
+  #  }else{
+  #    A_pen = mats$A != 0
+  #    pars_pen2 = c(mats$A[A_pen],pars_pen2)
+  #  }
+ # }else{
+    # remove factor loadings
+ #   if(any(colnames(mats$A) == "1")){
+ #     IntCol = which(colnames(A) == "1" | colnames(mats$A) != mats$name.factors)
+ #     A_minusInt = mats$A[,-IntCol]
+  #    A_pen = A_minusInt != 0
+  #    pars_pen2 = c(A_minusInt[A_pen],pars_pen2)
+  #  }else{
+  #    inds2 = mats$A[,colnames(mats$A) != mats$name.factors]
+#
+   #   pars_pen2 = c(inds2[inds2 != 0],pars_pen2)
+  #  }
+ # }
+}else if(is.null(pars_pen)==FALSE & is.numeric(pars_pen)==FALSE){
+  pars_pen2 <- parse_parameters(pars_pen,model)
+}else if(is.numeric(pars_pen)){
+  pars_pen2 = pars_pen
+}#else if(is.null(pars_pen)==TRUE){
+#  if(any(colnames(mats$A) == "1")){
+#    IntCol = which(colnames(mats$A) == "1")
+#    A_minusInt = mats$A[,-IntCol]
+#    A_pen = A_minusInt != 0
+#    pars_pen2 = A_minusInt[A_pen]
+#  }else{
+#    A_pen = mats$A != 0
+#    pars_pen2 = mats$A[A_pen]
+#  }
+#}
+
+
+
+pars_pen = as.numeric(pars_pen2)
+
+
+
+if(is.null(pars_pen) & type!="none"){
+  stop("for cv_regsem(), pars_pen needs to be specified")
+}
+
+#if(is.null(pars_pen)==FALSE & is.numeric(pars_pen)==FALSE){
+#  pars_pen <- parse_parameters(pars_pen,model)
+#}
+if(quasi==TRUE){
+  warnings("The quasi-Newton method is currently not recommended")
+}
 
 if(parallel == TRUE){
   stop("parallel is not currently supported")
 }
 
+if(type == "scad" | type == "mcp" & jump < 0.1){
+  warnings("For both scad and mcp it is recommended to increase jump > 0.1")
+}
+
 if(parallel==FALSE){
 par.matrix <- matrix(0,n.lambda,length(extractMatrices(model)$parameters))
 fits <- matrix(NA,n.lambda,length(fit.ret)+2)
+fit.reg <- rep(NA,n.lambda)
+fitt.var <- matrix(NA,n.lambda,length(fit.ret))
 SHRINK2 = lambda.start
 count = 0
 counts=n.lambda
 #res2 <- data.frame(matrix(NA,counts,3))
 #coefs = rep(1,14)
+if(verbose==TRUE){
+  pb <- txtProgressBar(min = 0, max = counts, style = 3)
+}
+
 
 while(count < counts){
   count = count + 1
-  print(count)
+
+  # create progress bar
+if(verbose==TRUE){
+  setTxtProgressBar(pb, count)
+}
+
+
+
   SHRINK <- SHRINK2 + jump*(count-1) # 0.01 works well & 0.007 as well with 150 iterations
+
+  if(count > 1 & all(abs(par.matrix[count-1,pars_pen])<.001)){
+    break
+  }
 
 if(mult.start==FALSE){
 
   if(warm.start==FALSE | count == 1){
     itt = 0
-    Start="lavaan"
+    Start=Start
   }else if(fits[count-1,2] == 0){
     itt = 0
     Start = par.matrix[count-1,]
-    Start[pars_pen] = Start[pars_pen]#-step*jump
+    Start[pars_pen] = Start[pars_pen]-step*jump
   }else if(fits[count-1,2] == 99){
-    Start="lavaan"
+    Start=Start
   }else{
     itt = itt + 1
     Start = par.matrix[count-itt-1,]
@@ -155,65 +326,486 @@ if(mult.start==FALSE){
   }
 
 
-  out <- regsem(model=model,lambda=SHRINK,type=type,data=data,
-                   optMethod=optMethod,
-                   gradFun=gradFun,hessFun=hessFun,
-                   parallel=parallel,Start=Start,
-                   subOpt=subOpt,
+  if(fit.ret2 == "train"){
+    out <- regsem(model=model,lambda=SHRINK,type=type,data=data,
+                  optMethod=optMethod,
+                  gradFun=gradFun,hessFun=hessFun,
+                  parallel=parallel,Start=Start,
+                  subOpt=subOpt,
                   alpha=alpha,
-                   pars_pen=pars_pen,
-                   diff_par=diff_par,
-                   LB=LB,
-                   UB=UB,
+                  pars_pen=pars_pen,
+                  diff_par=diff_par,
+                  LB=LB,
+                  UB=UB,
+                  gamma=gamma,
+                  prerun=prerun,
                   par.lim=par.lim,
-                   block=block,
-                   full=full,
-                   calc=calc,
-                   tol=tol,
-                    solver=solver,
+                  block=block,
+                  full=full,
+                  calc=calc,
+                  tol=tol,
+                  solver=solver,
+                  quasi=quasi,
                   solver.maxit=solver.maxit,
                   alpha.inc=alpha.inc,
                   step=step,
-                max.iter=max.iter,
-                momentum=momentum,
+                  max.iter=max.iter,
+                  line.search=line.search,
+                  momentum=momentum,
                   step.ratio=step.ratio,
-                   nlminb.control=nlminb.control,
-                   missing=missing)
+                  nlminb.control=nlminb.control,
+                  missing=missing)
+  }else if(fit.ret2=="boot"){
+
+    fitt <- matrix(NA,n.boot,length(fit.ret))
+
+    out <- regsem(model=model,lambda=SHRINK,type=type,data=NULL,
+                  optMethod=optMethod,
+                  gradFun=gradFun,hessFun=hessFun,
+                  parallel=parallel,
+                  subOpt=subOpt,
+                  alpha=alpha,
+                  gamma=gamma,
+                  pars_pen=pars_pen,
+                  diff_par=diff_par,
+                  LB=LB,prerun=prerun,
+                  Start=Start,
+                  UB=UB,
+                  par.lim=par.lim,
+                  block=block,
+                  full=full,
+                  calc=calc,
+                  tol=tol,
+                  solver=solver,
+                  quasi=quasi,
+                  solver.maxit=solver.maxit,
+                  alpha.inc=alpha.inc,
+                  step=step,
+                  max.iter=max.iter,
+                  line.search=line.search,
+                  momentum=momentum,
+                  step.ratio=step.ratio,
+                  nlminb.control=nlminb.control,
+                  missing=missing)
+
+    for(i in 1:n.boot){
+      set.seed(i)
+      data <- as.data.frame(model@Data@X)
+
+      ids1 <- sample(1:nrow(data),nrow(data),replace=TRUE)
+
+      train <- data[ids1,]
+      test <- data[-ids1,]
+
+      colnames(train) <- model@pta$vnames$ov[[1]]
+      colnames(test) <- model@pta$vnames$ov[[1]]
+
+
+      mod1 <- lavaan(parTable(model),train)
+
+    out2 <- regsem(model=mod1,lambda=SHRINK,type=type,data=NULL,
+                  optMethod=optMethod,
+                  gradFun=gradFun,hessFun=hessFun,
+                  parallel=parallel,
+                  subOpt=subOpt,
+                  gamma=gamma,
+                  alpha=alpha,prerun=prerun,
+                  pars_pen=pars_pen,
+                  diff_par=diff_par,
+                  LB=LB,
+                  UB=UB,
+                  Start=Start,
+                  par.lim=par.lim,
+                  block=block,
+                  full=full,
+                  calc=calc,
+                  tol=tol,
+                  solver=solver,
+                  quasi=quasi,
+                  solver.maxit=solver.maxit,
+                  alpha.inc=alpha.inc,
+                  step=step,
+                  max.iter=max.iter,
+                  line.search=line.search,
+                  momentum=momentum,
+                  step.ratio=step.ratio,
+                  nlminb.control=nlminb.control,
+                  missing=missing)
+
+    if(out$convergence==0){
+
+
+      if(mats$mean == TRUE){
+        mm = mats$A[,"1"]
+
+        SampMean <- colMeans(test)
+        ss = match(names(mm[mm > 0]),model@Data@ov$name)
+        SampMean[-c(ss)] = 0
+
+        SampCov=cov(test)
+        SampCov2 <- SampCov + SampMean%*%t(SampMean)
+
+        # try changing size of SampCov
+        SampCov3 = cbind(SampCov2,SampMean)
+        SampCov = rbind(SampCov3,append(SampMean,1))
+
+      }else if(mats$mean == FALSE){
+        # SampCov <- model@SampleStats@cov[][[1]]
+        SampMean = NULL
+        SampCov=cov(test)
+      }
+
+      fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov)$fits[fit.ret]
+
+    }else{
+      fitt[i,] = NA
+    }
+    }
+    fits[count,3:ncol(fits)] <- apply(fitt, 2, function(x) mean(x, trim = .2,na.rm=TRUE))
+    fitt.var[count,1:length(fit.ret)] <- apply(fitt, 2, function(x) var(x,na.rm=TRUE))
+  }else if(fit.ret2=="cv"){
+
+
+    fitt <- matrix(NA,5,length(fit.ret))
+
+    out <- regsem(model=model,lambda=SHRINK,type=type,data=NULL,
+                  optMethod=optMethod,
+                  gradFun=gradFun,hessFun=hessFun,
+                  parallel=parallel,Start=Start,
+                  subOpt=subOpt,
+                  alpha=alpha,
+                  gamma=gamma,
+                  pars_pen=pars_pen,
+                  diff_par=diff_par,
+                  LB=LB,
+                  UB=UB,prerun=prerun,
+                  par.lim=par.lim,
+                  block=block,
+                  full=full,
+                  calc=calc,
+                  tol=tol,
+                  solver=solver,
+                  quasi=quasi,
+                  solver.maxit=solver.maxit,
+                  alpha.inc=alpha.inc,
+                  step=step,
+                  max.iter=max.iter,
+                  line.search=line.search,
+                  momentum=momentum,
+                  step.ratio=step.ratio,
+                  nlminb.control=nlminb.control,
+                  missing=missing)
+
+
+    for(i in 1:5){
+      set.seed(i)
+      data <- as.data.frame(model@Data@X)
+
+      ids1 <- sample(1:nrow(data),round(nrow(data)*.80,1),replace=FALSE)
+
+      train <- data[ids1,]
+      test <- data[-ids1,]
+
+      colnames(train) <- model@pta$vnames$ov[[1]]
+      colnames(test) <- model@pta$vnames$ov[[1]]
+
+
+      mod1 <- lavaan(parTable(model),train)
+
+      out2 <- regsem(model=mod1,lambda=SHRINK,type=type,data=NULL,
+                     optMethod=optMethod,
+                     gradFun=gradFun,hessFun=hessFun,
+                     parallel=parallel,Start=Start,
+                     subOpt=subOpt,
+                     alpha=alpha,
+                     gamma=gamma,
+                     pars_pen=pars_pen,
+                     diff_par=diff_par,
+                     LB=LB,
+                     UB=UB,
+                     par.lim=par.lim,
+                     block=block,prerun=prerun,
+                     full=full,
+                     calc=calc,
+                     tol=tol,
+                     solver=solver,
+                     quasi=quasi,
+                     solver.maxit=solver.maxit,
+                     alpha.inc=alpha.inc,
+                     step=step,
+                     line.search=line.search,
+                     max.iter=max.iter,
+                     momentum=momentum,
+                     step.ratio=step.ratio,
+                     nlminb.control=nlminb.control,
+                     missing=missing)
+
+      if(out$convergence==0){
+
+
+        if(mats$mean == TRUE){
+          mm = mats$A[,"1"]
+
+          SampMean <- colMeans(test)
+          ss = match(names(mm[mm > 0]),model@Data@ov$name)
+          SampMean[-c(ss)] = 0
+
+          SampCov=cov(test)
+          SampCov2 <- SampCov + SampMean%*%t(SampMean)
+
+          # try changing size of SampCov
+          SampCov3 = cbind(SampCov2,SampMean)
+          SampCov = rbind(SampCov3,append(SampMean,1))
+
+        }else if(mats$mean == FALSE){
+          # SampCov <- model@SampleStats@cov[][[1]]
+          SampMean = NULL
+          SampCov=cov(test)
+        }
+
+        fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov)$fits[fit.ret]
+
+      }else{
+        fitt[i,] = NA
+      }
+    }
+    fits[count,3:ncol(fits)] <- apply(fitt, 2, function(x) mean(x, trim = .2,na.rm=TRUE))
+    fitt.var[count,1:length(fit.ret)] <- apply(fitt, 2, function(x) var(x,na.rm=TRUE))
+  }
+
+
 
 
   }else if(mult.start==TRUE){
 
     if(warm.start==FALSE | count == 1 | count == 99){
       itt = 0
-      Start2=NULL
+      Start2="lavaan"
     }else if(fits[count-1,2] == 0){
       itt = 0
       Start2 = par.matrix[count-1,]
       Start2[pars_pen] = Start2[pars_pen]-step*jump
     }else if(fits[count-1,2] == 99){
-      Start="lavaan"
+      Start2="lavaan"
     }else{
       itt = itt + 1
       Start2 = par.matrix[count-itt-1,]
       Start2[pars_pen] = Start2[pars_pen]-itt*jump
     }
-   out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
+
+
+
+
+    if(fit.ret2 == "train"){
+      out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
                       LB=LB,UB=UB,par.lim=par.lim,
                       type=type,optMethod=optMethod,
                       gradFun=gradFun,hessFun=hessFun,
                       tol=tol,
                       alpha=alpha,
+                      gamma=gamma,
                       solver=solver,
+                      quasi=quasi,
                       solver.maxit=solver.maxit,
                       max.iter=max.iter,
-                      full=full,
+                      full=full,prerun=prerun,
                       block=block,
                       alpha.inc=alpha.inc,
+                      line.search=line.search,
                       step=step,
                       momentum=momentum,
                       Start2=Start2,
                       step.ratio=step.ratio,nlminb.control=nlminb.control,
-                      pars_pen=pars_pen,diff_par=NULL)
+                      pars_pen=pars_pen,diff_par=diff_par)
+
+    }else if(fit.ret2=="boot"){
+      fitt <- matrix(NA,n.boot,length(fit.ret))
+
+      out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
+                         LB=LB,UB=UB,par.lim=par.lim,
+                         type=type,optMethod=optMethod,
+                         gradFun=gradFun,hessFun=hessFun,
+                         tol=tol,
+                         alpha=alpha,
+                         gamma=gamma,
+                         solver=solver,prerun=prerun,
+                         quasi=quasi,
+                         solver.maxit=solver.maxit,
+                         max.iter=max.iter,
+                         full=full,
+                         block=block,
+                         alpha.inc=alpha.inc,
+                         line.search=line.search,
+                         step=step,
+                         momentum=momentum,
+                         Start2=Start2,
+                         step.ratio=step.ratio,nlminb.control=nlminb.control,
+                         pars_pen=pars_pen,diff_par=diff_par)
+
+
+      for(i in 1:n.boot){
+        set.seed(i)
+        data <- as.data.frame(model@Data@X)
+
+        ids1 <- sample(1:nrow(data),nrow(data),replace=TRUE)
+
+        train <- data[ids1,]
+        test <- data[-ids1,]
+
+        colnames(train) <- model@pta$vnames$ov[[1]]
+        colnames(test) <- model@pta$vnames$ov[[1]]
+
+
+        mod1 <- lavaan(parTable(model),train)
+
+        out2 <- multi_optim(model=mod1,max.try=multi.iter,lambda=SHRINK,
+                           LB=LB,UB=UB,par.lim=par.lim,
+                           type=type,optMethod=optMethod,
+                           gradFun=gradFun,hessFun=hessFun,
+                           tol=tol,
+                           alpha=alpha,prerun=prerun,
+                           gamma=gamma,
+                           solver=solver,
+                           quasi=quasi,
+                           solver.maxit=solver.maxit,
+                           max.iter=max.iter,
+                           full=full,
+                           block=block,
+                           alpha.inc=alpha.inc,
+                           line.search=line.search,
+                           step=step,
+                           momentum=momentum,
+                           Start2=Start2,
+                           step.ratio=step.ratio,nlminb.control=nlminb.control,
+                           pars_pen=pars_pen,diff_par=diff_par)
+
+
+        if(out$convergence==0){
+
+
+          if(mats$mean == TRUE){
+            mm = mats$A[,"1"]
+
+            SampMean <- colMeans(test)
+            ss = match(names(mm[mm > 0]),model@Data@ov$name)
+            SampMean[-c(ss)] = 0
+
+            SampCov=cov(test)
+            SampCov2 <- SampCov + SampMean%*%t(SampMean)
+
+            # try changing size of SampCov
+            SampCov3 = cbind(SampCov2,SampMean)
+            SampCov = rbind(SampCov3,append(SampMean,1))
+
+          }else if(mats$mean == FALSE){
+            # SampCov <- model@SampleStats@cov[][[1]]
+            SampMean = NULL
+            SampCov=cov(test)
+          }
+
+          fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov)$fits[fit.ret]
+
+        }else{
+          fitt[i,] = NA
+        }
+      }
+      fits[count,3:ncol(fits)] <- apply(fitt, 2, function(x) mean(x, trim = .2,na.rm=TRUE))
+      fitt.var[count,1:length(fit.ret)] <- apply(fitt, 2, function(x) var(x,na.rm=TRUE))
+    }else if(fit.ret2=="cv"){
+
+
+      fitt <- matrix(NA,5,length(fit.ret))
+
+      out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
+                         LB=LB,UB=UB,par.lim=par.lim,
+                         type=type,optMethod=optMethod,
+                         gradFun=gradFun,hessFun=hessFun,
+                         tol=tol,
+                         alpha=alpha,
+                         gamma=gamma,
+                         solver=solver,
+                         quasi=quasi,prerun=prerun,
+                         solver.maxit=solver.maxit,
+                         max.iter=max.iter,
+                         full=full,
+                         block=block,
+                         alpha.inc=alpha.inc,
+                         step=step,
+                         line.search=line.search,
+                         momentum=momentum,
+                         Start2=Start2,
+                         step.ratio=step.ratio,nlminb.control=nlminb.control,
+                         pars_pen=pars_pen,diff_par=NULL)
+
+
+      for(i in 1:5){
+        set.seed(i)
+        data <- as.data.frame(model@Data@X)
+
+        ids1 <- sample(1:nrow(data),round(nrow(data)*.80,1),replace=FALSE)
+
+        train <- data[ids1,]
+        test <- data[-ids1,]
+
+        colnames(train) <- model@pta$vnames$ov[[1]]
+        colnames(test) <- model@pta$vnames$ov[[1]]
+
+
+        mod1 <- lavaan(parTable(model),train)
+
+        out2 <- multi_optim(model=mod1,max.try=multi.iter,lambda=SHRINK,
+                            LB=LB,UB=UB,par.lim=par.lim,
+                            type=type,optMethod=optMethod,
+                            gradFun=gradFun,hessFun=hessFun,
+                            tol=tol,
+                            alpha=alpha,prerun=prerun,
+                            gamma=gamma,
+                            solver=solver,
+                            quasi=quasi,
+                            solver.maxit=solver.maxit,
+                            max.iter=max.iter,
+                            full=full,
+                            block=block,
+                            alpha.inc=alpha.inc,
+                            step=step,
+                            line.search=line.search,
+                            momentum=momentum,
+                            Start2=Start2,
+                            step.ratio=step.ratio,nlminb.control=nlminb.control,
+                            pars_pen=pars_pen,diff_par=NULL)
+
+        if(out$convergence==0){
+
+
+          if(mats$mean == TRUE){
+            mm = mats$A[,"1"]
+
+            SampMean <- colMeans(test)
+            ss = match(names(mm[mm > 0]),model@Data@ov$name)
+            SampMean[-c(ss)] = 0
+
+            SampCov=cov(test)
+            SampCov2 <- SampCov + SampMean%*%t(SampMean)
+
+            # try changing size of SampCov
+            SampCov3 = cbind(SampCov2,SampMean)
+            SampCov = rbind(SampCov3,append(SampMean,1))
+
+          }else if(mats$mean == FALSE){
+            # SampCov <- model@SampleStats@cov[][[1]]
+            SampMean = NULL
+            SampCov=cov(test)
+          }
+
+          fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov)$fits[fit.ret]
+
+        }else{
+          fitt[i,] = NA
+        }
+      }
+      fits[count,3:ncol(fits)] <- apply(fitt, 2, function(x) mean(x, trim = .2,na.rm=TRUE))
+      fitt.var[count,1:length(fit.ret)] <- apply(fitt, 2, function(x) var(x,na.rm=TRUE))
+    }
 
   }
   #print(pars_pen)
@@ -223,6 +815,7 @@ if(mult.start==FALSE){
   #}else
   if(fit.ret2 == "train"){
     fitt = try(fit_indices(out,CV=FALSE)$fits[fit.ret],silent=T)
+    fit.reg[count] <- out$optim_fit
     if(inherits(fitt, "try-error")) {
       fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)
     }else{
@@ -232,17 +825,13 @@ if(mult.start==FALSE){
   }else if(fit.ret2 == "test"){
    # stop("fit.ret2=test is currently not implemented")
     #print(summary(out))
+
     fitt = try(fit_indices(out,CovMat=test.cov,CV=TRUE)$fits[fit.ret],silent=T)
     if(inherits(fitt, "try-error")) {
+
       fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)
     }else{
-      fits[count,3:ncol(fits)] = fitt
-    }
-  }else if(fit.ret2 == "boot"){
-    fitt = try(fit_indices(out,CV="boot")$fits[fit.ret],silent=T)
-    if(inherits(fitt, "try-error")) {
-      fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)
-    }else{
+
       fits[count,3:ncol(fits)] = fitt
     }
   }
@@ -266,13 +855,23 @@ if(mult.start==FALSE){
 
   colnames(par.matrix) = names(out$coefficients)
   colnames(fits) <- c("lambda","conv",fit.ret)
-  out2 <- list(par.matrix,fits,pars_pen)
+  fit.index = fits[,metric]
+  conv = fits[,"conv"]
+  if(metric=="TLI" | metric=="CFI"){
+    loc = which(abs(fit.index)==max(abs(fit.index[conv==0 & is.nan(fit.index) == FALSE & is.na(conv)==FALSE])))[1]
+  }else{
+    loc = which(abs(fit.index)==min(abs(fit.index[conv==0 & is.nan(fit.index) == FALSE & is.na(conv)==FALSE])))[1]
+  }
+
+  final_pars = par.matrix[loc,]
+
+  out2 <- list(par.matrix,fits,final_pars,pars_pen,metric) #fitt_var
  # ret
 
 }
 }else if(parallel==TRUE){
 
-
+  stop("Parallel is not currently supported")
 
   par.matrix <- matrix(0,n.lambda,model@Fit@npar)
   fits <- matrix(NA,n.lambda,length(fit.ret)+2)
@@ -293,18 +892,21 @@ if(mult.start==FALSE){
                     parallel=parallel,Start=Start,
                     subOpt=subOpt,
                     pars_pen=pars_pen,
+                    gamma=gamma,
                     diff_par=diff_par,
                     LB=LB,
                     alpha=alpha,
-                    UB=UB,
+                    UB=UB,prerun=prerun,
                     calc=calc,
                     nlminb.control=nlminb.control,
                     tol=tol,
                     full=full,
                     block=block,
                     solver=solver,
+                    quasi=quasi,
                     solver.maxit=solver.maxit,
                     alpha.inc=alpha.inc,
+                    line.search=line.search,
                     step=step,
                     momentum=momentum,
                     step.ratio=step.ratio,
@@ -318,11 +920,14 @@ if(mult.start==FALSE){
                          tol=tol,
                          full=full,
                          alpha=alpha,
-                         block=block,
+                         gamma=gamma,
+                         block=block,prerun=prerun,
                          solver=solver,
+                         quasi=quasi,
                          solver.maxit=solver.maxit,
                          alpha.inc=alpha.inc,
                          step=step,
+                         line.search=line.search,
                          momentum=momentum,
                          step.ratio=step.ratio,
                          pars_pen=pars_pen,diff_par=NULL,warm.start=warm.start)
@@ -373,7 +978,10 @@ if(mult.start==FALSE){
                      "diff_par",
                      "LB",
                      "block",
+                     "solver",
+                     "quasi",
                      "full",
+                     "line.search",
                      "UB",
                      "calc",
                      "nlminb.control",
@@ -399,10 +1007,15 @@ if(mult.start==FALSE){
 
 
 }
+
+
 #fits = fit_indices(out,CV=FALSE)
-out2$pars_pen <- pars_pen
+#out2$pars_pen <- pars_pen
 out2$call <- match.call()
 class(out2) <- "cvregsem"
+names(out2) <- c("parameters","fits","final_pars","pars_pen","metric","call")#"fit_variance"
 out2
+
+#close(pb)
 
 }

@@ -4,11 +4,12 @@
 \alias{multi_optim}
 \title{Multiple starts for Regularized Structural Equation Modeling}
 \usage{
-multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5, LB = -Inf,
-  UB = Inf, par.lim = c(-Inf, Inf), block = TRUE, full = TRUE,
-  type = "none", optMethod = "default", gradFun = "ram",
-  pars_pen = NULL, diff_par = NULL, hessFun = "none", tol = 1e-05,
-  solver = FALSE, solver.maxit = 50000, alpha.inc = FALSE, step = 0.1,
+multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5, gamma = 3.7,
+  LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf), block = TRUE,
+  full = TRUE, type = "lasso", optMethod = "rsolnp", gradFun = "ram",
+  pars_pen = "regressions", diff_par = NULL, hessFun = "none",
+  tol = 1e-05, solver = FALSE, quasi = FALSE, solver.maxit = 50000,
+  alpha.inc = FALSE, line.search = FALSE, prerun = FALSE, step = 0.1,
   momentum = FALSE, step.ratio = FALSE, verbose = FALSE,
   warm.start = FALSE, Start2 = NULL, nlminb.control = NULL,
   max.iter = 500)
@@ -33,6 +34,8 @@ convergence issues.}
 
 \item{alpha}{Mixture for elastic net.}
 
+\item{gamma}{Additional penalty for MCP and SCAD}
+
 \item{LB}{lower bound vector. Note: This is very important to specify
 when using regularization. It greatly increases the chances of
 converging.}
@@ -46,43 +49,55 @@ stop optimization and move to new starting values if violated.}
 
 \item{full}{Whether to do full gradient descent or block}
 
-\item{type}{Penalty type. Options include "none", "lasso", "ridge",
+\item{type}{Penalty type. Options include "none", "lasso",
 "enet" for the elastic net,
 "alasso" for the adaptive lasso
-and "diff_lasso". diff_lasso penalizes the discrepency between
+and "diff_lasso". If ridge penalties are desired, use type="enet" and
+alpha=1. diff_lasso penalizes the discrepency between
 parameter estimates and some pre-specified values. The values
 to take the deviation from are specified in diff_par. Two methods for
 sparser results than lasso are the smooth clipped absolute deviation,
 "scad", and the minimum concave penalty, "mcp".}
 
-\item{optMethod}{Solver to use. Recommended options include "nlminb" and
-"optimx". Note: for "optimx", the default method is to use nlminb.
-This can be changed in subOpt.}
+\item{optMethod}{Solver to use. Two main options for use: rsoolnp and coord_desc.
+Although slightly slower, rsolnp works much better for complex models.
+coord_desc uses gradient descent with soft thresholding for the type of
+of penalty. Rsolnp is a nonlinear solver that doesn't rely on gradient
+information. There is a similar type of solver also available for use,
+slsqp from the nloptr package. coord_desc can also be used with hessian
+information, either through the use of quasi=TRUE, or specifying a hess_fun.
+However, this option is not recommended at this time.}
 
 \item{gradFun}{Gradient function to use. Recommended to use "ram",
 which refers to the method specified in von Oertzen & Brick (2014).
-The "norm" procedure uses the forward difference method for
-calculating the hessian. This is slower and less accurate.}
+Only for use with optMethod="coord_desc".}
 
-\item{pars_pen}{Parameter indicators to penalize. If left NULL, by default,
-all parameters in the \emph{A} matrix outside of the intercepts are
-penalized when lambda > 0 and type != "none".}
+\item{pars_pen}{Parameter indicators to penalize. There are multiple ways to specify.
+The default is to penalize all regression parameters ("regressions"). Additionally,
+one can specify all loadings ("loadings"), or both c("regressions","loadings").
+Next, parameter labels can be assigned in the lavaan syntax and passed to pars_pen.
+See the example.Finally, one can take the parameter numbers from the A or S matrices and pass these
+directly. See extractMatrices(lav.object)$A.}
 
 \item{diff_par}{Parameter values to deviate from. Only used when
 type="diff_lasso".}
 
-\item{hessFun}{Hessian function to use. Recommended to use "ram",
-which refers to the method specified in von Oertzen & Brick (2014).
-The "norm" procedure uses the forward difference method for
-calculating the hessian. This is slower and less accurate.}
+\item{hessFun}{Hessian function to use. Currently not recommended.}
 
 \item{tol}{Tolerance for coordinate descent}
 
 \item{solver}{Whether to use solver for coord_desc}
 
+\item{quasi}{Whether to use quasi-Newton. Currently not recommended.}
+
 \item{solver.maxit}{Max iterations for solver in coord_desc}
 
 \item{alpha.inc}{Whether alpha should increase for coord_desc}
+
+\item{line.search}{Use line search for optimization. Default is no, use fixed step size}
+
+\item{prerun}{Logical. Use rsolnp to first optimize before passing to
+gradient descent? Only for use with coord_desc.}
 
 \item{step}{Step size}
 
@@ -106,17 +121,17 @@ Multiple starts for Regularized Structural Equation Modeling
 }
 \examples{
 \dontrun{
-# Note that this is not currently recommend. Use regsem() instead
+# Note that this is not currently recommended. Use cv_regsem() instead
 library(regsem)
-HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
+# put variables on same scale for regsem
+HS <- data.frame(scale(HolzingerSwineford1939[ ,7:15]))
 mod <- '
 f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 '
-outt = cfa(mod,HS,meanstructure=TRUE)
+outt = cfa(mod, HS, meanstructure=TRUE)
 
-fit1 <- multi_optim(outt,max.try=40,
-                   lambda=0.1,type="lasso",
-                   gradFun="ram")
+fit1 <- multi_optim(outt, max.try=40,
+                   lambda=0.1, type="lasso")
 
 
 # growth model
@@ -125,7 +140,7 @@ model <- ' i =~ 1*t1 + 1*t2 + 1*t3 + 1*t4
 fit <- growth(model, data=Demo.growth)
 summary(fit)
 fitmeasures(fit)
-fit3 <- multi_optim(fit,lambda=0.2,type="ridge",gradFun="none")
+fit3 <- multi_optim(fit, lambda=0.2, type="lasso")
 summary(fit3)
 }
 }

@@ -18,6 +18,7 @@
 #' @param lambda Penalty value. Note: higher values will result in additional
 #'        convergence issues.
 #' @param alpha Mixture for elastic net.
+#' @param gamma Additional penalty for MCP and SCAD
 #' @param LB lower bound vector. Note: This is very important to specify
 #'        when using regularization. It greatly increases the chances of
 #'        converging.
@@ -26,34 +27,43 @@
 #'        stop optimization and move to new starting values if violated.
 #' @param block Whether to use block coordinate descent
 #' @param full Whether to do full gradient descent or block
-#' @param type Penalty type. Options include "none", "lasso", "ridge",
+#' @param type Penalty type. Options include "none", "lasso",
 #'        "enet" for the elastic net,
 #'        "alasso" for the adaptive lasso
-#'        and "diff_lasso". diff_lasso penalizes the discrepency between
+#'        and "diff_lasso". If ridge penalties are desired, use type="enet" and
+#'        alpha=1. diff_lasso penalizes the discrepency between
 #'        parameter estimates and some pre-specified values. The values
 #'        to take the deviation from are specified in diff_par. Two methods for
 #'        sparser results than lasso are the smooth clipped absolute deviation,
 #'        "scad", and the minimum concave penalty, "mcp".
-#' @param optMethod Solver to use. Recommended options include "nlminb" and
-#'        "optimx". Note: for "optimx", the default method is to use nlminb.
-#'        This can be changed in subOpt.
+#' @param optMethod Solver to use. Two main options for use: rsoolnp and coord_desc.
+#'        Although slightly slower, rsolnp works much better for complex models.
+#'        coord_desc uses gradient descent with soft thresholding for the type of
+#'        of penalty. Rsolnp is a nonlinear solver that doesn't rely on gradient
+#'        information. There is a similar type of solver also available for use,
+#'        slsqp from the nloptr package. coord_desc can also be used with hessian
+#'        information, either through the use of quasi=TRUE, or specifying a hess_fun.
+#'        However, this option is not recommended at this time.
 #' @param gradFun Gradient function to use. Recommended to use "ram",
 #'        which refers to the method specified in von Oertzen & Brick (2014).
-#'        The "norm" procedure uses the forward difference method for
-#'        calculating the hessian. This is slower and less accurate.
-#' @param pars_pen Parameter indicators to penalize. If left NULL, by default,
-#'        all parameters in the \emph{A} matrix outside of the intercepts are
-#'        penalized when lambda > 0 and type != "none".
+#'        Only for use with optMethod="coord_desc".
+#' @param pars_pen Parameter indicators to penalize. There are multiple ways to specify.
+#'        The default is to penalize all regression parameters ("regressions"). Additionally,
+#'        one can specify all loadings ("loadings"), or both c("regressions","loadings").
+#'        Next, parameter labels can be assigned in the lavaan syntax and passed to pars_pen.
+#'        See the example.Finally, one can take the parameter numbers from the A or S matrices and pass these
+#'        directly. See extractMatrices(lav.object)$A.
 #' @param diff_par Parameter values to deviate from. Only used when
 #'        type="diff_lasso".
-#' @param hessFun Hessian function to use. Recommended to use "ram",
-#'        which refers to the method specified in von Oertzen & Brick (2014).
-#'        The "norm" procedure uses the forward difference method for
-#'        calculating the hessian. This is slower and less accurate.
+#' @param hessFun Hessian function to use. Currently not recommended.
+#' @param prerun Logical. Use rsolnp to first optimize before passing to
+#'        gradient descent? Only for use with coord_desc.
 #' @param tol Tolerance for coordinate descent
 #' @param solver Whether to use solver for coord_desc
+#' @param quasi Whether to use quasi-Newton. Currently not recommended.
 #' @param solver.maxit Max iterations for solver in coord_desc
 #' @param alpha.inc Whether alpha should increase for coord_desc
+#' @param line.search Use line search for optimization. Default is no, use fixed step size
 #' @param step Step size
 #' @param momentum Momentum for step sizes
 #' @param step.ratio Ratio of step size between A and S. Logical
@@ -67,17 +77,17 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' # Note that this is not currently recommend. Use regsem() instead
+#' # Note that this is not currently recommended. Use cv_regsem() instead
 #' library(regsem)
-#' HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
+#' # put variables on same scale for regsem
+#' HS <- data.frame(scale(HolzingerSwineford1939[ ,7:15]))
 #' mod <- '
 #' f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
 #' '
-#' outt = cfa(mod,HS,meanstructure=TRUE)
+#' outt = cfa(mod, HS, meanstructure=TRUE)
 #'
-#' fit1 <- multi_optim(outt,max.try=40,
-#'                    lambda=0.1,type="lasso",
-#'                    gradFun="ram")
+#' fit1 <- multi_optim(outt, max.try=40,
+#'                    lambda=0.1, type="lasso")
 #'
 #'
 #'# growth model
@@ -87,28 +97,32 @@
 #'summary(fit)
 #'fitmeasures(fit)
 
-#'fit3 <- multi_optim(fit,lambda=0.2,type="ridge",gradFun="none")
+#'fit3 <- multi_optim(fit, lambda=0.2, type="lasso")
 #'summary(fit3)
 #'}
 
 
 multi_optim <- function(model,max.try=10,lambda=0,
                         alpha=.5,
+                        gamma=3.7,
                          LB=-Inf,
                         UB=Inf,
                         par.lim=c(-Inf,Inf),
                         block=TRUE,
                         full=TRUE,
-                        type="none",
-                        optMethod="default",
+                        type="lasso",
+                        optMethod="rsolnp",
                         gradFun="ram",
-                        pars_pen=NULL,
+                        pars_pen="regressions",
                         diff_par=NULL,
                         hessFun="none",
                         tol=1e-5,
                         solver=FALSE,
+                        quasi=FALSE,
                         solver.maxit=50000,
                         alpha.inc=FALSE,
+                        line.search=FALSE,
+                        prerun=FALSE,
                         step=.1,
                         momentum=FALSE,
                         step.ratio=FALSE,
@@ -139,7 +153,13 @@ multi_optim <- function(model,max.try=10,lambda=0,
 #    warning("At this time, only gradFun=ram recommended with lasso penalties")
 #  }
 
+  if(type=="ridge"){
+    type="enet";alpha=1
+  }
 
+  if(quasi==TRUE){
+    warnings("The quasi-Newton method is currently not recommended")
+  }
 #if(warm.start==TRUE){
 #  stop("warm start not currently functioning")
 #}
@@ -164,18 +184,20 @@ multi_optim <- function(model,max.try=10,lambda=0,
 
   sss = seq(1,max.try)
 
-    mult_run <- function(model,n.try=1,lambda,LB=-Inf,tol,alpha,
+    mult_run <- function(model,n.try=1,lambda,LB=-Inf,tol,alpha,gamma,
                          UB=Inf,
                          par.lim,
                          block,
                          full,
                          type,optMethod,warm.start,
                          solver,
+                         quasi,
                          solver.maxit,
                          alpha.inc,
                          step,
-                         momentum,
+                         momentum,prerun,
                          max.iter,
+                         line.search,
                          step.ratio,
                          gradFun,n.optim,pars_pen,nlminb.control,
                          diff_par,hessFun,Start2){
@@ -210,16 +232,19 @@ multi_optim <- function(model,max.try=10,lambda=0,
        # }
 
 
-        fit1 <- suppressWarnings(try(regsem(model,lambda=lambda,alpha=alpha,type=type,optMethod=optMethod,
+        fit1 <- suppressWarnings(try(regsem(model,lambda=lambda,alpha=alpha,gamma=gamma,
+                                            type=type,optMethod=optMethod,
                                             Start=start.optim,gradFun=gradFun,hessFun=hessFun,
                                             nlminb.control=nlminb.control,tol=tol,
                                             solver=solver,
+                                            quasi=quasi,
                                             block=block,
                                             par.lim=par.lim,
-                                            full=full,
+                                            full=full,prerun=prerun,
                                             solver.maxit=solver.maxit,
                                             alpha.inc=alpha.inc,
                                             max.iter=max.iter,
+                                            line.search=line.search,
                                             step=step,
                                             momentum=momentum,
                                             step.ratio=step.ratio,
@@ -248,8 +273,8 @@ multi_optim <- function(model,max.try=10,lambda=0,
             mtt[n.optim,2] = fit1$out$convergence
           }else{
             #print(fit1$out$value)
-            mtt[n.optim,1] = fit1$out$value
-            mtt[n.optim,2] = fit1$out$convergence
+            mtt[n.optim,1] = fit1$optim_fit
+            mtt[n.optim,2] = fit1$convergence
           }
         }
     }
@@ -264,15 +289,18 @@ iter.optim = iter.optim + 1
 
 
 
-    ret.mult = mult_run(model,n.try=1,lambda=lambda,alpha=alpha,LB,UB,type,warm.start=warm.start,
+    ret.mult = mult_run(model,n.try=1,lambda=lambda,alpha=alpha,gamma=gamma,
+                        LB,UB,type,warm.start=warm.start,
                         nlminb.control=nlminb.control,tol=tol,
                         solver=solver,
+                        quasi=quasi,
                         block=block,
                         par.lim=par.lim,
-                        full=full,
+                        full=full,prerun=prerun,
                         solver.maxit=solver.maxit,
                         max.iter=max.iter,
                         alpha.inc=alpha.inc,
+                        line.search=line.search,
                         step=step,
                         momentum=momentum,
                         step.ratio=step.ratio,
@@ -325,17 +353,21 @@ iter.optim = iter.optim + 1
       }else{
         Start="default"
       }
-      fit1 <- suppressWarnings(regsem(model,lambda=lambda,alpha=alpha,type=type,optMethod=optMethod,
+      fit1 <- suppressWarnings(regsem(model,lambda=lambda,
+                     alpha=alpha,gamma=gamma,
+                     type=type,optMethod=optMethod,
                      Start=Start,gradFun=gradFun,hessFun=hessFun,
                      nlminb.control=nlminb.control,tol=tol,
                      solver=solver,
+                     quasi=quasi,
                      block=block,
                      full=full,
-                     par.lim=par.lim,
+                     par.lim=par.lim,prerun=prerun,
                      max.iter=max.iter,
                      solver.maxit=solver.maxit,
                      alpha.inc=alpha.inc,
                      step=step,
+                     line.search=line.search,
                      momentum=momentum,
                      step.ratio=step.ratio,
                      LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))

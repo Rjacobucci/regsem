@@ -61,7 +61,15 @@ A_init <- matrix(0, nrow = nvar + nfac2, ncol = nvar + nfac2)
 name <- unique(pars$lhs)
 
 name.vars <- model@pta$vnames$ov[[1]]
+
+
 name.factors <- model@pta$vnames$lv[[1]]
+
+if(identical(name.factors, character(0))){
+  name.factors2=NA
+}else{
+  name.factors2 = name.factors
+}
 
 if(length(name.factors)!=0){
   if(mean==TRUE){
@@ -85,6 +93,7 @@ A <- A_init
 
 A.parT = parT[parT$op == "=~" | parT$op == "~1" | parT$op == "~",]
 A.pars = pars[parT$op == "=~" | parT$op == "~1" | parT$op == "~",]
+
 
 A.parFree <- A.parT[A.parT$free > 0,]
 
@@ -125,18 +134,23 @@ A.parFree[,"free"] <- rank(A.parFree[,"free"],ties.method="min")
 
 A.parFree2 <- A.parFree
 
+loadings <- NULL
+regressions <- NULL
+
 if(nrow(A.parFree2) > 0){
 for(i in 1:nrow(A.parFree2)){
   if(A.parFree2$op[i] == "=~"){
   colNum <- which(A.parFree2$lhs[i] == colnames(A))
   rowNum <- which(A.parFree2$rhs[i] == rownames(A))
   A[rowNum,colNum] = A.parFree2[i,"free"]
+  loadings = c(loadings,A.parFree2[i,"free"])
   }else if(A.parFree2$op[i] == "~1"){
     A[which(rownames(A)==A.parFree2$lhs[i]),which(colnames(A) == "1")] = A.parFree2[i,"free"]
   }else if(A.parFree2$op[i] == "~"){
     colNum <- which(A.parFree2$rhs[i] == colnames(A))
     rowNum <- which(A.parFree2$lhs[i] == rownames(A))
     A[rowNum,colNum] = A.parFree2[i,"free"]
+    regressions = c(regressions,A.parFree2[i,"free"])
   }
 }
 }else{
@@ -421,6 +435,9 @@ matrices$F <- F
 matrices$parameters <- round(pars,3)
 matrices$mean <- mean
 matrices$mediation <- mediation
+matrices$name.factors <- name.factors2
+matrices$loadings <- loadings
+matrices$regressions <- regressions
 
 matrices
 

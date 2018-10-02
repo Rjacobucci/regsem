@@ -2,16 +2,18 @@
 % Please edit documentation in R/regsem.R
 \name{regsem}
 \alias{regsem}
-\title{Regularized Structural Equation Modeling}
+\title{Regularized Structural Equation Modeling. Tests a single penalty. For
+testing multiple penalties, see cv_regsem().}
 \usage{
-regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "none",
-  data = NULL, optMethod = "default", gradFun = "ram", hessFun = "none",
-  parallel = "no", Start = "lavaan", subOpt = "nlminb", longMod = F,
-  pars_pen = NULL, diff_par = NULL, LB = -Inf, UB = Inf,
-  par.lim = c(-Inf, Inf), block = TRUE, full = TRUE, calc = "normal",
-  max.iter = 500, tol = 1e-05, solver = FALSE, solver.maxit = 5,
-  alpha.inc = FALSE, step = 0.1, momentum = FALSE, step.ratio = FALSE,
-  nlminb.control = list(), missing = "listwise")
+regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "lasso",
+  data = NULL, optMethod = "rsolnp", estimator = "ML", gradFun = "ram",
+  hessFun = "none", prerun = FALSE, parallel = "no", Start = "lavaan",
+  subOpt = "nlminb", longMod = F, pars_pen = "regressions",
+  diff_par = NULL, LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf),
+  block = TRUE, full = TRUE, calc = "normal", max.iter = 500,
+  tol = 1e-05, solver = FALSE, quasi = FALSE, solver.maxit = 5,
+  alpha.inc = FALSE, line.search = FALSE, step = 0.1, momentum = FALSE,
+  step.ratio = FALSE, nlminb.control = list(), missing = "listwise")
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -30,14 +32,15 @@ sample covariance matrix.}
 convergence issues. If using values > 0.1, it is recommended to use
 mutli_optim() instead. See \code{\link{multi_optim}} for more detail.}
 
-\item{alpha}{Mixture for elastic net.}
+\item{alpha}{Mixture for elastic net. 1 = ridge, 0 = lasso}
 
 \item{gamma}{Additional penalty for MCP and SCAD}
 
-\item{type}{Penalty type. Options include "none", "lasso", "ridge",
+\item{type}{Penalty type. Options include "none", "lasso",
 "enet" for the elastic net,
 "alasso" for the adaptive lasso
-and "diff_lasso". diff_lasso penalizes the discrepency between
+and "diff_lasso". If ridge penalties are desired, use type="enet" and
+alpha=1. diff_lasso penalizes the discrepency between
 parameter estimates and some pre-specified values. The values
 to take the deviation from are specified in diff_par. Two methods for
 sparser results than lasso are the smooth clipped absolute deviation,
@@ -46,19 +49,28 @@ sparser results than lasso are the smooth clipped absolute deviation,
 \item{data}{Optional dataframe. Only required for missing="fiml" which
 is not currently working.}
 
-\item{optMethod}{Solver to use. Recommended options include "nlminb" and
-"optimx". Note: for "optimx", the default method is to use nlminb.
-This can be changed in subOpt.}
+\item{optMethod}{Solver to use. Two main options for use: rsoolnp and coord_desc.
+Although slightly slower, rsolnp works much better for complex models.
+coord_desc uses gradient descent with soft thresholding for the type of
+of penalty. Rsolnp is a nonlinear solver that doesn't rely on gradient
+information. There is a similar type of solver also available for use,
+slsqp from the nloptr package. coord_desc can also be used with hessian
+information, either through the use of quasi=TRUE, or specifying a hess_fun.
+However, this option is not recommended at this time.}
+
+\item{estimator}{Whether to use maximum likelihood (ML) or unweighted least squares
+(ULS) as a base estimator.}
 
 \item{gradFun}{Gradient function to use. Recommended to use "ram",
 which refers to the method specified in von Oertzen & Brick (2014).
-The "norm" procedure uses the forward difference method for
-calculating the hessian. This is slower and less accurate.}
+Only for use with optMethod="coord_desc".}
 
 \item{hessFun}{Hessian function to use. Recommended to use "ram",
 which refers to the method specified in von Oertzen & Brick (2014).
-The "norm" procedure uses the forward difference method for
-calculating the hessian. This is slower and less accurate.}
+This is currently not recommended.}
+
+\item{prerun}{Logical. Use rsolnp to first optimize before passing to
+gradient descent? Only for use with coord_desc.}
 
 \item{parallel}{Logical. Whether to parallelize the processes?}
 
@@ -73,9 +85,12 @@ chances in getting stuck at the previous parameter estimates.}
 \item{longMod}{If TRUE, the model is using longitudinal data? This changes
 the sample covariance used.}
 
-\item{pars_pen}{Parameter indicators to penalize. If left NULL, by default,
-all parameters in the \emph{A} matrix outside of the intercepts are
-penalized when lambda > 0 and type != "none".}
+\item{pars_pen}{Parameter indicators to penalize. There are multiple ways to specify.
+The default is to penalize all regression parameters ("regressions"). Additionally,
+one can specify all loadings ("loadings"), or both c("regressions","loadings").
+Next, parameter labels can be assigned in the lavaan syntax and passed to pars_pen.
+See the example.Finally, one can take the parameter numbers from the A or S matrices and pass these
+directly. See extractMatrices(lav.object)$A.}
 
 \item{diff_par}{Parameter values to deviate from. Only used when
 type="diff_lasso".}
@@ -102,9 +117,13 @@ for use.}
 
 \item{solver}{Whether to use solver for coord_desc}
 
+\item{quasi}{Whether to use quasi-Newton}
+
 \item{solver.maxit}{Max iterations for solver in coord_desc}
 
 \item{alpha.inc}{Whether alpha should increase for coord_desc}
+
+\item{line.search}{Use line search for optimization. Default is no, use fixed step size}
 
 \item{step}{Step size}
 
@@ -156,18 +175,24 @@ baseline.chisq Baseline chi-square.
 baseline.df Baseline degrees of freedom.
 }
 \description{
-Regularized Structural Equation Modeling
+Regularized Structural Equation Modeling. Tests a single penalty. For
+testing multiple penalties, see cv_regsem().
 }
 \examples{
+# Note that this is not currently recommended. Use cv_regsem() instead
+# vignette("overview",package="regsem")
 library(lavaan)
+# put variables on same scale for regsem
 HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
 mod <- '
-f =~ x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
+f =~ 1*x1 + l1*x2 + l2*x3 + l3*x4 + l4*x5 + l5*x6 + l6*x7 + l7*x8 + l8*x9
 '
 # Recommended to specify meanstructure in lavaan
-outt = cfa(mod,HS,meanstructure=TRUE)
+outt = cfa(mod, HS, meanstructure=TRUE)
 
-fit1 <- regsem(outt,lambda=0.05,type="lasso",pars_pen=c(1:2,6:8))
+fit1 <- regsem(outt, lambda=0.05, type="lasso",
+  pars_pen=c("l1", "l2", "l6", "l7", "l8"))
+#equivalent to pars_pen=c(1:2, 6:8)
 #summary(fit1)
 }
 \keyword{calc}

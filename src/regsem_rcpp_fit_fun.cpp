@@ -24,7 +24,10 @@ double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov,
                  double gamma,
                  arma::vec pen_vec,
                  arma::vec pen_diff,
-                 double e_alpha){
+                 double e_alpha){//,
+                 //int estimator2,
+                // arma::vec poly_vec,
+                // arma::vec imp_vec){
            //      int alpha,
 
 
@@ -32,6 +35,7 @@ double m;
 m = ImpCov.nrow();
 double fit;
 double add;
+double fit_base;
 arma::mat ImpCov2 = Rcpp::as <arma::mat>(ImpCov);
 arma::mat SampCov2 = Rcpp::as<arma::mat>(SampCov);
 //arma::mat Areg2 = Rcpp::as<arma::mat>(Areg);
@@ -44,22 +48,29 @@ arma::mat SampCov2 = Rcpp::as<arma::mat>(SampCov);
 //NumericMatrix S2;
 //S2 = clone(S);
 
+//if (estimator2 == 1) { // ML
+  fit_base = log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m;
+//}
+//else if (estimator2 == 2) {
+//   fit_base = as_scalar((poly_vec - imp_vec).t() * (poly_vec - imp_vec));
+//}
+
+
 
   if (type2 == 0) {
-    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m);
+    fit = fit_base;
   }
   else if (type2 == 1) {
-    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  + 2*lambda * norm(pen_vec,1));
+    fit = fit_base  + lambda * norm(pen_vec,1);
   }
   else if (type2 == 2) {
-    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  + 2*lambda * norm(pen_vec,2));
+    fit = fit_base  + lambda * norm(pen_vec,2);
   }
   else if (type2 == 3) {
-    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  + 2*lambda * norm(pen_diff,1));
+    fit = fit_base  + lambda * norm(pen_diff,1);
   }
   else if (type2 == 4) {
-    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m  +
-      2*lambda * (.5*(1-e_alpha)*norm(pen_vec,2) + e_alpha*norm(pen_vec,1)));
+    fit = fit_base  + lambda * ((1-e_alpha)*norm(pen_vec,1) + e_alpha*norm(pen_vec,2));
   }
   else if (type2 == 6) {
     add = 0;
@@ -76,19 +87,19 @@ arma::mat SampCov2 = Rcpp::as<arma::mat>(SampCov);
         }
       }
     }
-    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m + add);
+    fit = fit_base + add;
   }
   else if (type2 == 7) {
     add = 0;
     for (double i = 0; i < pen_vec.n_elem; i++) {
       if (pen_vec[i] <= lambda*gamma){
-        add = add + (lambda * (abs(pen_vec[i] - (pen_vec[i] - ((pen_vec[i]*pen_vec[i])/2*lambda*gamma)))));
+        add = add + (lambda * (std::abs(pen_vec[i] - (pen_vec[i] - ((pen_vec[i]*pen_vec[i])/2*lambda*gamma)))));
       }
       else if(pen_vec[i] > lambda * gamma){
         add = add + pen_vec[i];
       }
     }
-    fit = 0.5*(log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m + add);
+    fit = fit_base + add;
   }
   else{
     fit = -9999999;
@@ -101,6 +112,6 @@ arma::mat SampCov2 = Rcpp::as<arma::mat>(SampCov);
   //return fit;
 
   //return(std::cout << std::setprecision(5) << fit);
-  return fit;
+  return 0.5*fit;
 }
 

@@ -4,8 +4,9 @@
 \alias{plot.cvregsem}
 \title{Plot function for cv_regsem}
 \usage{
-\method{plot}{cvregsem}(x, ..., pars = NULL, col = NULL, type = "l",
-  lwd = 3, lty = 1, xlab = NULL, ylab = NULL)
+\method{plot}{cvregsem}(x, ..., pars = NULL, show.minimum = "BIC",
+  col = NULL, type = "l", lwd = 3, h_line = 0, lty = 1, xlab = NULL,
+  ylab = NULL)
 }
 \arguments{
 \item{x}{An x from cv_regsem.}
@@ -14,11 +15,15 @@
 
 \item{pars}{Which parameters to plot}
 
+\item{show.minimum}{What fit index to use}
+
 \item{col}{A specification for the default plotting color.}
 
 \item{type}{what type of plot should be drawn. Possible types are "p" for points, "l" for lines, or "b" for both}
 
 \item{lwd}{line width}
+
+\item{h_line}{Where to draw horizontal line}
 
 \item{lty}{line type}
 

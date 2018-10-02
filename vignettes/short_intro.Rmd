@@ -1,0 +1,102 @@
+---
+title: "Regsem Package"
+author: "Ross Jacobucci"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteIndexEntry{Overview}
+  %\usepackage[UTF-8]{inputenc}
+---
+Let's first load R packages
+```{r,results='hide',warning=FALSE,message=FALSE}
+# install.packages("regsem") # lavaan is a dependency
+# install.packages("semPlot")
+library(semPlot) # for plotting the model
+library(lavaan)
+library(regsem)
+```
+
+### Simulate Data
+
+To test out the regsem package, we will first simulate data
+
+```{r}
+sim.mod <- "
+f1 =~ 1*y1 + 1*y2 + 1*y3+ 1*y4 + 1*y5
+f1 ~ 0*x1 + 0*x2 + 0*x3 + 0*x4 + 0*x5 + 0.2*x6 + 0.5*x7 + 0.8*x8
+f1~~1*f1"
+dat.sim = simulateData(sim.mod,sample.nobs=60,seed=12)
+```
+
+### Run the Model with Lavaan
+
+And then run the model with lavaan so we can better see the structure.
+
+```{r}
+run.mod <- "
+f1 =~ NA*y1 + y2 + y3+ y4 + y5
+f1 ~ c1*x1 + c2*x2 + c3*x3 + c4*x4 + c5*x5 + c6*x6 + c7*x7 + c8*x8
+f1~~1*f1
+"
+lav.out <- sem(run.mod,dat.sim,fixed.x=FALSE)
+#summary(lav.out)
+parameterestimates(lav.out)[6:13,] # just look at regressions
+```
+
+
+
+### Plot the Model
+
+```{r,message=FALSE,warning=FALSE,fig.width=5,fig.height=5}
+semPaths(lav.out)
+```
+
+One of the difficult pieces in using the cv_regsem function is that the penalty has to be calibrated for each particular problem. In running this code, I first tested the default, but this was too small given that there were some parameters > 0.4. After plotting this initial run, I saw that some parameters weren't penalized enough, therefore, I increased the penalty jump to 0.03 and with 50 different values this tested a model (at a high penalty) that had all estimates as zero. In some cases it isn't necessary to test a sequence of penalties that would set "large" parameters to zero, as either the model could fail to converge then, or there is not uncertainty about those parameters inclusion.
+
+```{r,results='hide'}
+reg.out <- cv_regsem(lav.out,n.lambda=50,type="lasso",jump=0.03,
+                     pars_pen=c("c1","c2","c3","c4","c5","c6","c7","c8"))
+```
+
+In specifying this model, we use the parameter labels to tell *cv_regsem* which of the parameters to penalize. Equivalently, we could have used the *extractMatrices* function to identify which parameters to penalize.
+
+```{r,eval=FALSE}
+# not run
+extractMatrices(lav.out)["A"]
+```
+
+Additionally, we can specify which parameters are penalized by type: "regressions", "loadings", or both c("regressions","loadings"). Note though that this penalizes *all* parameters of this type. If you desire to penalize a subset of parameters, use either the parameter name or number format for pars_pen.
+
+Next, we can get a summary of the models tested.
+
+```{r}
+summary(reg.out)
+```
+
+## Plot the parameter trajectories
+
+```{r,fig.width=5,fig.height=5}
+
+plot(reg.out)
+```
+
+Here we can see that we used a large enough penalty to set all parameter estimates to zero. However, the best fitting model came early on, when only a couple parameters were zero. 
+
+regsem defaults to using the BIC to choose a final model. This shows up in the *final_pars* object as well as the lines in the plot. This can be changed with the *metric* argument.
+
+Understand better what went on with the fit
+
+```{r}
+head(reg.out$fits,10)
+```
+
+One thing to check is the "conv" column. This refers to convergence, with 0 meaning the model converged. 
+
+And see what the best fitting parameter estimates are. 
+
+```{r}
+reg.out$final_pars[1:13] # don't show variances/covariances
+```
+
+In this final model, we set the regression paths for x2,x3, x4, and x5 to zero. We make a mistake for x1, but we also correctly identify x6, x7, and x8 as true paths .Maximum likelihood estimation with lavaan had p-values > 0.05 for the parameters simulated as zero, but also did not identify the true path of 0.2 as significant (< 0.05).
