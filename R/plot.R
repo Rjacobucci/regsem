@@ -37,16 +37,31 @@ plot.cvregsem <- function(x,..., pars=NULL,col=NULL,type="l",lwd=3,lty=1,xlab=NU
 
   }
 
+  if (is.null(dim(coef.mat))) {
+    cfm <- coef.mat
+    nc <- 1
+  } else {
+    cfm <- coef.mat[, 1]
+    nc <- (ncol(coef.mat))
+  }
+  
   # empty plot
-  plot(x[[2]][,"lambda"],coef.mat[,1],ylim=c(min(coef.mat)-.1,max(coef.mat)+.1),
+  plot(x[[2]][,"lambda"],cfm,ylim=c(min(coef.mat)-.1,max(coef.mat)+.1),
        ylab=ylab,xlab=xlab,type="n")
 
   # add lines/points
-  for(i in 1:(ncol(coef.mat))){
+  for(i in 1:nc){
+    
+    if (is.null(dim(coef.mat))) {
+      cfm <- coef.mat
+    } else {
+      cfm <- coef.mat[, i]
+    }
+    
     if (type == "l" || type == "b")
-      lines(x[[2]][,"lambda"],coef.mat[,i],lty=lty,col=colls[i],lwd=lwd)
+      lines(x[[2]][,"lambda"],cfm,lty=lty,col=colls[i],lwd=lwd)
     if (type == "p" || type == "b")
-      points(x[[2]][,"lambda"],coef.mat[,i])
+      points(x[[2]][,"lambda"],cfm)
   }
 
   abline(a=0,b=0)
