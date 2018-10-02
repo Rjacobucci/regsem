@@ -76,8 +76,6 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
     }
   }
 
-
-
   abline(a=h_line,b=0)
 
   # add minimum
