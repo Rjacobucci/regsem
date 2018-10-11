@@ -11,6 +11,9 @@
 #' @param lty line type
 #' @param xlab X axis label
 #' @param ylab Y axis label
+#' @param legend.x x-coordinate of legend. See ?legend
+#' @param legend.y y-coordinate of legend. See ?legend
+#' @param legend.cex cex of legend. See ?legend
 #' @method plot cvregsem
 #' @export
 
@@ -18,7 +21,9 @@
 
 plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
                               col = NULL, type = "l", lwd = 3,h_line=0,
-                              lty = 1, xlab = NULL, ylab = NULL)
+                              lty = 1, xlab = NULL, ylab = NULL,
+                              legend.x = NULL, legend.y = NULL,
+                              legend.cex = 1, legend.bg=par("bg"), grey.out=FALSE)
 {
   if (is.null(pars))
     pars <- x$pars_pen
@@ -53,9 +58,19 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
     ydat <- ydat[-rm.ids]
     coef.mat <- coef.mat[-rm.ids, ]
   }
-
+  
+  # grey-out colors based on threshold
+  if (grey.out!=FALSE) {
+    if (isTRUE(grey.out)) grey.out<-0.001
+    min.id <- which.min(abs(x$fits[,show.minimum]))
+    min.pars <- coef.mat[min.id, ]
+    min.pars.filt <- abs(min.pars)<grey.out
+    colls[min.pars.filt] <- "grey"  
+  }
+  
   # adjust plot limits relative to scale not by absolute increment
-  plot(xdat, ydat, ylim = c(min(coef.mat) * 0.95, max(coef.mat) * 1.05), ylab = ylab, xlab = xlab,
+  plot(xdat, ydat, ylim = c(min(coef.mat) * 0.95, max(coef.mat) * 1.05), 
+       ylab = ylab, xlab = xlab,
        type = "n")
 
   if(is.null(dim(coef.mat))){
@@ -76,6 +91,7 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
     }
   }
 
+  # draw horizontal line
   abline(a=h_line,b=0)
 
   # add minimum
@@ -90,4 +106,15 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
     points(rep(lambda,length(pnts)),pnts, col="black",cex=1)
   }
   # --
+  
+  # add legend
+  if (!is.null(legend.x)) {
+    graphics::legend(x=legend.x, y=legend.y,colnames(x$parameters[,pars]),
+                     #lty=1,lwd=legend.lwd,
+                     fill=colls, 
+                     cex=legend.cex, 
+                     y.intersp=0.75,x.intersp=0.5,
+                     bg=legend.bg
+                     )
+  }
 }
