@@ -101,9 +101,9 @@ A.parFree <- A.parT[A.parT$free > 0,]
 uniq <- unique(A.parFree[,"label"])
 
 uniq2 <- uniq[table(A.parFree[,"label"]) == 1]
+pars.align.A = matrix(NA,length(A.parFree$free),2)
 
-
-
+A.parFree33 = A.parFree
 if(length(uniq2)>0){
   for(i in 1:length(uniq2)){
     A.parFree[A.parFree[,"label"] == uniq2[i],"label"] <- ""
@@ -152,6 +152,7 @@ for(i in 1:nrow(A.parFree2)){
     A[rowNum,colNum] = A.parFree2[i,"free"]
     regressions = c(regressions,A.parFree2[i,"free"])
   }
+  pars.align.A[i,] = c(i,A.parFree33[i,"label"])
 }
 }else{
   A = A
@@ -248,6 +249,7 @@ S_est[rownames(S_est) == "1",colnames(S_est) == "1"] <- 1
 S <- S_init
 
 covarT.free <- covarT[covarT$free > 0, ]
+pars.align.S = matrix(NA,length(covarT$free),2)
 
 # any equality?
 if(any(duplicated(covarT.free$label[covarT.free$label != ""]) == T)){
@@ -287,6 +289,10 @@ dec2 = max(A) - min(S[S != 0]) + 1
 S[S != 0] = S[S != 0] + dec2
 }else{
   S = S
+}
+
+for(i in 1:length(covarT.free$free)){
+  pars.align.S[i,] = c(sort(unique(S[S>0]))[i],covarT.free$label[i])
 }
 
 # S_fixed
@@ -424,6 +430,9 @@ mediation$pars.labs <- args.labs
   mediation <- NA
 }
 
+
+
+
 # return Matrices
 matrices$A <- A
 matrices$A_est <- A_est
@@ -438,7 +447,7 @@ matrices$mediation <- mediation
 matrices$name.factors <- name.factors2
 matrices$loadings <- loadings
 matrices$regressions <- regressions
-
+matrices$pars.align <- rbind(pars.align.A,pars.align.S)
 matrices
 
 }

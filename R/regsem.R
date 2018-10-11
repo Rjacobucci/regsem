@@ -242,7 +242,10 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
     #  }
     # }
   }else if(is.null(pars_pen)==FALSE & is.numeric(pars_pen)==FALSE){
-    pars_pen2 <- parse_parameters(pars_pen,model)
+    #pars_pen2 <- parse_parameters(pars_pen,model)
+    ids = which(mats$pars.align[,2] %in% pars_pen)
+    pars_pen2 = as.numeric(mats$pars.align[ids,1])
+
   }else if(is.numeric(pars_pen)){
     pars_pen2 = pars_pen
   }#else if(is.null(pars_pen)==TRUE){
