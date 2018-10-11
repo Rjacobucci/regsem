@@ -23,7 +23,7 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
                               col = NULL, type = "l", lwd = 3,h_line=0,
                               lty = 1, xlab = NULL, ylab = NULL,
                               legend.x = NULL, legend.y = NULL,
-                              legend.cex = 1, grey.out=FALSE)
+                              legend.cex = 1, legend.bg=par("bg"), grey.out=FALSE)
 {
   if (is.null(pars))
     pars <- x$pars_pen
@@ -113,7 +113,8 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
                      #lty=1,lwd=legend.lwd,
                      fill=colls, 
                      cex=legend.cex, 
-                     y.intersp=0.75,x.intersp=0.5
+                     y.intersp=0.75,x.intersp=0.5,
+                     bg=legend.bg
                      )
   }
 }
