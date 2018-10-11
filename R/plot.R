@@ -11,6 +11,9 @@
 #' @param lty line type
 #' @param xlab X axis label
 #' @param ylab Y axis label
+#' @param legend.x x-coordinate of legend. See ?legend
+#' @param legend.y y-coordinate of legend. See ?legend
+#' @param legend.cex cex of legend. See ?legend
 #' @method plot cvregsem
 #' @export
 
@@ -18,7 +21,9 @@
 
 plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
                               col = NULL, type = "l", lwd = 3,h_line=0,
-                              lty = 1, xlab = NULL, ylab = NULL)
+                              lty = 1, xlab = NULL, ylab = NULL,
+                              legend.x = NULL, legend.y = NULL,
+                              legend.cex = 1)
 {
   if (is.null(pars))
     pars <- x$pars_pen
@@ -90,4 +95,11 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
     points(rep(lambda,length(pnts)),pnts, col="black",cex=1)
   }
   # --
+  
+  # add legend
+  if (!is.null(legend.x)) {
+    graphics::legend(x=legend.x, y=legend.y,colnames(x$parameters[,pars]),
+                     lty=1,lwd=1,col=colls, cex=legend.cex,
+                     y.intersp=0.75,x.intersp=0.1)
+  }
 }
