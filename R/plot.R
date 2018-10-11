@@ -23,7 +23,7 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
                               col = NULL, type = "l", lwd = 3,h_line=0,
                               lty = 1, xlab = NULL, ylab = NULL,
                               legend.x = NULL, legend.y = NULL,
-                              legend.cex = 1)
+                              legend.cex = 1, grey.out=FALSE)
 {
   if (is.null(pars))
     pars <- x$pars_pen
@@ -58,7 +58,16 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
     ydat <- ydat[-rm.ids]
     coef.mat <- coef.mat[-rm.ids, ]
   }
-
+  
+  # grey-out colors 
+  if (grey.out!=FALSE) {
+    if (isTRUE(grey.out)) grey.out<-0.001
+    min.id <- which.min(abs(x$fits[,show.minimum]))
+    min.pars <- coef.mat[min.id, ]
+    min.pars.filt <- abs(min.pars)<grey.out
+    colls[min.pars.filt] <- "grey"  
+  }
+  
   # adjust plot limits relative to scale not by absolute increment
   plot(xdat, ydat, ylim = c(min(coef.mat) * 0.95, max(coef.mat) * 1.05), ylab = ylab, xlab = xlab,
        type = "n")
@@ -81,6 +90,7 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
     }
   }
 
+  # draw horizontal line
   abline(a=h_line,b=0)
 
   # add minimum
