@@ -14,6 +14,8 @@
 #' @param legend.x x-coordinate of legend. See ?legend
 #' @param legend.y y-coordinate of legend. See ?legend
 #' @param legend.cex cex of legend. See ?legend
+#' @param legend.bg legend background color. See ?legend
+#' @param grey.out Add grey to background
 #' @method plot cvregsem
 #' @export
 
@@ -58,18 +60,18 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
     ydat <- ydat[-rm.ids]
     coef.mat <- coef.mat[-rm.ids, ]
   }
-  
+
   # grey-out colors based on threshold
   if (grey.out!=FALSE) {
     if (isTRUE(grey.out)) grey.out<-0.001
     min.id <- which.min(abs(x$fits[,show.minimum]))
     min.pars <- coef.mat[min.id, ]
     min.pars.filt <- abs(min.pars)<grey.out
-    colls[min.pars.filt] <- "grey"  
+    colls[min.pars.filt] <- "grey"
   }
-  
+
   # adjust plot limits relative to scale not by absolute increment
-  plot(xdat, ydat, ylim = c(min(coef.mat) * 0.95, max(coef.mat) * 1.05), 
+  plot(xdat, ydat, ylim = c(min(coef.mat) * 0.95, max(coef.mat) * 1.05),
        ylab = ylab, xlab = xlab,
        type = "n")
 
@@ -106,13 +108,13 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
     points(rep(lambda,length(pnts)),pnts, col="black",cex=1)
   }
   # --
-  
+
   # add legend
   if (!is.null(legend.x)) {
     graphics::legend(x=legend.x, y=legend.y,colnames(x$parameters[,pars]),
                      #lty=1,lwd=legend.lwd,
-                     fill=colls, 
-                     cex=legend.cex, 
+                     fill=colls,
+                     cex=legend.cex,
                      y.intersp=0.75,x.intersp=0.5,
                      bg=legend.bg
                      )

@@ -114,7 +114,7 @@
 #' @import lavaan
 #' @import Rsolnp
 #' @importFrom stats cov na.omit nlminb pchisq rnorm runif sd uniroot var weighted.mean cov2cor
-#' @importFrom graphics abline lines plot points
+#' @importFrom graphics abline lines plot points par
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #' @export
 #' @examples

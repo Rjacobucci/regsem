@@ -6,7 +6,8 @@
 \usage{
 \method{plot}{cvregsem}(x, ..., pars = NULL, show.minimum = "BIC",
   col = NULL, type = "l", lwd = 3, h_line = 0, lty = 1, xlab = NULL,
-  ylab = NULL)
+  ylab = NULL, legend.x = NULL, legend.y = NULL, legend.cex = 1,
+  legend.bg = par("bg"), grey.out = FALSE)
 }
 \arguments{
 \item{x}{An x from cv_regsem.}
@@ -30,6 +31,16 @@
 \item{xlab}{X axis label}
 
 \item{ylab}{Y axis label}
+
+\item{legend.x}{x-coordinate of legend. See ?legend}
+
+\item{legend.y}{y-coordinate of legend. See ?legend}
+
+\item{legend.cex}{cex of legend. See ?legend}
+
+\item{legend.bg}{legend background color. See ?legend}
+
+\item{grey.out}{Add grey to background}
 }
 \description{
 Plot function for cv_regsem
