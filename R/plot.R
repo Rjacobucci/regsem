@@ -62,7 +62,7 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
   # grey-out colors based on threshold
   if (grey.out!=FALSE) {
     if (isTRUE(grey.out)) grey.out<-0.001
-    min.id <- which.min(abs(x$fits[,show.minimum]))
+    min.id <- which.min(abs(x$fits[ x$fits[,"conv"]!=0 ,show.minimum]))
     min.pars <- coef.mat[min.id, ]
     min.pars.filt <- abs(min.pars)<grey.out
     colls[min.pars.filt] <- "grey"  
