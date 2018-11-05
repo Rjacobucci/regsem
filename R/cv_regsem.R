@@ -457,7 +457,7 @@ if(mult.start==FALSE){
         SampCov=cov(test)
       }
 
-      fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov)$fits[fit.ret]
+      fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov,n.obs=nrow(test))$fits[fit.ret]
 
     }else{
       fitt[i,] = NA
@@ -956,7 +956,7 @@ if(mult.start==FALSE){
         fitss = fitt
       }
     }else if(fit.ret2 == "boot"){
-      fitt = try(fit_indices(out,CV="boot")$fits[fit.ret],silent=T)
+      fitt = try(fit_indices(out,CV="boot",n.obs=model@SampleStats@nobs[[1]][1])$fits[fit.ret],silent=T)
       if(inherits(fitt, "try-error")) {
         fitss = rep(NA,ncol(fits)-2)
       }else{
