@@ -1,6 +1,6 @@
 #'
 #'
-#' Function to performed exploratory mediation with categorical variables
+#' Function to performed exploratory mediation with continuous and categorical variables
 #'
 #' @param data Name of the dataset
 #' @param iv Name of independent variable
@@ -42,18 +42,18 @@
 #'fit.delta = sem(model1,data=Data,fixed.x=TRUE,ordered="Grad.Rate")
 #'summary(fit.delta)
 #'
-#'#xmed_cat()
+#'#xmed()
 #'
 #'iv <- "Accept"
 #'dv <- "Grad.Rate"
 #'mediators <- c("Outstate","Room.Board","Books","Expend")
 #'
-#'out <- xmed_cat(Data,iv,mediators,dv)
+#'out <- xmed(Data,iv,mediators,dv)
 #'out
 #'}
 
 
-xmed_cat = function (data, iv, mediators, dv, covariates=NULL, type = "lasso", nfolds = 10,
+xmed = function (data, iv, mediators, dv, covariates=NULL, type = "lasso", nfolds = 10,
                      epsilon = 0.001, seed = NULL)
 {
   res <- list()
@@ -152,7 +152,7 @@ xmed_cat = function (data, iv, mediators, dv, covariates=NULL, type = "lasso", n
   res$indirect <- indirect
   res$call <- match.call()
 
-  class(res) <- "xmed_cat"
+  class(res) <- "xmed"
   return(res)
 }
 

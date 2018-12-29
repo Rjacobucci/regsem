@@ -6,14 +6,16 @@
 testing multiple penalties, see cv_regsem().}
 \usage{
 regsem(model, lambda = 0, alpha = 0.5, gamma = 3.7, type = "lasso",
-  data = NULL, optMethod = "rsolnp", estimator = "ML", gradFun = "ram",
-  hessFun = "none", prerun = FALSE, parallel = "no", Start = "lavaan",
-  subOpt = "nlminb", longMod = F, pars_pen = "regressions",
-  diff_par = NULL, LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf),
-  block = TRUE, full = TRUE, calc = "normal", max.iter = 500,
-  tol = 1e-05, solver = FALSE, quasi = FALSE, solver.maxit = 5,
-  alpha.inc = FALSE, line.search = FALSE, step = 0.1, momentum = FALSE,
-  step.ratio = FALSE, nlminb.control = list(), missing = "listwise")
+  data = NULL, optMethod = "rsolnp", estimator = "ML",
+  gradFun = "ram", hessFun = "none", prerun = FALSE,
+  parallel = "no", Start = "lavaan", subOpt = "nlminb",
+  longMod = F, pars_pen = "regressions", diff_par = NULL,
+  LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf), block = TRUE,
+  full = TRUE, calc = "normal", max.iter = 500, tol = 1e-05,
+  solver = FALSE, quasi = FALSE, solver.maxit = 5,
+  alpha.inc = FALSE, line.search = FALSE, step = 0.1,
+  momentum = FALSE, step.ratio = FALSE, nlminb.control = list(),
+  missing = "listwise")
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously

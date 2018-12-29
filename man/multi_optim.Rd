@@ -4,15 +4,15 @@
 \alias{multi_optim}
 \title{Multiple starts for Regularized Structural Equation Modeling}
 \usage{
-multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5, gamma = 3.7,
-  LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf), block = TRUE,
-  full = TRUE, type = "lasso", optMethod = "rsolnp", gradFun = "ram",
-  pars_pen = "regressions", diff_par = NULL, hessFun = "none",
-  tol = 1e-05, solver = FALSE, quasi = FALSE, solver.maxit = 50000,
-  alpha.inc = FALSE, line.search = FALSE, prerun = FALSE, step = 0.1,
-  momentum = FALSE, step.ratio = FALSE, verbose = FALSE,
-  warm.start = FALSE, Start2 = NULL, nlminb.control = NULL,
-  max.iter = 500)
+multi_optim(model, max.try = 10, lambda = 0, alpha = 0.5,
+  gamma = 3.7, LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf),
+  block = TRUE, full = TRUE, type = "lasso", optMethod = "rsolnp",
+  gradFun = "ram", pars_pen = "regressions", diff_par = NULL,
+  hessFun = "none", tol = 1e-05, solver = FALSE, quasi = FALSE,
+  solver.maxit = 50000, alpha.inc = FALSE, line.search = FALSE,
+  prerun = FALSE, step = 0.1, momentum = FALSE, step.ratio = FALSE,
+  verbose = FALSE, warm.start = FALSE, Start2 = NULL,
+  nlminb.control = NULL, max.iter = 500)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
