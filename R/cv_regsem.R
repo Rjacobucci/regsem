@@ -162,6 +162,7 @@ cv_regsem = function(model,
                     gradFun="ram",
                     hessFun="none",
                     test.cov=NULL,
+                    test.n.obs = NULL,
                     prerun=FALSE,
                     parallel=FALSE,
                     ncore=2,
@@ -264,6 +265,11 @@ if(is.null(pars_pen) & type!="none"){
   stop("for cv_regsem(), pars_pen needs to be specified")
 }
 
+if(fit.ret2 == "test" && is.null(test.n.obs)){
+  stop("Please provide a sample size for the test sample")
+}
+
+
 #if(is.null(pars_pen)==FALSE & is.numeric(pars_pen)==FALSE){
 #  pars_pen <- parse_parameters(pars_pen,model)
 #}
@@ -328,7 +334,7 @@ if(mult.start==FALSE){
   }
 
 
-  if(fit.ret2 == "train"){
+  if(fit.ret2 == "train" || fit.ret2 == "test"){
     out <- regsem(model=model,lambda=SHRINK,type=type,data=data,
                   optMethod=optMethod,
                   gradFun=gradFun,hessFun=hessFun,
@@ -598,7 +604,7 @@ if(mult.start==FALSE){
 
 
 
-    if(fit.ret2 == "train"){
+    if(fit.ret2 == "train" || fit.ret2 == "test"){
       out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
                       LB=LB,UB=UB,par.lim=par.lim,
                       type=type,optMethod=optMethod,
@@ -828,7 +834,7 @@ if(mult.start==FALSE){
    # stop("fit.ret2=test is currently not implemented")
     #print(summary(out))
 
-    fitt = try(fit_indices(out,CovMat=test.cov,CV=TRUE)$fits[fit.ret],silent=T)
+    fitt = try(fit_indices(out,CovMat=test.cov,CV=TRUE, n.obs = test.n.obs)$fits[fit.ret],silent=T)
     if(inherits(fitt, "try-error")) {
 
       fits[count,3:ncol(fits)] = rep(NA,ncol(fits)-2)
@@ -949,7 +955,7 @@ if(mult.start==FALSE){
 
     }else if(fit.ret2 == "test"){
       # stop("fit.ret2=test is currently not implemented")
-      fitt = try(fit_indices(out,CovMat=test.cov,CV=TRUE)$fits[fit.ret],silent=T)
+      fitt = try(fit_indices(out,CovMat=test.cov,CV=TRUE, n.obs = test.n.obs)$fits[fit.ret],silent=T)
       if(inherits(fitt, "try-error")) {
         fitss = rep(NA,ncol(fits)-2)
       }else{
