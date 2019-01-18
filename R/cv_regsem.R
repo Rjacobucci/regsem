@@ -457,7 +457,14 @@ if(mult.start==FALSE){
         SampCov=cov(test)
       }
 
-      fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov,n.obs=nrow(test))$fits[fit.ret]
+      fitt.out = try(fit_indices(out2,CV=TRUE,CovMat=SampCov,n.obs=nrow(test))$fits[fit.ret],silent=T)
+
+        if(inherits(fitt.out, "try-error")) {
+          fitt[i,] = NA
+        }else{
+          fitt[i,] = fitt.out
+        }
+
 
     }else{
       fitt[i,] = NA
