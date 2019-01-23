@@ -712,7 +712,7 @@ if(mult.start==FALSE){
             SampCov=cov(test)
           }
 
-          fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov)$fits[fit.ret]
+          fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov,n.obs=nrow(test))$fits[fit.ret]
 
         }else{
           fitt[i,] = NA
@@ -806,7 +806,7 @@ if(mult.start==FALSE){
             SampCov=cov(test)
           }
 
-          fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov)$fits[fit.ret]
+          fitt[i,] = fit_indices(out2,CV=TRUE,CovMat=SampCov,n.obs=nrow(test))$fits[fit.ret]
 
         }else{
           fitt[i,] = NA
