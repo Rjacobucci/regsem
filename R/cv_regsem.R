@@ -56,6 +56,7 @@
 #'        Only for use with optMethod="coord_desc".
 #' @param hessFun hessian function to use. Currently not recommended.
 #' @param test.cov Covariance matrix from test dataset. Necessary for CV=T
+#' @param test.n.obs Number of observations in test set. Used when CV=T
 #' @param prerun Logical. Use rsolnp to first optimize before passing to
 #'        gradient descent? Only for use with coord_desc
 #' @param parallel Logical. whether to parallelize the processes running models for all

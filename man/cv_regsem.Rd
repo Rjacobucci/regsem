@@ -9,14 +9,14 @@ cv_regsem(model, n.lambda = 40, pars_pen = "regressions",
   multi.iter = 10, jump = 0.01, lambda.start = 0, alpha = 0.5,
   gamma = 3.7, type = "lasso", fit.ret = c("rmsea", "BIC", "chisq"),
   fit.ret2 = "train", n.boot = 20, data = NULL, optMethod = "rsolnp",
-  gradFun = "ram", hessFun = "none", test.cov = NULL, prerun = FALSE,
-  parallel = FALSE, ncore = 2, Start = "lavaan", subOpt = "nlminb",
-  diff_par = NULL, LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf),
-  block = TRUE, full = TRUE, calc = "normal", max.iter = 2000,
-  tol = 1e-05, solver = FALSE, quasi = FALSE, solver.maxit = 5,
-  alpha.inc = FALSE, step = 0.1, momentum = FALSE, step.ratio = FALSE,
-  line.search = FALSE, nlminb.control = list(), warm.start = FALSE,
-  missing = "listwise", verbose = TRUE, ...)
+  gradFun = "ram", hessFun = "none", test.cov = NULL, test.n.obs = NULL,
+  prerun = FALSE, parallel = FALSE, ncore = 2, Start = "lavaan",
+  subOpt = "nlminb", diff_par = NULL, LB = -Inf, UB = Inf,
+  par.lim = c(-Inf, Inf), block = TRUE, full = TRUE, calc = "normal",
+  max.iter = 2000, tol = 1e-05, solver = FALSE, quasi = FALSE,
+  solver.maxit = 5, alpha.inc = FALSE, step = 0.1, momentum = FALSE,
+  step.ratio = FALSE, line.search = FALSE, nlminb.control = list(),
+  warm.start = FALSE, missing = "listwise", verbose = TRUE, ...)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -91,6 +91,8 @@ Only for use with optMethod="coord_desc".}
 \item{hessFun}{hessian function to use. Currently not recommended.}
 
 \item{test.cov}{Covariance matrix from test dataset. Necessary for CV=T}
+
+\item{test.n.obs}{Number of observations in test set. Used when CV=T}
 
 \item{prerun}{Logical. Use rsolnp to first optimize before passing to
 gradient descent? Only for use with coord_desc}
