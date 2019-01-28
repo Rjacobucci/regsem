@@ -14,7 +14,7 @@
 #'# Note to find number of factors, recommended to use
 #'# fa.parallel() from the psych package
 #'# using the wrong number of factors can distort the results
-#'mod = initialModel(3, colnames(HS))
+#'mod = efaModel(3, colnames(HS))
 #'
 #'semFit = sem(mod, data = HS, int.ov.free = FALSE, int.lv.free = FALSE,
 #'             std.lv = TRUE, std.ov = TRUE, auto.fix.single = FALSE, se = "none")
