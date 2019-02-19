@@ -13,10 +13,11 @@ cv_regsem(model, n.lambda = 40, pars_pen = "regressions",
   prerun = FALSE, parallel = FALSE, ncore = 2, Start = "lavaan",
   subOpt = "nlminb", diff_par = NULL, LB = -Inf, UB = Inf,
   par.lim = c(-Inf, Inf), block = TRUE, full = TRUE, calc = "normal",
-  max.iter = 2000, tol = 1e-05, solver = FALSE, quasi = FALSE,
-  solver.maxit = 5, alpha.inc = FALSE, step = 0.1, momentum = FALSE,
-  step.ratio = FALSE, line.search = FALSE, nlminb.control = list(),
-  warm.start = FALSE, missing = "listwise", verbose = TRUE, ...)
+  max.iter = 2000, tol = 1e-05, round = 3, solver = FALSE,
+  quasi = FALSE, solver.maxit = 5, alpha.inc = FALSE, step = 0.1,
+  momentum = FALSE, step.ratio = FALSE, line.search = FALSE,
+  nlminb.control = list(), warm.start = FALSE, missing = "listwise",
+  verbose = TRUE, ...)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -125,6 +126,8 @@ for use.}
 \item{max.iter}{Number of iterations for coordinate descent}
 
 \item{tol}{Tolerance for coordinate descent}
+
+\item{round}{Number of digits to round results to}
 
 \item{solver}{Whether to use solver for coord_desc}
 

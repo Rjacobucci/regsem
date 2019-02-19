@@ -59,6 +59,7 @@
 #' @param prerun Logical. Use rsolnp to first optimize before passing to
 #'        gradient descent? Only for use with coord_desc.
 #' @param tol Tolerance for coordinate descent
+#' @param round Number of digits to round results to
 #' @param solver Whether to use solver for coord_desc
 #' @param quasi Whether to use quasi-Newton. Currently not recommended.
 #' @param solver.maxit Max iterations for solver in coord_desc
@@ -117,6 +118,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                         diff_par=NULL,
                         hessFun="none",
                         tol=1e-5,
+                        round=3,
                         solver=FALSE,
                         quasi=FALSE,
                         solver.maxit=50000,
@@ -192,6 +194,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                          type,optMethod,warm.start,
                          solver,
                          quasi,
+                         round,
                          solver.maxit,
                          alpha.inc,
                          step,
@@ -239,6 +242,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                                             solver=solver,
                                             quasi=quasi,
                                             block=block,
+                                            round=round,
                                             par.lim=par.lim,
                                             full=full,prerun=prerun,
                                             solver.maxit=solver.maxit,
@@ -295,6 +299,7 @@ iter.optim = iter.optim + 1
                         solver=solver,
                         quasi=quasi,
                         block=block,
+                        round=round,
                         par.lim=par.lim,
                         full=full,prerun=prerun,
                         solver.maxit=solver.maxit,
@@ -362,6 +367,7 @@ iter.optim = iter.optim + 1
                      quasi=quasi,
                      block=block,
                      full=full,
+                     round=round,
                      par.lim=par.lim,prerun=prerun,
                      max.iter=max.iter,
                      solver.maxit=solver.maxit,
