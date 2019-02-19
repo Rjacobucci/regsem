@@ -175,13 +175,13 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
   match.arg(type,c("lasso","none","ridge","scad","alasso","mcp","diff_lasso","enet"))
 
 
-  if(type == "mcp" & optMethod!= "coord_desc"){
-    stop("For both scad and mcp must use optMethod=coord_desc")
-  }
+ # if(type == "mcp" & optMethod!= "coord_desc"){
+  #  stop("For both scad and mcp must use optMethod=coord_desc")
+ # }
 
-  if(type == "scad" & optMethod != "coord_desc"){
-    stop("For both scad and mcp must use optMethod=coord_desc")
-  }
+ # if(type == "scad" & optMethod != "coord_desc"){
+ #   stop("For both scad and mcp must use optMethod=coord_desc")
+ # }
 
 
 

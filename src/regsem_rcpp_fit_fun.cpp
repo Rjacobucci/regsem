@@ -75,28 +75,30 @@ arma::mat SampCov2 = Rcpp::as<arma::mat>(SampCov);
   else if (type2 == 6) {
     add = 0;
     for (double i = 0; i < pen_vec.n_elem; i++) {
-      if (pen_vec[i] <= lambda){
-        add = add + lambda;
+      if (std::abs(pen_vec[i]) <= lambda){
+        add = add + lambda*(std::abs(pen_vec[i]));
       }
-      else if(pen_vec[i] > lambda){
-        if (gamma*lambda - pen_vec[i] > 0) {
-          add = add + (gamma*lambda - pen_vec[i])/((gamma - 1)*lambda) * lambda;
+      else if(std::abs(pen_vec[i]) > lambda && std::abs(pen_vec[i]) <= lambda*gamma){
+        add = add - (lambda*lambda + std::abs(pen_vec[i])*std::abs(pen_vec[i]) + 2*gamma*lambda*(std::abs(pen_vec[i])))/(2*(gamma-1));
+      }
+      else if(std::abs(pen_vec[i]) > lambda*gamma){
+// add = add + ((lambda*lambda)*(gamma*gamma - 1))/(2*(gamma-1));
+        add = add + ((gamma+1)*(lambda*lambda))/2;
         }
         else {
           add = add + 0;
         }
       }
-    }
     fit = fit_base + add;
   }
   else if (type2 == 7) {
     add = 0;
     for (double i = 0; i < pen_vec.n_elem; i++) {
-      if (pen_vec[i] <= lambda*gamma){
-        add = add + (lambda * (std::abs(pen_vec[i] - (pen_vec[i] - ((pen_vec[i]*pen_vec[i])/2*lambda*gamma)))));
+      if (std::abs(pen_vec[i]) <= lambda*gamma){
+        add = add + (lambda * (std::abs(pen_vec[i]) - ((pen_vec[i]*pen_vec[i])/(2*lambda*gamma))));
       }
-      else if(pen_vec[i] > lambda * gamma){
-        add = add + pen_vec[i];
+      else if(std::abs(pen_vec[i]) > lambda * gamma){
+        add = add + ((lambda*lambda)*gamma)/2;
       }
     }
     fit = fit_base + add;
