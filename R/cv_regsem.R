@@ -292,6 +292,7 @@ fits <- matrix(NA,n.lambda,length(fit.ret)+2)
 fit.reg <- rep(NA,n.lambda)
 fitt.var <- matrix(NA,n.lambda,length(fit.ret))
 SHRINK2 = lambda.start
+dfs = rep(NA,n.lambda)
 count = 0
 counts=n.lambda
 #res2 <- data.frame(matrix(NA,counts,3))
@@ -868,6 +869,7 @@ if(mult.start==FALSE){
     break
   }
   par.matrix[count,] = as.matrix(out$coefficients)
+  dfs[count] = out$df
 
   colnames(par.matrix) = names(out$coefficients)
   colnames(fits) <- c("lambda","conv",fit.ret)
@@ -881,7 +883,7 @@ if(mult.start==FALSE){
 
   final_pars = par.matrix[loc,]
 
-  out2 <- list(par.matrix,fits,final_pars,pars_pen,metric) #fitt_var
+  out2 <- list(par.matrix,fits,final_pars,pars_pen,dfs,metric) #fitt_var
  # ret
 
 }
@@ -1029,7 +1031,7 @@ if(mult.start==FALSE){
 #out2$pars_pen <- pars_pen
 out2$call <- match.call()
 class(out2) <- "cvregsem"
-names(out2) <- c("parameters","fits","final_pars","pars_pen","metric","call")#"fit_variance"
+names(out2) <- c("parameters","fits","final_pars","pars_pen","df","metric","call")#"fit_variance"
 out2
 
 #close(pb)
