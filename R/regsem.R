@@ -78,6 +78,7 @@
 #' @param nlminb.control list of control values to pass to nlminb
 #' @param max.iter Number of iterations for coordinate descent
 #' @param tol Tolerance for coordinate descent
+#' @param round Number of digits to round results to
 #' @param solver Whether to use solver for coord_desc
 #' @param quasi Whether to use quasi-Newton
 #' @param solver.maxit Max iterations for solver in coord_desc
@@ -152,6 +153,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
                  calc="normal",
                  max.iter=500,
                  tol=1e-5,
+                 round=3,
                  solver=FALSE,
                  quasi=FALSE,
                  solver.maxit=5,
@@ -1067,8 +1069,8 @@ if(optMethod=="nlminb"){
       #pars = A_est[A_estim]
       pars_sum = pars.df[pars_pen]
       pars_l2 = sqrt(pars_sum**2)
-      res$df = df + sum(pars_l2 < 0.001)
-      res$npar = npar - sum(pars_l2 < 0.001)
+      res$df = df + sum(pars_l2 < 1/(10^round))
+      res$npar = npar - sum(pars_l2 < 1/(10^round))
 
     }else if(type=="ridge" | alpha == 1){
       #ratio1 <- sqrt(pars.df[pars_pen]**2)/sqrt(mats$parameters[pars_pen]**2)
@@ -1132,7 +1134,7 @@ if(optMethod=="nlminb"){
 
     res$data <- as.data.frame(model@Data@X)
 
-    res$coefficients <- round(pars.df,3)
+    res$coefficients <- round(pars.df,round)
     res$nvar = nvar
     res$N = nobs
     res$nfac = nfac
@@ -1174,9 +1176,9 @@ if(optMethod=="nlminb"){
 
 
         if(any(A==par.num)){
-        val[i] <- round(A_est[A==par.num],3)
+        val[i] <- round(A_est[A==par.num],round)
         }else if(any(S==par.num)){
-        val[i] <- round(S_est[S==par.num],3)
+        val[i] <- round(S_est[S==par.num],round)
         }
     }
 
