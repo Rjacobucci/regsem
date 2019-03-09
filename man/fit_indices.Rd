@@ -4,7 +4,8 @@
 \alias{fit_indices}
 \title{Calculates the fit indices}
 \usage{
-fit_indices(model, CV = F, CovMat = NULL, data = NULL, n.obs = NULL)
+fit_indices(model, CV = F, CovMat = NULL, data = NULL,
+  n.obs = NULL)
 }
 \arguments{
 \item{model}{regsem model object.}

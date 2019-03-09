@@ -5,9 +5,9 @@
 \title{Plot function for cv_regsem}
 \usage{
 \method{plot}{cvregsem}(x, ..., pars = NULL, show.minimum = "BIC",
-  col = NULL, type = "l", lwd = 3, h_line = 0, lty = 1, xlab = NULL,
-  ylab = NULL, legend.x = NULL, legend.y = NULL, legend.cex = 1,
-  legend.bg = par("bg"), grey.out = FALSE)
+  col = NULL, type = "l", lwd = 3, h_line = 0, lty = 1,
+  xlab = NULL, ylab = NULL, legend.x = NULL, legend.y = NULL,
+  legend.cex = 1, legend.bg = par("bg"), grey.out = FALSE)
 }
 \arguments{
 \item{x}{An x from cv_regsem.}

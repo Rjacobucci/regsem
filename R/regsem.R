@@ -345,11 +345,11 @@ pars_pen = as.numeric(pars_pen2)
 
 
 
-      # get mediation parameters
-      if(any(is.na(mats$mediation))==FALSE){
-        mediation_vals <- mats$mediation
+      # get defined parameters
+      if(any(is.na(mats$defined_params))==FALSE){
+        defined_params_vals <- mats$defined_params
       }else{
-        mediation_vals <- NA
+        defined_params_vals <- NA
       }
 
       if(missing=="listwise"){
@@ -384,7 +384,7 @@ pars_pen = as.numeric(pars_pen2)
       #stop("FIML is currently not supported at this time")
       calc_fit = "ind"
       SampCov <- model@SampleStats@cov[][[1]]
-      mediation_vals <- NA
+      defined_params_vals <- NA
 
       nobs = model@SampleStats@nobs[[1]][1]
      # if(is.null(data)==TRUE){
@@ -1150,7 +1150,7 @@ if(optMethod=="nlminb"){
     #res$grad <- grad(res$par.ret)
 
    # res$hess <- hess(as.numeric(res$par.ret))
-    if(any(is.na(mediation_vals))==FALSE){
+    if(any(is.na(defined_params_vals))==FALSE){
 
       rettt = rcpp_RAMmult(par=as.numeric(pars.df),A,S,S_fixed,A_fixed,A_est,S_est,F,I)
        A_est <- rettt$A_est22
@@ -1159,7 +1159,7 @@ if(optMethod=="nlminb"){
 
        #S_new <- S
 
-     ppars <- mediation_vals$pars.mult
+     ppars <- defined_params_vals$pars.mult
 
      #mediation_vals
 
@@ -1171,13 +1171,14 @@ if(optMethod=="nlminb"){
     val <- rep(NA,nrow(parT[par.labels,]))
 
     for(i in 1:nrow(parT[par.labels,])){
-      par <- parT$label[i]
-      par.num <- parT$free[i]
+      pp = parT[par.labels,]
+      par <- pp[i,"label"]
+      par.num <- pp[i,"free"]
 
 
-        if(any(A==par.num)){
+        if(any(A==par.num & par.num != 0)){
         val[i] <- round(A_est[A==par.num],round)
-        }else if(any(S==par.num)){
+        }else if(any(S==par.num & par.num != 0)){
         val[i] <- round(S_est[S==par.num],round)
         }
     }
@@ -1196,15 +1197,15 @@ if(optMethod=="nlminb"){
    }
 
 
-   ppars <- mediation_vals$pars.mult
+   ppars <- defined_params_vals$pars.mult
 
    for(i in 1:length(ppars)){
      first <- paste("=",return.vals[i])
      ppars[i] <- paste(ppars[i],first)
    }
 
-   res$mediation <- ppars
-   res$mediation_vals <- return.vals
+   res$defined_params <- ppars
+   res$defined_params_vals <- return.vals
 
 
     }

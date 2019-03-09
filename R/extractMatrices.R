@@ -386,15 +386,15 @@ for(i in 1:length(unique(S[S>0]))){
   S[S==ord[i]] <- max(A) + i
 }
 
-
+# --- for defined params
 # get mediation parameters
 # only record arguments
 
 if(any(parT$op == ":=")){
 
-med.pars <- parT[parT$op == ":=",]
-args <- med.pars$rhs
-args.labs <- med.pars$lhs
+def.pars <- parT[parT$op == ":=",]
+args <- def.pars$rhs
+args.labs <- def.pars$lhs
 
 sub09 = (parT$label != "")
 labels <- parT$label[sub09]
@@ -421,13 +421,13 @@ for(i in 1:length(labs.single)){
 
 
 
-mediation <- list()
+defined_params <- list()
 
-mediation$pars.mult <- args
-mediation$pars.labs <- args.labs
+defined_params$pars.mult <- args
+defined_params$pars.labs <- args.labs
 
 }else{
-  mediation <- NA
+  defined_params <- NA
 }
 
 
@@ -443,7 +443,7 @@ matrices$S_fixed <- S_fixed
 matrices$F <- F
 matrices$parameters <- round(pars,3)
 matrices$mean <- mean
-matrices$mediation <- mediation
+matrices$defined_params <- defined_params
 matrices$name.factors <- name.factors2
 matrices$loadings <- loadings
 matrices$regressions <- regressions
