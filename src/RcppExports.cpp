@@ -6,6 +6,25 @@
 
 using namespace Rcpp;
 
+// rcpp_RAMmult
+List rcpp_RAMmult(NumericVector par, NumericMatrix A, NumericMatrix S, LogicalMatrix S_fixed, LogicalMatrix A_fixed, NumericMatrix A_est, NumericMatrix S_est, IntegerMatrix F, IntegerMatrix I);
+RcppExport SEXP _regsem_rcpp_RAMmult(SEXP parSEXP, SEXP ASEXP, SEXP SSEXP, SEXP S_fixedSEXP, SEXP A_fixedSEXP, SEXP A_estSEXP, SEXP S_estSEXP, SEXP FSEXP, SEXP ISEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type A(ASEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type S(SSEXP);
+    Rcpp::traits::input_parameter< LogicalMatrix >::type S_fixed(S_fixedSEXP);
+    Rcpp::traits::input_parameter< LogicalMatrix >::type A_fixed(A_fixedSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type A_est(A_estSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type S_est(S_estSEXP);
+    Rcpp::traits::input_parameter< IntegerMatrix >::type F(FSEXP);
+    Rcpp::traits::input_parameter< IntegerMatrix >::type I(ISEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_RAMmult(par, A, S, S_fixed, A_fixed, A_est, S_est, F, I));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_fit_fun
 double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov, Rcpp::NumericMatrix SampCov, int type2, double lambda, double gamma, arma::vec pen_vec, arma::vec pen_diff, double e_alpha);
 RcppExport SEXP _regsem_rcpp_fit_fun(SEXP ImpCovSEXP, SEXP SampCovSEXP, SEXP type2SEXP, SEXP lambdaSEXP, SEXP gammaSEXP, SEXP pen_vecSEXP, SEXP pen_diffSEXP, SEXP e_alphaSEXP) {
@@ -60,31 +79,12 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_RAMmult
-List rcpp_RAMmult(NumericVector par, NumericMatrix A, NumericMatrix S, LogicalMatrix S_fixed, LogicalMatrix A_fixed, NumericMatrix A_est, NumericMatrix S_est, IntegerMatrix F, IntegerMatrix I);
-RcppExport SEXP _regsem_rcpp_RAMmult(SEXP parSEXP, SEXP ASEXP, SEXP SSEXP, SEXP S_fixedSEXP, SEXP A_fixedSEXP, SEXP A_estSEXP, SEXP S_estSEXP, SEXP FSEXP, SEXP ISEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type A(ASEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type S(SSEXP);
-    Rcpp::traits::input_parameter< LogicalMatrix >::type S_fixed(S_fixedSEXP);
-    Rcpp::traits::input_parameter< LogicalMatrix >::type A_fixed(A_fixedSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type A_est(A_estSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type S_est(S_estSEXP);
-    Rcpp::traits::input_parameter< IntegerMatrix >::type F(FSEXP);
-    Rcpp::traits::input_parameter< IntegerMatrix >::type I(ISEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_RAMmult(par, A, S, S_fixed, A_fixed, A_est, S_est, F, I));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_regsem_rcpp_RAMmult", (DL_FUNC) &_regsem_rcpp_RAMmult, 9},
     {"_regsem_rcpp_fit_fun", (DL_FUNC) &_regsem_rcpp_fit_fun, 8},
     {"_regsem_rcpp_grad_ram", (DL_FUNC) &_regsem_rcpp_grad_ram, 12},
     {"_regsem_rcpp_quasi_calc", (DL_FUNC) &_regsem_rcpp_quasi_calc, 4},
-    {"_regsem_rcpp_RAMmult", (DL_FUNC) &_regsem_rcpp_RAMmult, 9},
     {NULL, NULL, 0}
 };
 
