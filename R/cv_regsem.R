@@ -37,7 +37,8 @@
 #'        parameter estimates and some pre-specified values. The values
 #'        to take the deviation from are specified in diff_par. Two methods for
 #'        sparser results than lasso are the smooth clipped absolute deviation,
-#'        "scad", and the minimum concave penalty, "mcp".
+#'        "scad", and the minimum concave penalty, "mcp". Last option is "rlasso"
+#'        which is the randomised lasso to be used for stability selection.
 #' @param fit.ret Fit indices to return.
 #' @param fit.ret2 Return fits using only dataset "train" or bootstrap "boot"? Have to
 #'        do 2 sample CV manually.

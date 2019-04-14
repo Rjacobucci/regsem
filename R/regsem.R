@@ -27,7 +27,8 @@
 #'        parameter estimates and some pre-specified values. The values
 #'        to take the deviation from are specified in diff_par. Two methods for
 #'        sparser results than lasso are the smooth clipped absolute deviation,
-#'        "scad", and the minimum concave penalty, "mcp".
+#'        "scad", and the minimum concave penalty, "mcp". Last option is "rlasso"
+#'        which is the randomised lasso to be used for stability selection.
 #' @param data Optional dataframe. Only required for missing="fiml" which
 #'        is not currently working.
 #' @param optMethod Solver to use. Two main options for use: rsoolnp and coord_desc.
@@ -172,9 +173,11 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
   }
 
 
+
+
   if (class(model)!="lavaan") stop("Input is not a 'lavaan' object")
 
-  match.arg(type,c("lasso","none","ridge","scad","alasso","mcp","diff_lasso","enet"))
+  match.arg(type,c("lasso","none","ridge","scad","alasso","mcp","diff_lasso","enet","rlasso"))
 
 
  # if(type == "mcp" & optMethod!= "coord_desc"){
@@ -265,6 +268,10 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
 
 
 pars_pen = as.numeric(pars_pen2)
+
+if(type=="rlasso"){
+  ralpha <- runif(length(pars_pen),0.05,1) # can alter and add argument
+}
 
 #  if(optMethod=="nlminb"& type !="ridge" | type != "none"){
 #    stop("Only optMethod=coord_desc is recommended for use")
@@ -417,6 +424,8 @@ pars_pen = as.numeric(pars_pen2)
       type2=4
     }else if(type=="alasso"){ ## try just creating new pen_vec
       type2=1
+    }else if(type=="rlasso"){ ## try just creating new pen_vec
+        type2=1
     }else if(type=="scad"){
       type2=6
     }else if(type=="mcp"){
@@ -487,6 +496,9 @@ pars_pen = as.numeric(pars_pen2)
          if(type=="alasso"){
            pen_vec_ml = c(mats$A_est[match(pars_pen,A,nomatch=0)],mats$S_est[match(pars_pen,S,nomatch=0)])
            pen_vec = abs(pen_vec)*(1/(abs(pen_vec_ml)))
+         }
+         if(type=="rlasso"){
+           pen_vec = abs(pen_vec)/ralpha
          }
 
          if(calc_fit=="cov"){
@@ -1064,7 +1076,7 @@ if(optMethod=="nlminb"){
     if(type=="none" | lambda==0){
       res$df = df
       res$npar = npar
-    }else if(type=="lasso" | type=="alasso" | type=="enet" | type=="scad" | type=="mcp" & alpha < 1){
+    }else if(type=="lasso" | type=="alasso" | type=="rlasso" | type=="enet" | type=="scad" | type=="mcp" & alpha < 1){
       #A_estim = A != 0
       #pars = A_est[A_estim]
       pars_sum = pars.df[pars_pen]

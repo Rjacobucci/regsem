@@ -46,7 +46,8 @@ alpha=1. diff_lasso penalizes the discrepency between
 parameter estimates and some pre-specified values. The values
 to take the deviation from are specified in diff_par. Two methods for
 sparser results than lasso are the smooth clipped absolute deviation,
-"scad", and the minimum concave penalty, "mcp".}
+"scad", and the minimum concave penalty, "mcp". Last option is "rlasso"
+which is the randomised lasso to be used for stability selection.}
 
 \item{data}{Optional dataframe. Only required for missing="fiml" which
 is not currently working.}
