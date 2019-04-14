@@ -270,7 +270,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
 pars_pen = as.numeric(pars_pen2)
 
 if(type=="rlasso"){
-  ralpha <- runif(length(pars_pen),0.05,1) # can alter and add argument
+  ralpha <- runif(length(pars_pen),0.5,1) # can alter and add argument
 }
 
 #  if(optMethod=="nlminb"& type !="ridge" | type != "none"){
