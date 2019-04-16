@@ -19,6 +19,9 @@
 #'        convergence issues.
 #' @param alpha Mixture for elastic net.
 #' @param gamma Additional penalty for MCP and SCAD
+#' @param random.alpha Alpha parameter for randomised lasso. Has to be between
+#'        0 and 1, with a default of 0.5. Note this is only used for
+#'        "rlasso", which pairs with stability selection.
 #' @param LB lower bound vector. Note: This is very important to specify
 #'        when using regularization. It greatly increases the chances of
 #'        converging.
@@ -35,7 +38,8 @@
 #'        parameter estimates and some pre-specified values. The values
 #'        to take the deviation from are specified in diff_par. Two methods for
 #'        sparser results than lasso are the smooth clipped absolute deviation,
-#'        "scad", and the minimum concave penalty, "mcp".
+#'        "scad", and the minimum concave penalty, "mcp". Last option is "rlasso"
+#'        which is the randomised lasso to be used for stability selection.
 #' @param optMethod Solver to use. Two main options for use: rsoolnp and coord_desc.
 #'        Although slightly slower, rsolnp works much better for complex models.
 #'        coord_desc uses gradient descent with soft thresholding for the type of
@@ -106,6 +110,7 @@
 multi_optim <- function(model,max.try=10,lambda=0,
                         alpha=.5,
                         gamma=3.7,
+                        random.alpha=0.5,
                          LB=-Inf,
                         UB=Inf,
                         par.lim=c(-Inf,Inf),
@@ -189,6 +194,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
     mult_run <- function(model,n.try=1,lambda,LB=-Inf,tol,alpha,gamma,
                          UB=Inf,
                          par.lim,
+                         random.alpha,
                          block,
                          full,
                          type,optMethod,warm.start,
@@ -240,6 +246,7 @@ multi_optim <- function(model,max.try=10,lambda=0,
                                             Start=start.optim,gradFun=gradFun,hessFun=hessFun,
                                             nlminb.control=nlminb.control,tol=tol,
                                             solver=solver,
+                                            random.alpha=random.alpha,
                                             quasi=quasi,
                                             block=block,
                                             round=round,
@@ -297,6 +304,7 @@ iter.optim = iter.optim + 1
                         LB,UB,type,warm.start=warm.start,
                         nlminb.control=nlminb.control,tol=tol,
                         solver=solver,
+                        random.alpha=random.alpha,
                         quasi=quasi,
                         block=block,
                         round=round,
@@ -360,6 +368,7 @@ iter.optim = iter.optim + 1
       }
       fit1 <- suppressWarnings(regsem(model,lambda=lambda,
                      alpha=alpha,gamma=gamma,
+                     random.alpha=random.alpha,
                      type=type,optMethod=optMethod,
                      Start=Start,gradFun=gradFun,hessFun=hessFun,
                      nlminb.control=nlminb.control,tol=tol,

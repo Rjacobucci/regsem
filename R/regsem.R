@@ -29,6 +29,9 @@
 #'        sparser results than lasso are the smooth clipped absolute deviation,
 #'        "scad", and the minimum concave penalty, "mcp". Last option is "rlasso"
 #'        which is the randomised lasso to be used for stability selection.
+#' @param random.alpha Alpha parameter for randomised lasso. Has to be between
+#'        0 and 1, with a default of 0.5. Note this is only used for
+#'        "rlasso", which pairs with stability selection.
 #' @param data Optional dataframe. Only required for missing="fiml" which
 #'        is not currently working.
 #' @param optMethod Solver to use. Two main options for use: rsoolnp and coord_desc.
@@ -140,7 +143,9 @@
 
 
 
-regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,optMethod="rsolnp",
+regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",
+                  random.alpha=0.5,
+                  data=NULL,optMethod="rsolnp",
                   estimator="ML",
                  gradFun="ram",hessFun="none",prerun=FALSE,parallel="no",Start="lavaan",
                  subOpt="nlminb",longMod=F,
@@ -270,7 +275,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",data=NULL,opt
 pars_pen = as.numeric(pars_pen2)
 
 if(type=="rlasso"){
-  ralpha <- runif(length(pars_pen),0.5,1) # can alter and add argument
+  ralpha <- runif(length(pars_pen),random.alpha,1) # can alter and add argument
 }
 
 #  if(optMethod=="nlminb"& type !="ridge" | type != "none"){

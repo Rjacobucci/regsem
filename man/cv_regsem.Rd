@@ -8,17 +8,18 @@ cv_regsem(model, n.lambda = 40, pars_pen = "regressions",
   metric = ifelse(fit.ret2 == "train", "BIC", "chisq"),
   mult.start = FALSE, multi.iter = 10, jump = 0.01,
   lambda.start = 0, alpha = 0.5, gamma = 3.7, type = "lasso",
-  fit.ret = c("rmsea", "BIC", "chisq"), fit.ret2 = "train",
-  n.boot = 20, data = NULL, optMethod = "rsolnp", gradFun = "ram",
-  hessFun = "none", test.cov = NULL, test.n.obs = NULL,
-  prerun = FALSE, parallel = FALSE, ncore = 2, Start = "lavaan",
-  subOpt = "nlminb", diff_par = NULL, LB = -Inf, UB = Inf,
-  par.lim = c(-Inf, Inf), block = TRUE, full = TRUE,
-  calc = "normal", max.iter = 2000, tol = 1e-05, round = 3,
-  solver = FALSE, quasi = FALSE, solver.maxit = 5,
-  alpha.inc = FALSE, step = 0.1, momentum = FALSE,
-  step.ratio = FALSE, line.search = FALSE, nlminb.control = list(),
-  warm.start = FALSE, missing = "listwise", verbose = TRUE, ...)
+  random.alpha = 0.5, fit.ret = c("rmsea", "BIC", "chisq"),
+  fit.ret2 = "train", n.boot = 20, data = NULL,
+  optMethod = "rsolnp", gradFun = "ram", hessFun = "none",
+  test.cov = NULL, test.n.obs = NULL, prerun = FALSE,
+  parallel = FALSE, ncore = 2, Start = "lavaan", subOpt = "nlminb",
+  diff_par = NULL, LB = -Inf, UB = Inf, par.lim = c(-Inf, Inf),
+  block = TRUE, full = TRUE, calc = "normal", max.iter = 2000,
+  tol = 1e-05, round = 3, solver = FALSE, quasi = FALSE,
+  solver.maxit = 5, alpha.inc = FALSE, step = 0.1,
+  momentum = FALSE, step.ratio = FALSE, line.search = FALSE,
+  nlminb.control = list(), warm.start = FALSE, missing = "listwise",
+  verbose = TRUE, ...)
 }
 \arguments{
 \item{model}{Lavaan output object. This is a model that was previously
@@ -68,6 +69,10 @@ to take the deviation from are specified in diff_par. Two methods for
 sparser results than lasso are the smooth clipped absolute deviation,
 "scad", and the minimum concave penalty, "mcp". Last option is "rlasso"
 which is the randomised lasso to be used for stability selection.}
+
+\item{random.alpha}{Alpha parameter for randomised lasso. Has to be between
+0 and 1, with a default of 0.5. Note this is only used for
+"rlasso", which pairs with stability selection.}
 
 \item{fit.ret}{Fit indices to return.}
 

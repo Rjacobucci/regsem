@@ -39,6 +39,9 @@
 #'        sparser results than lasso are the smooth clipped absolute deviation,
 #'        "scad", and the minimum concave penalty, "mcp". Last option is "rlasso"
 #'        which is the randomised lasso to be used for stability selection.
+#' @param random.alpha Alpha parameter for randomised lasso. Has to be between
+#'        0 and 1, with a default of 0.5. Note this is only used for
+#'        "rlasso", which pairs with stability selection.
 #' @param fit.ret Fit indices to return.
 #' @param fit.ret2 Return fits using only dataset "train" or bootstrap "boot"? Have to
 #'        do 2 sample CV manually.
@@ -157,6 +160,7 @@ cv_regsem = function(model,
                      alpha=.5,
                      gamma=3.7,
                      type="lasso",
+                     random.alpha=0.5,
                      fit.ret=c("rmsea","BIC","chisq"),
                      fit.ret2 = "train",
                      n.boot=20,
@@ -341,6 +345,7 @@ if(mult.start==FALSE){
 
   if(fit.ret2 == "train" || fit.ret2 == "test"){
     out <- regsem(model=model,lambda=SHRINK,type=type,data=data,
+                  random.alpha=random.alpha,
                   optMethod=optMethod,
                   gradFun=gradFun,hessFun=hessFun,
                   parallel=parallel,Start=Start,
@@ -375,6 +380,7 @@ if(mult.start==FALSE){
 
     out <- regsem(model=model,lambda=SHRINK,type=type,data=NULL,
                   optMethod=optMethod,
+                  random.alpha=random.alpha,
                   gradFun=gradFun,hessFun=hessFun,
                   parallel=parallel,
                   subOpt=subOpt,
@@ -420,6 +426,7 @@ if(mult.start==FALSE){
 
     out2 <- regsem(model=mod1,lambda=SHRINK,type=type,data=NULL,
                   optMethod=optMethod,
+                  random.alpha=random.alpha,
                   gradFun=gradFun,hessFun=hessFun,
                   parallel=parallel,
                   subOpt=subOpt,
@@ -493,6 +500,7 @@ if(mult.start==FALSE){
 
     out <- regsem(model=model,lambda=SHRINK,type=type,data=NULL,
                   optMethod=optMethod,
+                  random.alpha=random.alpha,
                   gradFun=gradFun,hessFun=hessFun,
                   parallel=parallel,Start=Start,
                   subOpt=subOpt,
@@ -538,6 +546,7 @@ if(mult.start==FALSE){
 
       out2 <- regsem(model=mod1,lambda=SHRINK,type=type,data=NULL,
                      optMethod=optMethod,
+                     random.alpha=random.alpha,
                      gradFun=gradFun,hessFun=hessFun,
                      parallel=parallel,Start=Start,
                      subOpt=subOpt,
@@ -624,6 +633,7 @@ if(mult.start==FALSE){
     if(fit.ret2 == "train" || fit.ret2 == "test"){
       out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
                       LB=LB,UB=UB,par.lim=par.lim,
+                      random.alpha=random.alpha,
                       type=type,optMethod=optMethod,
                       gradFun=gradFun,hessFun=hessFun,
                       tol=tol,
@@ -649,6 +659,7 @@ if(mult.start==FALSE){
 
       out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
                          LB=LB,UB=UB,par.lim=par.lim,
+                         random.alpha=random.alpha,
                          type=type,optMethod=optMethod,
                          gradFun=gradFun,hessFun=hessFun,
                          tol=tol,
@@ -687,6 +698,7 @@ if(mult.start==FALSE){
 
         out2 <- multi_optim(model=mod1,max.try=multi.iter,lambda=SHRINK,
                            LB=LB,UB=UB,par.lim=par.lim,
+                           random.alpha=random.alpha,
                            type=type,optMethod=optMethod,
                            gradFun=gradFun,hessFun=hessFun,
                            tol=tol,
@@ -746,6 +758,7 @@ if(mult.start==FALSE){
 
       out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
                          LB=LB,UB=UB,par.lim=par.lim,
+                         random.alpha=random.alpha,
                          type=type,optMethod=optMethod,
                          gradFun=gradFun,hessFun=hessFun,
                          tol=tol,
@@ -784,6 +797,7 @@ if(mult.start==FALSE){
 
         out2 <- multi_optim(model=mod1,max.try=multi.iter,lambda=SHRINK,
                             LB=LB,UB=UB,par.lim=par.lim,
+                            random.alpha=random.alpha,
                             type=type,optMethod=optMethod,
                             gradFun=gradFun,hessFun=hessFun,
                             tol=tol,
@@ -919,6 +933,7 @@ if(mult.start==FALSE){
     if(mult.start==FALSE){
       out <- regsem(model=model,lambda=SHRINK,type=type,data=data,
                     optMethod=optMethod,
+                    random.alpha=random.alpha,
                     gradFun=gradFun,hessFun=hessFun,
                     parallel=parallel,Start=Start,
                     subOpt=subOpt,
@@ -948,6 +963,7 @@ if(mult.start==FALSE){
     }else if(mult.start==TRUE){
       out <- multi_optim(model=model,max.try=multi.iter,lambda=SHRINK,
                          LB=LB,UB=UB,type=type,optMethod=optMethod,
+                         random.alpha=random.alpha,
                          gradFun=gradFun,hessFun=hessFun,nlminb.control=nlminb.control,
                          tol=tol,
                          round=round,
@@ -1003,7 +1019,7 @@ if(mult.start==FALSE){
   snowfall::sfLibrary(regsem)
   snowfall::sfInit(parallel=TRUE, cpus=ncore)
   snowfall::sfExport("model","type","data",
-                     "optMethod",
+                     "optMethod","random.alpha",
                      "gradFun","hessFun",
                      "parallel","Start",
                      "subOpt",
