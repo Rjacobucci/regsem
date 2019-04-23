@@ -4,7 +4,7 @@
 \alias{summary.cvregsem}
 \title{print information about cvregsem object}
 \usage{
-summary.cvregsem(object, ...)
+\method{summary}{cvregsem}(object, ...)
 }
 \arguments{
 \item{object}{cv_regsem object}
