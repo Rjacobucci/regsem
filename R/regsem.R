@@ -435,7 +435,7 @@ if(type=="rlasso2"){
     }else if(type=="rlasso"){ ## try just creating new pen_vec
         type2=1
     }else if(type=="rlasso2"){ ## try just creating new pen_vec
-      type2=1
+      type2=5
     }else if(type=="scad"){
       type2=6
     }else if(type=="mcp"){
@@ -511,7 +511,9 @@ if(type=="rlasso2"){
            pen_vec = abs(pen_vec)/ralpha
          }
          if(type=="rlasso2"){
-           pen_vec = abs(pen_vec) + ralpha
+           rlasso_pen = sum((ralpha + lambda) * abs(pen_vec))
+         }else{
+           rlasso_pen=0
          }
 
          if(calc_fit=="cov"){
@@ -521,7 +523,7 @@ if(type=="rlasso2"){
              imp_vec = mult$ImpCov[lower.tri(mult$ImpCov)]
            }
            fit = rcpp_fit_fun(ImpCov=mult$ImpCov,SampCov,type2,lambda,gamma,
-                              pen_vec,pen_diff,e_alpha)#,estimator2,poly_vec,imp_vec)
+                              pen_vec,pen_diff,e_alpha,rlasso_pen)#,estimator2,poly_vec,imp_vec)
           # print(fit)
            #print(fit)
           # print(type2)
@@ -1132,7 +1134,7 @@ if(optMethod=="nlminb"){
         imp_vec = Imp_Cov1[lower.tri(Imp_Cov1)]
       }
       res$fit = rcpp_fit_fun(Imp_Cov1, SampCov,type2=0,lambda=0,pen_vec=0,
-                             pen_diff=pen_diff,e_alpha=0,gamma=0)#,
+                             pen_diff=pen_diff,e_alpha=0,gamma=0,rlasso_pen=0)#,
                            #  estimator2,poly_vec,imp_vec)
     }else if(missing == "fiml" & type == "none"){
       #print(res$optim_fit)
@@ -1148,7 +1150,7 @@ if(optMethod=="nlminb"){
 
       res$fit = rcpp_fit_fun(ImpCov=Imp_Cov,SampCov,
                              type2,lambda,pen_vec=0,
-                             pen_diff=0,e_alpha=0,gamma=0)
+                             pen_diff=0,e_alpha=0,gamma=0,rlasso_pen=0)
                             # estimator2,poly_vec,imp_vec)
 
     }

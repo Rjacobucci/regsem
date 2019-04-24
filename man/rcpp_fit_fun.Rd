@@ -5,7 +5,7 @@
 \title{Calculates the objective function values.}
 \usage{
 rcpp_fit_fun(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff,
-  e_alpha)
+  e_alpha, rlasso_pen)
 }
 \arguments{
 \item{ImpCov}{expected covariance matrix.}
@@ -23,6 +23,8 @@ rcpp_fit_fun(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff,
 \item{pen_diff}{Vector of values to take deviation from.}
 
 \item{e_alpha}{Alpha for elastic net}
+
+\item{rlasso_pen}{Alpha for rlasso2}
 }
 \description{
 Calculates the objective function values.

@@ -26,8 +26,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_fit_fun
-double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov, Rcpp::NumericMatrix SampCov, int type2, double lambda, double gamma, arma::vec pen_vec, arma::vec pen_diff, double e_alpha);
-RcppExport SEXP _regsem_rcpp_fit_fun(SEXP ImpCovSEXP, SEXP SampCovSEXP, SEXP type2SEXP, SEXP lambdaSEXP, SEXP gammaSEXP, SEXP pen_vecSEXP, SEXP pen_diffSEXP, SEXP e_alphaSEXP) {
+double rcpp_fit_fun(Rcpp::NumericMatrix ImpCov, Rcpp::NumericMatrix SampCov, int type2, double lambda, double gamma, arma::vec pen_vec, arma::vec pen_diff, double e_alpha, double rlasso_pen);
+RcppExport SEXP _regsem_rcpp_fit_fun(SEXP ImpCovSEXP, SEXP SampCovSEXP, SEXP type2SEXP, SEXP lambdaSEXP, SEXP gammaSEXP, SEXP pen_vecSEXP, SEXP pen_diffSEXP, SEXP e_alphaSEXP, SEXP rlasso_penSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -39,7 +39,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type pen_vec(pen_vecSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type pen_diff(pen_diffSEXP);
     Rcpp::traits::input_parameter< double >::type e_alpha(e_alphaSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_fit_fun(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha));
+    Rcpp::traits::input_parameter< double >::type rlasso_pen(rlasso_penSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_fit_fun(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha, rlasso_pen));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -82,7 +83,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_regsem_rcpp_RAMmult", (DL_FUNC) &_regsem_rcpp_RAMmult, 9},
-    {"_regsem_rcpp_fit_fun", (DL_FUNC) &_regsem_rcpp_fit_fun, 8},
+    {"_regsem_rcpp_fit_fun", (DL_FUNC) &_regsem_rcpp_fit_fun, 9},
     {"_regsem_rcpp_grad_ram", (DL_FUNC) &_regsem_rcpp_grad_ram, 12},
     {"_regsem_rcpp_quasi_calc", (DL_FUNC) &_regsem_rcpp_quasi_calc, 4},
     {NULL, NULL, 0}
