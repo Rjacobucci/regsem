@@ -253,7 +253,13 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",
     # }
   }else if(is.null(pars_pen)==FALSE & is.numeric(pars_pen)==FALSE){
     #pars_pen2 <- parse_parameters(pars_pen,model)
+
     ids = which(mats$pars.align[,2] %in% pars_pen)
+
+    if(length(ids) != length(pars_pen)){
+      stop("Have to specify parameter number in pars_pen for equality constrained labels")
+    }
+
     pars_pen2 = as.numeric(mats$pars.align[ids,1])
 
   }else if(is.numeric(pars_pen)){
