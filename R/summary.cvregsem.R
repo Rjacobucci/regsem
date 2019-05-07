@@ -2,6 +2,7 @@
 #' print information about cvregsem object
 #' @param object cv_regsem object
 #' @param ... Additional arguments
+#' @method summary cvregsem
 #' @export
 summary.cvregsem <- function(object,...)
 {
