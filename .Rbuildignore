@@ -5,3 +5,4 @@
 ^README-.*\.png$
 Makefile
 ^\.travis\.yml$
+^CRAN-RELEASE$
