@@ -8,13 +8,10 @@ knitr::opts_chunk$set(
 )
 ```
 
-[![cran version](http://www.r-pkg.org/badges/version/regsem)](https://cran.r-project.org/package=regsem)
-[![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/regsem)](https://github.com/metacran/cranlogs.app)
-
 
 ## What is this?
 
-An R package for estimating regularized Structural Equation Models.
+An R package for estimating regularized structural equation models.
 
 ## Install
 
