@@ -14,11 +14,11 @@ An R package for estimating regularized Structural Equation Models.
 Install
 -------
 
-To install the latest semtree package directly from GitHub, copy the
+To install the latest regsem package directly from GitHub, copy the
 following line into R:
 
     library(regsem)
-    devtools::install_github("regsem","Rjacobucci")
+    devtools::install_github("Rjacobucci/regsem")
 
 Literature
 ----------
