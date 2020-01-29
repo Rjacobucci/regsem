@@ -74,7 +74,7 @@ arma::mat S3 = Rcpp::as<arma::mat>(S2);
 
 
 
-arma::mat ImpCov = F3 * inv(I3-A3) * S3 * (inv(I3-A3)).t() * F3.t();
+arma::mat ImpCov = F3 * pinv(I3-A3) * S3 * (pinv(I3-A3)).t() * F3.t();
 
 
 return Rcpp::List::create(
