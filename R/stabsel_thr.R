@@ -54,7 +54,15 @@ stabsel_thr<-function(stabsel=NULL,
     fit[[i]]<-fitMeasures(new_est_mod)
   }
   m<-unlist(lapply(fit, '[[', which(names(fitMeasures(new_est_mod))==method)))
-  id<-which.min(m)##!!!write if else to distinguish whether min/max is best!!!
+  if (method %in% c("aic","bic","bic2","rmsea","rmr","srmr")){
+    id<-max(which(m==min(m)))
+  }else if (method %in% c("cfi","nfi","nnfi","gfi","tli","rni","ifi","mfi","pgfi","agfi")){
+    id<-max(which(m=max(m)))
+  }else{
+    warning(paste0(method," is not in {aic,bic,bic2,rmsea,rmr,srmr,cfi,nfi,nnfi,gfi,tli,rni,ifi,mfi,pgfi,agfi}. ",'Best result is chosen based on smallest value of ',method, ", which may be incorrect."))
+    id<-max(which(m==min(m)))
+  }
+  
   opt.p<-thr[id]
   opt.sel.res<-max.prob>=opt.p#true false
   opt.rm.path<-pars.pen[opt.sel.res==0]

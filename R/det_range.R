@@ -22,7 +22,7 @@ det_range<-function(data,
     datasub.boot <- data[ids,]
     est_model_boot <- sem(model, data = datasub.boot)
     try(cv.out.boot <- cv_regsem(est_model_boot,...))
-    try(lam[i]<-cv.out.boot$fit[which.min(cv.out.boot$fits[,4])])
+    try(lam[i]<-cv.out.boot$fit[which.min(cv.out.boot$fits[cv.out.boot$fit[,2]==0,4])])
   }
   if (sum(lam!=0,na.rm=T)==0){
     warning("0 penalty is selected by all runs.")
