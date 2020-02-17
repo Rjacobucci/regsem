@@ -51,7 +51,7 @@ arma::mat SampCov2 = Rcpp::as<arma::mat>(SampCov);
 //S2 = clone(S);
 
 //if (estimator2 == 1) { // ML
-  fit_base = log(det(ImpCov2)) + trace(SampCov2 * (inv(ImpCov2))) - log(det(SampCov2))  - m;
+  fit_base = log(det(ImpCov2)) + trace(SampCov2 * (pinv(ImpCov2))) - log(det(SampCov2))  - m;
 //}
 //else if (estimator2 == 2) {
 //   fit_base = as_scalar((poly_vec - imp_vec).t() * (poly_vec - imp_vec));
