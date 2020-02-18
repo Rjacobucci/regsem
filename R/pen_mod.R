@@ -14,13 +14,13 @@ pen_mod<-function(model,nm=NULL,pars_pen=NULL){
   #model: lavaan output object
   #nm: names(regsem$coefficients)
   #pars_pen: parameters to be set to 0 (same sequence as regsem$coefficients)
-  
+
   parT<-parTable(model)
   id<-parT$id[parT$user==1]
   l<-parT$lhs;r<-parT$rhs
   parl<-l;parl[parT$op=="~"]<-r[parT$op=="~"]
   parr<-r;parr[parT$op=="~"]<-l[parT$op=="~"]
-  
+
   if (length(pars_pen)==0){
     #warning("no path is removed")
     id.l<-length(id)
@@ -54,7 +54,7 @@ pen_mod<-function(model,nm=NULL,pars_pen=NULL){
   }else{
     nm.pen<-nm[pars_pen]
     #library(stringr)
-    
+
     un.reg<-unlist(stringr::str_split(nm.pen,pattern=" -> "))
     n.reg<-length(un.reg)
     un.cor<-unlist(stringr::str_split(nm.pen,pattern=" ~~ "))
@@ -67,7 +67,7 @@ pen_mod<-function(model,nm=NULL,pars_pen=NULL){
       pen<-data.frame(matrix(un.reg,ncol=2,byrow=T))
       part<-"reg"
     }
-    
+
     colnames(pen)<-c('parl','parr')
     #library(plyr)
     #pars_pen2: parameters to be set to 0 (sequence matched with lavann model)

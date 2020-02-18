@@ -44,7 +44,7 @@ stabsel_par<-function(data,
   rtn<-list()
   #determine range for lambda (by prestage or user specify)
   if (det.range==TRUE){#use a prestep to determine lambda range
-    lam<-det.range.par(data,model,times,n.lambda=detr.nlambda,jump=jump,type=type,par_pen=pars_pen,...)
+    lam<-det_range_par(data,model,times,n.lambda=detr.nlambda,jump=jump,type=type,par_pen=pars_pen,...)
     lb<-lam$lb;ub<-lam$ub
     #rtn$det.range<-lam
   }else{
