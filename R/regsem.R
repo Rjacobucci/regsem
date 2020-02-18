@@ -116,6 +116,7 @@
 #' @keywords optim calc
 #' @useDynLib regsem, .registration=TRUE
 #' @import Rcpp
+#' @import parallel
 #' @import lavaan
 #' @import Rsolnp
 #' @importFrom stats cov na.omit nlminb pchisq rnorm runif sd uniroot var weighted.mean cov2cor quantile
