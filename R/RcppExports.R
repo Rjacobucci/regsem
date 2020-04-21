@@ -29,9 +29,13 @@ rcpp_RAMmult <- function(par, A, S, S_fixed, A_fixed, A_est, S_est, F, I) {
 #' @param pen_diff Vector of values to take deviation from.
 #' @param e_alpha Alpha for elastic net
 #' @param rlasso_pen Alpha for rlasso2
+#' @param pen_vec1 vector of penalized parameters for lasso penalty.
+#' @param pen_vec2 vector of penalized parameters for ridge penalty.
+#' @param dual_pen1 vector of penalized parameters for lasso penalty.
+#' @param dual_pen2 vector of penalized parameters for ridge penalty.
 #'
-rcpp_fit_fun <- function(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha, rlasso_pen) {
-    .Call(`_regsem_rcpp_fit_fun`, ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha, rlasso_pen)
+rcpp_fit_fun <- function(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha, rlasso_pen, pen_vec1, pen_vec2, dual_pen1, dual_pen2) {
+    .Call(`_regsem_rcpp_fit_fun`, ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha, rlasso_pen, pen_vec1, pen_vec2, dual_pen1, dual_pen2)
 }
 
 #' Calculates the gradient vector based on Von Oertzen \& Brick, 2014

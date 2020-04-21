@@ -5,7 +5,7 @@
 \title{Calculates the objective function values.}
 \usage{
 rcpp_fit_fun(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff,
-  e_alpha, rlasso_pen)
+  e_alpha, rlasso_pen, pen_vec1, pen_vec2, dual_pen1, dual_pen2)
 }
 \arguments{
 \item{ImpCov}{expected covariance matrix.}
@@ -25,6 +25,14 @@ rcpp_fit_fun(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff,
 \item{e_alpha}{Alpha for elastic net}
 
 \item{rlasso_pen}{Alpha for rlasso2}
+
+\item{pen_vec1}{vector of penalized parameters for lasso penalty.}
+
+\item{pen_vec2}{vector of penalized parameters for ridge penalty.}
+
+\item{dual_pen1}{vector of penalized parameters for lasso penalty.}
+
+\item{dual_pen2}{vector of penalized parameters for ridge penalty.}
 }
 \description{
 Calculates the objective function values.
