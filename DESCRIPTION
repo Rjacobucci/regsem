@@ -8,7 +8,8 @@ Author: Ross Jacobucci[aut,cre],
         Sarfaraz Serang [ctb],
         Rogier A. Kievit [ctb],
         Florian Scharf [ctb],
-        Xiaobei Li [ctb]
+        Xiaobei Li [ctb], 
+        Ai Ye [ctb]
 Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
 Description: Uses both ridge and lasso penalties (and extensions) to penalize
     specific parameters in structural equation models. The package offers additional
