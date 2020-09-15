@@ -119,6 +119,7 @@
 #' @import Rcpp
 #' @import parallel
 #' @import lavaan
+#' @import markdown
 #' @import Rsolnp
 #' @importFrom stats cov na.omit nlminb pchisq rnorm runif sd uniroot var weighted.mean cov2cor quantile
 #' @importFrom graphics abline lines plot points par
