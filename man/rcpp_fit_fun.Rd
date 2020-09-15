@@ -4,8 +4,21 @@
 \alias{rcpp_fit_fun}
 \title{Calculates the objective function values.}
 \usage{
-rcpp_fit_fun(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff,
-  e_alpha, rlasso_pen, pen_vec1, pen_vec2, dual_pen1, dual_pen2)
+rcpp_fit_fun(
+  ImpCov,
+  SampCov,
+  type2,
+  lambda,
+  gamma,
+  pen_vec,
+  pen_diff,
+  e_alpha,
+  rlasso_pen,
+  pen_vec1,
+  pen_vec2,
+  dual_pen1,
+  dual_pen2
+)
 }
 \arguments{
 \item{ImpCov}{expected covariance matrix.}

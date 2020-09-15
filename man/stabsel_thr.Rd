@@ -4,9 +4,19 @@
 \alias{stabsel_thr}
 \title{Tuning the probability threshold.}
 \usage{
-stabsel_thr(stabsel = NULL, data = NULL, model = NULL,
-  est_model = NULL, prob = NULL, nm = NULL, pars.pen = NULL,
-  from = 0.5, to = 1, jump = 0.01, method = "aic")
+stabsel_thr(
+  stabsel = NULL,
+  data = NULL,
+  model = NULL,
+  est_model = NULL,
+  prob = NULL,
+  nm = NULL,
+  pars.pen = NULL,
+  from = 0.5,
+  to = 1,
+  jump = 0.01,
+  method = "aic"
+)
 }
 \arguments{
 \item{stabsel}{output object from stabsel function. If specified, data, model, est_model, prob, nm, and pars.pen parameters are not needed.}

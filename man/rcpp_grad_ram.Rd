@@ -4,8 +4,20 @@
 \alias{rcpp_grad_ram}
 \title{Calculates the gradient vector based on Von Oertzen \& Brick, 2014}
 \usage{
-rcpp_grad_ram(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2,
-  pen_vec, diff_par)
+rcpp_grad_ram(
+  par,
+  ImpCov,
+  SampCov,
+  Areg,
+  Sreg,
+  A,
+  S,
+  F,
+  lambda,
+  type2,
+  pen_vec,
+  diff_par
+)
 }
 \arguments{
 \item{par}{vector with parameters.}

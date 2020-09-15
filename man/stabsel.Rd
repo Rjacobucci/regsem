@@ -4,11 +4,27 @@
 \alias{stabsel}
 \title{Stability selection}
 \usage{
-stabsel(data, model, det.range = FALSE, from, to, times = 50,
-  jump = 0.01, detr.nlambda = 20, n.lambda = 40, n.boot = 100,
-  det.thr = FALSE, p = 0.8, p.from = 0.5, p.to = 1,
-  p.jump = 0.05, p.method = "aic", type = "lasso",
-  pars_pen = "regressions", ...)
+stabsel(
+  data,
+  model,
+  det.range = FALSE,
+  from,
+  to,
+  times = 50,
+  jump = 0.01,
+  detr.nlambda = 20,
+  n.lambda = 40,
+  n.boot = 100,
+  det.thr = FALSE,
+  p = 0.8,
+  p.from = 0.5,
+  p.to = 1,
+  p.jump = 0.05,
+  p.method = "aic",
+  type = "lasso",
+  pars_pen = "regressions",
+  ...
+)
 }
 \arguments{
 \item{data}{data frame}

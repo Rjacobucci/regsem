@@ -4,8 +4,17 @@
 \alias{xmed}
 \title{Function to performed exploratory mediation with continuous and categorical variables}
 \usage{
-xmed(data, iv, mediators, dv, covariates = NULL, type = "lasso",
-  nfolds = 10, epsilon = 0.001, seed = NULL)
+xmed(
+  data,
+  iv,
+  mediators,
+  dv,
+  covariates = NULL,
+  type = "lasso",
+  nfolds = 10,
+  epsilon = 0.001,
+  seed = NULL
+)
 }
 \arguments{
 \item{data}{Name of the dataset}
