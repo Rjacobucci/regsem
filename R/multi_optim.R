@@ -335,7 +335,7 @@ iter.optim = iter.optim + 1
     if(verbose==TRUE) print(c(iter.optim,outt[,1],outt[,2]))
 
       if(all(is.na(outt[,2])==TRUE)){
-        return
+        return(NA)
       }else if(any(na.omit(outt[,2]) == 0)){
         if(any(is.na(outt[,1]) == FALSE & outt[,1] < 999999 & outt[,1] > 0)){
        # row = which(outt[,1] == min(outt[which(is.na(outt[,1]) == FALSE & outt[,1] > 0 & outt[,2] == 0)]))[1]
@@ -353,10 +353,10 @@ iter.optim = iter.optim + 1
         return(ret.mult$fit1)
         break
         }else{
-          return
+          return(NA)
         }
       }else{
-        return
+        return(NA)
       }
     }
    # if(exists("fit1")==FALSE){
