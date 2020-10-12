@@ -461,7 +461,7 @@ if(type=="rlasso2"){
 
     #nUniq = nvar
     #nFacCov
-    df = model@Fit@test[[1]]$df
+    df = model@test[[1]]$df
     npar = model@Fit@npar
     nload = length(model@ParTable$op[model@ParTable$op == "=~"])
 
