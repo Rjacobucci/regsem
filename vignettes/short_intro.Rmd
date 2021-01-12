@@ -8,14 +8,6 @@ vignette: >
   %\VignetteIndexEntry{Overview}
   %\usepackage[UTF-8]{inputenc}
 ---
-Let's first load R packages
-```{r,results='hide',warning=FALSE,message=FALSE}
-# install.packages("regsem") # lavaan is a dependency
-# install.packages("semPlot")
-library(semPlot) # for plotting the model
-library(lavaan)
-library(regsem)
-```
 
 ### Simulate Data
 
@@ -49,7 +41,7 @@ parameterestimates(lav.out)[6:13,] # just look at regressions
 ### Plot the Model
 
 ```{r,message=FALSE,warning=FALSE,fig.width=5,fig.height=5}
-semPaths(lav.out)
+semPlot::semPaths(lav.out)
 ```
 
 One of the difficult pieces in using the cv_regsem function is that the penalty has to be calibrated for each particular problem. In running this code, I first tested the default, but this was too small given that there were some parameters > 0.4. After plotting this initial run, I saw that some parameters weren't penalized enough, therefore, I increased the penalty jump to 0.05 and with 30 different values this tested a model (at a high penalty) that had all estimates as zero. In some cases it isn't necessary to test a sequence of penalties that would set "large" parameters to zero, as either the model could fail to converge then, or there is not uncertainty about those parameters inclusion.

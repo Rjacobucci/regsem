@@ -8,7 +8,7 @@
 #' @param to Maximum value of penalization values for stability selection.
 #' @param times Number of bootstrapping sample used to determine the range. Default is 50.
 #' @param jump Amount to increase penalization each iteration. Default is 0.01
-#' @param detr.nlambda Number of penalization values to test for determing range.
+#' @param detr.nlambda Number of penalization values to test for determining range.
 #' @param n.lambda Number of penalization values to test for stability selection.
 #' @param n.boot Number of bootstrap samples needed for stability selection.
 #' @param det.thr Whether to determine the probability threshold value. Default is FALSE, p is then needed. If set to TRUE, p.from, p.to, p.method arguments will be needed.

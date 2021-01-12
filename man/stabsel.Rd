@@ -41,7 +41,7 @@ stabsel(
 
 \item{jump}{Amount to increase penalization each iteration. Default is 0.01}
 
-\item{detr.nlambda}{Number of penalization values to test for determing range.}
+\item{detr.nlambda}{Number of penalization values to test for determining range.}
 
 \item{n.lambda}{Number of penalization values to test for stability selection.}
 
