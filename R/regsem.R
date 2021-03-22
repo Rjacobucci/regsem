@@ -461,7 +461,7 @@ if(type=="rlasso2"){
 
     #nUniq = nvar
     #nFacCov
-    df = model@test[[1]]$df
+    df = model@Fit@test[[1]]$df
     npar = model@Fit@npar
     nload = length(model@ParTable$op[model@ParTable$op == "=~"])
 
@@ -556,17 +556,21 @@ if(type=="rlasso2"){
            #print(fit)
            fit
          }else if(calc_fit=="ind"){
-           stop("Not currently supported")
+           #stop("Not currently supported")
            #print(mult$ImpCov)
 
            #fit = fiml_calc(ImpCov=mult$ImpCov,mu.hat=model@SampleStats@missing.h1[[1]]$mu,
            #                h1=model@SampleStats@missing.h1[[1]]$h1,
            #                Areg=mult$A_est22,lambda,alpha,type,pen_vec,nvar,
            #                lav.miss=model@SampleStats@missing[[1]])
-          # fit = fiml_calc2(ImpCov=mult$ImpCov,F,mats2=mult,
-          #                 type=type,lambda=lambda,
-          #                 model=model,sat.lik=sat.lik,
-          #                 pen_vec=pen_vec)
+           #fit = fiml_calc2(ImpCov=mult$ImpCov,F,mats2=mult,
+           #                 type=type,lambda=lambda,
+           #                 model=model,sat.lik=sat.lik,
+           #                 pen_vec=pen_vec)
+           fit = fiml_calc4(ImpCov=mult$ImpCov,F,mats2=mult,
+                            type=type,lambda=lambda,
+                            model=model,sat.lik=sat.lik,
+                            pen_vec=pen_vec)
          }
 
     }
