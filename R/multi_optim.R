@@ -363,36 +363,36 @@ iter.optim = iter.optim + 1
 }
 
 
-  #  if(exists("fit1")==FALSE){
+    if(exists("fit1")==FALSE){
 
-   #   if(warm.start==TRUE){
-   #     Start=Start2
-   #   }else{
-    #    Start="default"
-    #  }
-    #  fit1 <- suppressWarnings(regsem(model,lambda=lambda,
-    #                 alpha=alpha,gamma=gamma,
-     #                random.alpha=random.alpha,
-     #                Start=Start,gradFun=gradFun,hessFun=hessFun,
-     #                nlminb.control=nlminb.control,tol=tol,
-     #                solver=solver,
-     #                quasi=quasi,
-     #                block=block,
-     #                full=full,
-     #                round=round,
-     #                par.lim=par.lim,prerun=prerun,
-     #                max.iter=max.iter,
-     #                solver.maxit=solver.maxit,
-     #                alpha.inc=alpha.inc,
-     #                step=step,
-     #                line.search=line.search,
-     #                momentum=momentum,
-     #                step.ratio=step.ratio,
-     #                LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))
-#
-     #   fit1$convergence <- 99
-     #   return(fit1)
-   # }
+      if(warm.start==TRUE){
+        Start=Start2
+      }else{
+        Start="default"
+      }
+      fit1 <- suppressWarnings(regsem(model,lambda=lambda,
+                     alpha=alpha,gamma=gamma,
+                     random.alpha=random.alpha,
+                     Start=Start,gradFun=gradFun,hessFun=hessFun,
+                     nlminb.control=nlminb.control,tol=tol,
+                     solver=solver,
+                     quasi=quasi,
+                     block=block,
+                     full=full,
+                     round=round,
+                     par.lim=par.lim,prerun=prerun,
+                     max.iter=max.iter,
+                     solver.maxit=solver.maxit,
+                     alpha.inc=alpha.inc,
+                     step=step,
+                     line.search=line.search,
+                     momentum=momentum,
+                     step.ratio=step.ratio,
+                     LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par))
+
+        fit1$convergence <- 99
+        return(fit1)
+    }
 
 
 
