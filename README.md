@@ -30,3 +30,6 @@ Literature
 -   Jacobucci, R., Kievit, R., & Brandmaier, A. M. (2018, February 16).
     Variable Selection in Structural Equation Models with Regularized
     MIMIC Models. <https://doi.org/10.31234/osf.io/bxzjf>
+    
+-   Li, X., & Jacobucci, R. (2021). Regularized structural equation 
+    modeling with stability selection. Psychological Methods. 
