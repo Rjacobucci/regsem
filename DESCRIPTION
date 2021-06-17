@@ -1,7 +1,7 @@
 Package: regsem
 Type: Package
 Title: Regularized Structural Equation Modeling
-Version: 1.8.1
+Version: 1.8.3
 Author: Ross Jacobucci[aut,cre], 
         Kevin J. Grimm [ctb], 
         Andreas M. Brandmaier [ctb],
@@ -14,8 +14,9 @@ Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
 Description: Uses both ridge and lasso penalties (and extensions) to penalize
     specific parameters in structural equation models. The package offers additional
     cost functions, cross validation, and other extensions beyond traditional structural
-    equation models. Also contains a function to perform exploratory mediation (XMed). Most 
-    up to date version maintained at https://github.com/Rjacobucci/regsem. 
+    equation models. Also contains a function to perform exploratory mediation (XMed). 
+URL: https://github.com/Rjacobucci/regsem/
+BugReports: https://github.com/Rjacobucci/regsem/issues/
 License: GPL (>= 2)
 LazyData: TRUE
 VignetteBuilder: knitr

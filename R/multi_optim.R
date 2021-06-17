@@ -299,7 +299,6 @@ while(iter.optim < max.try){
 iter.optim = iter.optim + 1
 
 
-
     ret.mult = mult_run(model,n.try=1,lambda=lambda,alpha=alpha,gamma=gamma,
                         LB,UB,type,warm.start=warm.start,
                         nlminb.control=nlminb.control,tol=tol,
@@ -322,6 +321,7 @@ iter.optim = iter.optim + 1
 
 
 
+
     if(warm.start == TRUE & ret.mult$mtt[1,1] > 0){
 
       Start2 = ret.mult$start.vals +
@@ -336,9 +336,13 @@ iter.optim = iter.optim + 1
 
     if(verbose==TRUE) print(c(iter.optim,outt[,1],outt[,2]))
 
-  if(all(is.na(outt[,2])==TRUE)){
-        return(NA)
-   }else if(any(na.omit(outt[,2]) == 0)){
+ # if(all(is.na(outt[,2])==TRUE)){
+   # print(19)
+   #     return(NA)
+#
+   #}else
+     if(any(na.omit(outt[,2]) == 0)){
+
     #if(any(is.na(outt[,1]) == FALSE & outt[,1] < 999999 & outt[,1] > 0)){
        # row = which(outt[,1] == min(outt[which(is.na(outt[,1]) == FALSE & outt[,1] > 0 & outt[,2] == 0)]))[1]
        # set.seed(outt[row,3])
@@ -352,15 +356,17 @@ iter.optim = iter.optim + 1
         #fit1 <- suppressWarnings(regsem(model,lambda=lambda,type=type,optMethod=optMethod,
         #               Start=start.optim,gradFun=gradFun,hessFun=hessFun,max.iter=max.iter,
          #              LB=LB,UB=UB,pars_pen=pars_pen,diff_par=diff_par,tol=tol))
+
         return(ret.mult$fit1)
+
         break
       # }else{
       #    return(NA)
       # }
-    }#else{
-    #    return(NA)
-  # }
+    }
+
 }
+
 
 
     if(exists("fit1")==FALSE){
@@ -370,6 +376,7 @@ iter.optim = iter.optim + 1
       }else{
         Start="default"
       }
+
       fit1 <- suppressWarnings(regsem(model,lambda=lambda,
                      alpha=alpha,gamma=gamma,
                      random.alpha=random.alpha,
