@@ -1124,7 +1124,7 @@ if(optMethod=="nlminb"){
     if(type=="none" | lambda==0){
       res$df = df
       res$npar = npar
-    }else if(type=="lasso" | type=="alasso" | type=="rlasso" | type=="rlasso2" | type=="enet" | type=="scad" | type=="mcp" & alpha < 1){
+    }else if((type=="lasso" | type=="alasso" | type=="rlasso" | type=="rlasso2" | type=="enet" | type=="scad" | type=="mcp") & alpha < 1){
       #A_estim = A != 0
       #pars = A_est[A_estim]
       pars_sum = pars.df[pars_pen]
