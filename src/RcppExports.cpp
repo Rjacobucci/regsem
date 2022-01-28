@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // rcpp_RAMmult
 List rcpp_RAMmult(NumericVector par, NumericMatrix A, NumericMatrix S, LogicalMatrix S_fixed, LogicalMatrix A_fixed, NumericMatrix A_est, NumericMatrix S_est, IntegerMatrix F, IntegerMatrix I);
 RcppExport SEXP _regsem_rcpp_RAMmult(SEXP parSEXP, SEXP ASEXP, SEXP SSEXP, SEXP S_fixedSEXP, SEXP A_fixedSEXP, SEXP A_estSEXP, SEXP S_estSEXP, SEXP FSEXP, SEXP ISEXP) {

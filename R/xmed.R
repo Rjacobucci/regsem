@@ -60,11 +60,9 @@ xmed = function (data, iv, mediators, dv, covariates=NULL, type = "lasso", nfold
   Data <- data
   if (type == "lasso") {
     alpha = 1
-  }
-  else if (type == "ridge") {
+  }else if (type == "ridge") {
     alpha = 0
-  }
-  else if (type == "enet") {
+  }else if (type == "enet") {
     alpha = 0.5
   }
   var.check = function(data) {
@@ -100,8 +98,7 @@ xmed = function (data, iv, mediators, dv, covariates=NULL, type = "lasso", nfold
   }
   if (var.check(dv.mat) == 0) {
     dv.class = "gaussian"
-  }
-  else if (var.check(dv.mat) == 1) {
+  }else if (var.check(dv.mat) == 1) {
     dv.class = "binomial"
   }
   if(!is.null(seed)){
@@ -109,7 +106,7 @@ xmed = function (data, iv, mediators, dv, covariates=NULL, type = "lasso", nfold
   }
   b.cv.lasso = glmnet::cv.glmnet(mediators.mat, dv.mat, alpha = alpha, family = dv.class, standardize = FALSE,
                                  lambda = exp(seq(log(0.001), log(5), length.out = 100)), nfolds=nfolds,
-                                 penalty.factor = c(rep(1, ncol(data) - 2), 0))
+                                 penalty.factor = c(rep(1, ncol(Data) - 2)))
   b.coefs = coef(b.cv.lasso, s = b.cv.lasso$lambda.min)[-1,1]
   a.cv.lasso = a.fit.lasso = vector("list", ncol(mediators.mat))
   a.lambda = numeric(ncol(mediators.mat))
