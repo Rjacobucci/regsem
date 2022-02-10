@@ -12,6 +12,7 @@ xmed(
   covariates = NULL,
   type = "lasso",
   nfolds = 10,
+  show.lambda = F,
   epsilon = 0.001,
   seed = NULL
 )
@@ -19,7 +20,7 @@ xmed(
 \arguments{
 \item{data}{Name of the dataset}
 
-\item{iv}{Name of independent variable}
+\item{iv}{Name (or vector of names) of independent variable(s)}
 
 \item{mediators}{Name of mediators}
 
@@ -30,6 +31,8 @@ xmed(
 \item{type}{What type of penalty. Options include lasso, ridge, and enet.}
 
 \item{nfolds}{Number of cross-validation folds.}
+
+\item{show.lambda}{Displays lambda values in output}
 
 \item{epsilon}{Threshold for determining whether effect is 0 or not.}
 
