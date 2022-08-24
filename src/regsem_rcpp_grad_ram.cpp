@@ -6,7 +6,7 @@ using namespace arma;
 
 
 
-//' Calculates the gradient vector based on Von Oertzen \& Brick, 2014
+//' Calculates the gradient vector based on Von Oertzen and Brick, 2014
 //'
 //' @param par vector with parameters.
 //' @param ImpCov expected covariance matrix.

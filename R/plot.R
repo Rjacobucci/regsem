@@ -31,7 +31,7 @@ plot.cvregsem <- function (x, ..., pars = NULL, show.minimum="BIC",
     pars <- x$pars_pen
   if (!(type %in% c("p", "b", "l")))
     stop("Unknown plot type given.")
-  if (!class(x) == "cvregsem")
+  if (inherits(x,"cvregsem")==F)
     stop("Specified x is not a x from cv_regsem(.")
   if (is.null(xlab))
     xlab <- "Penalty"

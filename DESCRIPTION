@@ -1,7 +1,7 @@
 Package: regsem
 Type: Package
 Title: Regularized Structural Equation Modeling
-Version: 1.9.0
+Version: 1.9.3
 Author: Ross Jacobucci[aut,cre], 
         Kevin J. Grimm [ctb], 
         Andreas M. Brandmaier [ctb],
@@ -46,4 +46,4 @@ Suggests:
     stringr
 LinkingTo: Rcpp,
     RcppArmadillo
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.1

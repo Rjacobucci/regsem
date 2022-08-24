@@ -38,7 +38,7 @@ rcpp_fit_fun <- function(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_dif
     .Call(`_regsem_rcpp_fit_fun`, ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_diff, e_alpha, rlasso_pen, pen_vec1, pen_vec2, dual_pen1, dual_pen2)
 }
 
-#' Calculates the gradient vector based on Von Oertzen \& Brick, 2014
+#' Calculates the gradient vector based on Von Oertzen and Brick, 2014
 #'
 #' @param par vector with parameters.
 #' @param ImpCov expected covariance matrix.

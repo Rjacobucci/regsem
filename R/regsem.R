@@ -182,7 +182,7 @@ regsem = function(model,lambda=0,alpha=0.5,gamma=3.7, type="lasso",
 
 
 
-  if (class(model)!="lavaan") stop("Input is not a 'lavaan' object")
+  if (inherits(model,"lavaan")==FALSE) stop("Input is not a 'lavaan' object")
 
   match.arg(type,c("lasso","none","ridge","scad","alasso","mcp","diff_lasso","enet","rlasso","rlasso2","dual"))
 
@@ -487,9 +487,9 @@ if(type=="rlasso2"){
 
 
 
-   if(class(Start)=="numeric"){
+   if(inherits(Start,"numeric")){
       start=Start
-   }else if(class(Start) != "numeric"){
+   }else if(inherits(Start,"numeric")==FALSE){
      if(Start=="lavaan"){
        # get starting values
        start <- mats$parameters

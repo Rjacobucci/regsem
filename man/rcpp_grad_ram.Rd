@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{rcpp_grad_ram}
 \alias{rcpp_grad_ram}
-\title{Calculates the gradient vector based on Von Oertzen \& Brick, 2014}
+\title{Calculates the gradient vector based on Von Oertzen and Brick, 2014}
 \usage{
 rcpp_grad_ram(
   par,
@@ -45,5 +45,5 @@ rcpp_grad_ram(
 \item{diff_par}{parameter values to take deviations from.}
 }
 \description{
-Calculates the gradient vector based on Von Oertzen \& Brick, 2014
+Calculates the gradient vector based on Von Oertzen and Brick, 2014
 }
