@@ -12,7 +12,7 @@ rcpp_grad_ram(
   Sreg,
   A,
   S,
-  F,
+  Fmat,
   lambda,
   type2,
   pen_vec,
@@ -34,7 +34,7 @@ rcpp_grad_ram(
 
 \item{S}{S matrix with parameter labels.}
 
-\item{F}{F matrix.}
+\item{Fmat}{Fmat matrix.}
 
 \item{lambda}{penalty value.}
 

@@ -199,11 +199,26 @@ and "fiml".}
 
 \item{...}{Any additional arguments to pass to regsem() or multi_optim().}
 }
+\value{
+parameters Matrix of parameter estimates across the penalties
+
+fits Fit metrics across penalties
+
+final_pars Parameter estimates from the best fitting model according to metric
+
+pars_pen Parameter indicators that were penalized.
+
+df Degrees of freedom
+
+metric The fit function used to choose a final model
+
+call
+}
 \description{
 The main function that runs multiple penalty values.
 }
 \examples{
-\dontrun{
+\donttest{
 library(regsem)
 # put variables on same scale for regsem
 HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))

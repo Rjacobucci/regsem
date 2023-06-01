@@ -1,10 +1,10 @@
 
-ram_calc = function(par,SampCov22,A,S,F,SampMean){
+ram_calc = function(par,SampCov22,A,S,Fmat,SampMean){
 
   #mult = extractMatrices(fit.growth)
   #A <- mult$A
  # S <- mult$S
- # F <- mult$F
+ # Fmat <- mult$Fmat
 
 
   ret <- list()
@@ -35,17 +35,17 @@ ram_calc = function(par,SampCov22,A,S,F,SampMean){
   #m.pars = A[-nncol,"1"]
   A.pars = A[-nncol,-nncol]
   A2 = A2[-nncol,-nncol]
-  F= F[-nncol,-nncol]
+  Fmat= Fmat[-nncol,-nncol]
   dd = SampMean
   S2 = S2[-nncol,-nncol]
   S.pars = S[-nncol,-nncol]
   I = diag(nrow(A2))
-  mu = F %*% solve(I - A2) %*% m
+  mu = Fmat %*% solve(I - A2) %*% m
 
 
 
   #I = diag(nrow(Areg))
-  ImpCov = F %*% solve(I-A2) %*% S2 %*% t(solve(I-A2)) %*% t(F)
+  ImpCov = Fmat %*% solve(I-A2) %*% S2 %*% t(solve(I-A2)) %*% t(Fmat)
 
   #grad.out <- rep(0,length(par))
 
@@ -70,7 +70,7 @@ ram_calc = function(par,SampCov22,A,S,F,SampMean){
   ret$m.pars <- m.pars
   ret$A.pars <- A.pars
   ret$S.pars <- S.pars
-  ret$F <- F
+  ret$Fmat <- Fmat
   ret$mu <- mu
   #lik;ImpCov;S2;A2
   ret

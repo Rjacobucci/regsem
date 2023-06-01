@@ -11,6 +11,7 @@
 #'        not overlap with the data or covariance matrix used to run the model.
 #' @param data supply the dataset?
 #' @param n.obs Number of observations in the test set for CV.
+#' @return fits Full set of fit indices
 #' @keywords fit chisq ncp rmsea
 #' @export
 #' @examples
@@ -19,7 +20,7 @@
 #' }
 
 
-fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.obs=NULL){
+fit_indices =  function(model,CV=FALSE,CovMat=NULL,data=NULL,n.obs=NULL){
 
   res <- list()
   ret <- as.vector(rep(0,24))
@@ -42,7 +43,7 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.obs=NULL){
   npar = model$npar
   ret["npar"] = npar
 
-  if(CV==F){
+  if(CV==FALSE){
     N = model$N
     ret["N"] = N
   }else{
@@ -54,7 +55,7 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.obs=NULL){
   }
 
 
-  if(CV==F){
+  if(CV==FALSE){
     fit = model$fit
     res$Data_Type = "Train"
     SampCov = model$SampCov
@@ -65,8 +66,8 @@ fit_indices =  function(model,CV=F,CovMat=NULL,data=NULL,n.obs=NULL){
       ImpCov = model$Imp_Cov
       SampCov2 = SampCov
     }
-  }else if(CV==T){
-    if(is.null(CovMat) ==T){
+  }else if(CV==TRUE){
+    if(is.null(CovMat) ==TRUE){
       stop("Need to Provide Test CovMat")
     }
     res$Data_Type = "Test"

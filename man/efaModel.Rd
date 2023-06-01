@@ -14,6 +14,9 @@ efaModel(nFactors, variables)
 
 \item{variables}{Names of variables to be used as indicators}
 }
+\value{
+model Full EFA model parameters.
+}
 \description{
 Generates an EFA model to be used by lavaan and regsem
 Function created by Florian Scharf for the paper

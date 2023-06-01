@@ -11,6 +11,9 @@
 
 \item{...}{Other arguments.}
 }
+\value{
+Details regarding convergence and fit
+}
 \description{
 Summary results from regsem.
 }

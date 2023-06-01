@@ -56,6 +56,9 @@
 
 \item{grey.out}{Add grey to background}
 }
+\value{
+Plot of parameter estimates across penalties
+}
 \description{
 Plot function for cv_regsem
 }

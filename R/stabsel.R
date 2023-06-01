@@ -19,9 +19,10 @@
 #' @param p.method Which fit index to use to choose a final model?
 #' @param type Penalty type
 #' @param pars_pen Parameter indicators to penalize.
+#' @return NULL
 #' @param ... Any additional arguments to pass to regsem() or cv_regsem().
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(regsem)
 #' # put variables on same scale for regsem
 #' HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))
@@ -31,7 +32,7 @@
 #' '
 #' outt = cfa(mod, HS)
 #'
-#'stabsel.out = stabsel(data=HS,model=mod,det.range=T,detr.nlambda=20,n.lambda=5,
+#'stabsel.out = stabsel(data=HS,model=mod,det.range=TRUE,detr.nlambda=20,n.lambda=5,
 #'                     n.boot=10,p=0.9,type="alasso", p.method="aic",
 #'                     pars_pen=c("r1","r2","r3","r4"))
 #' stabsel.out$selection_results
@@ -91,7 +92,7 @@ stabsel<-function(data,
   p.select<-data.frame(matrix(NA,1,n.pen))#probabilities of being selected
   for (k in 1:nlambda){
     for(i in 1:n.boot){
-      ids = sample(1:nsize,nsize,replace=T)
+      ids = sample(1:nsize,nsize,replace=TRUE)
       datasub.ss <- data[ids,]
       data.hold.ss<-data[-unique(ids),]
 
@@ -106,7 +107,7 @@ stabsel<-function(data,
       }
     }
     pars.ss.1<-pars!=0
-    p.select[k,]<-colSums(pars.ss.1,na.rm=T)/dim(na.omit(pars.ss.1))[1]
+    p.select[k,]<-colSums(pars.ss.1,na.rm=TRUE)/dim(na.omit(pars.ss.1))[1]
   }
   names(p.select)<-nm[pars.pen]
 

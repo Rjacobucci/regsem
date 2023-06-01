@@ -11,6 +11,9 @@
 
 \item{...}{Additional arguments}
 }
+\value{
+Details regarding convergence and fit
+}
 \description{
 print information about cvregsem object
 }

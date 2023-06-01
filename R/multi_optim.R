@@ -78,6 +78,7 @@
 #' @param Start2 Provided starting values. Not required
 #' @param nlminb.control list of control values to pass to nlminb
 #' @param max.iter Number of iterations for coordinate descent
+#' @return fit Full set of output from regsem()
 #' @keywords multiple optim
 #' @export
 #' @examples

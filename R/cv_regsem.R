@@ -95,10 +95,17 @@
 #'        and "fiml".
 #' @param verbose Print progress bar?
 #' @param ... Any additional arguments to pass to regsem() or multi_optim().
+#' @return parameters Matrix of parameter estimates across the penalties
+#' @return fits Fit metrics across penalties
+#' @return final_pars Parameter estimates from the best fitting model according to metric
+#' @return pars_pen Parameter indicators that were penalized.
+#' @return df Degrees of freedom
+#' @return metric The fit function used to choose a final model
+#' @return call
 #' @keywords optim calc
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(regsem)
 #' # put variables on same scale for regsem
 #' HS <- data.frame(scale(HolzingerSwineford1939[,7:15]))

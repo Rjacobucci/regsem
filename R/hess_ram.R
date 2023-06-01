@@ -1,5 +1,5 @@
 
-hess_ram = function(par,ImpCov,SampCov,Areg,Sreg,A,S,F){
+hess_ram = function(par,ImpCov,SampCov,Areg,Sreg,A,S,Fmat){
 
 #?sfClusterApplyLB
 #sfClusterApplyLB(index, simulationIteration, n, rho, g, h, pv, het=F)
@@ -29,15 +29,15 @@ E = B %*% Sreg %*% t(B)
           Sij <- matrix(0,nrow(S),ncol(S))
           Sij[Si==T & Sj==T] <- 1
 
-  deriv15_I <- F %*% B %*% Ai %*% E %*% t(F) + F %*% B %*% Si %*% t(B) %*% t(F)
-  deriv15_J <- F %*% B %*% Aj %*% E %*% t(F) + F %*% B %*% Sj %*% t(B) %*% t(F)
+  deriv15_I <- Fmat %*% B %*% Ai %*% E %*% t(Fmat) + Fmat %*% B %*% Si %*% t(B) %*% t(Fmat)
+  deriv15_J <- Fmat %*% B %*% Aj %*% E %*% t(Fmat) + Fmat %*% B %*% Sj %*% t(B) %*% t(Fmat)
 
   # this is cause of asymmetry
-  deriv15_IJ <- F %*% B %*% Ai %*% B %*% Aj %*% E %*% t(F) +
-                F %*% B %*% Aj %*% B %*% Ai %*% E %*% t(F) +
-                F %*% B %*% Ai %*% B %*% Sj %*% t(B) %*% t(F) +
-                F %*% B %*% Ai %*% E %*% t(Aj) %*% t(B) %*% t(F) +
-                F %*% B %*% Aj %*% B %*% Si %*% t(B) %*% t(F)
+  deriv15_IJ <- Fmat %*% B %*% Ai %*% B %*% Aj %*% E %*% t(Fmat) +
+                Fmat %*% B %*% Aj %*% B %*% Ai %*% E %*% t(Fmat) +
+                Fmat %*% B %*% Ai %*% B %*% Sj %*% t(B) %*% t(Fmat) +
+                Fmat %*% B %*% Ai %*% E %*% t(Aj) %*% t(B) %*% t(Fmat) +
+                Fmat %*% B %*% Aj %*% B %*% Si %*% t(B) %*% t(Fmat)
 
   # left out mean part
   hess.out[i,j]  <- trace(solve(ImpCov) %*% deriv15_IJ %*% C - solve(ImpCov) %*%

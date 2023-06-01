@@ -2,6 +2,7 @@
 #'
 #' @param object An object from regsem.
 #' @param ... Other arguments.
+#' @return Details regarding convergence and fit
 #' @method summary regsem
 #' @export
 

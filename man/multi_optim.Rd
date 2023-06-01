@@ -149,6 +149,9 @@ This is not recommended.}
 
 \item{max.iter}{Number of iterations for coordinate descent}
 }
+\value{
+fit Full set of output from regsem()
+}
 \description{
 Multiple starts for Regularized Structural Equation Modeling
 }

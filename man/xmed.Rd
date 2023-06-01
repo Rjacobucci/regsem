@@ -38,11 +38,14 @@ xmed(
 
 \item{seed}{Set seed to control CV results}
 }
+\value{
+Coefficients from best fitting model
+}
 \description{
 Function to performed exploratory mediation with continuous and categorical variables
 }
 \examples{
-\dontrun{
+\donttest{
 # example
 library(ISLR)
 College1 = College[which(College$Private=="Yes"),]

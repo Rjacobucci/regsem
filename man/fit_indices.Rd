@@ -4,7 +4,7 @@
 \alias{fit_indices}
 \title{Calculates the fit indices}
 \usage{
-fit_indices(model, CV = F, CovMat = NULL, data = NULL, n.obs = NULL)
+fit_indices(model, CV = FALSE, CovMat = NULL, data = NULL, n.obs = NULL)
 }
 \arguments{
 \item{model}{regsem model object.}
@@ -21,6 +21,9 @@ not overlap with the data or covariance matrix used to run the model.}
 \item{data}{supply the dataset?}
 
 \item{n.obs}{Number of observations in the test set for CV.}
+}
+\value{
+fits Full set of fit indices
 }
 \description{
 Calculates the fit indices

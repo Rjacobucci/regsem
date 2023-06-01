@@ -12,9 +12,10 @@
 #' @param show.lambda Displays lambda values in output
 #' @param epsilon Threshold for determining whether effect is 0 or not.
 #' @param seed Set seed to control CV results
+#' @return Coefficients from best fitting model
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'# example
 #'library(ISLR)
 #'College1 = College[which(College$Private=="Yes"),]

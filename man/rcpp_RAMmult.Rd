@@ -4,7 +4,7 @@
 \alias{rcpp_RAMmult}
 \title{Take RAM matrices, multiplies, and returns Implied Covariance matrix.}
 \usage{
-rcpp_RAMmult(par, A, S, S_fixed, A_fixed, A_est, S_est, F, I)
+rcpp_RAMmult(par, A, S, S_fixed, A_fixed, A_est, S_est, Fmat, I)
 }
 \arguments{
 \item{par}{parameter estimates.}
@@ -21,7 +21,7 @@ rcpp_RAMmult(par, A, S, S_fixed, A_fixed, A_est, S_est, F, I)
 
 \item{S_est}{S matrix with parameter estimates.}
 
-\item{F}{F matrix.}
+\item{Fmat}{Fmat matrix.}
 
 \item{I}{Diagonal matrix of ones.}
 }

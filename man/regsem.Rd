@@ -22,7 +22,7 @@ regsem(
   parallel = "no",
   Start = "lavaan",
   subOpt = "nlminb",
-  longMod = F,
+  longMod = FALSE,
   pars_pen = "regressions",
   diff_par = NULL,
   LB = -Inf,

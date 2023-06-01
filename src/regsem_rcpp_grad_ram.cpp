@@ -15,7 +15,7 @@ using namespace arma;
 //' @param Sreg S matrix with current parameter estimates.
 //' @param A A matrix with parameter labels.
 //' @param S S matrix with parameter labels.
-//' @param F F matrix.
+//' @param Fmat Fmat matrix.
 //' @param lambda penalty value.
 //' @param type2 penalty type.
 //' @param pen_vec parameter indicators to be penalized.
@@ -30,7 +30,7 @@ arma::vec rcpp_grad_ram(arma::vec par,
                   arma::mat Sreg,
                   arma::mat A,
                   arma::mat S,
-                  arma::mat F,
+                  arma::mat Fmat,
                   double lambda,
                   int type2,
                   arma::vec pen_vec,
@@ -73,7 +73,7 @@ arma::vec rcpp_grad_ram(arma::vec par,
         }
 
 
-        deriv15 = F * B * A2 * E * F.t() + F * B * S2 * B.t() * F.t();
+        deriv15 = Fmat * B * A2 * E * Fmat.t() + Fmat * B * S2 * B.t() * Fmat.t();
           // left out mean part
         grad_out[i]  = trace(pinv(ImpCov) * deriv15 * C);
 
@@ -111,7 +111,7 @@ arma::vec rcpp_grad_ram(arma::vec par,
         }
 
 
-        deriv15 = F * B * A2 * E * F.t() + F * B * S2 * B.t() * F.t();
+        deriv15 = Fmat * B * A2 * E * Fmat.t() + Fmat * B * S2 * B.t() * Fmat.t();
         // left out mean part
 
 
@@ -150,7 +150,7 @@ arma::vec rcpp_grad_ram(arma::vec par,
         }
 
 
-        deriv15 = F * B * A2 * E * F.t() + F * B * S2 * B.t() * F.t();
+        deriv15 = Fmat * B * A2 * E * Fmat.t() + Fmat * B * S2 * B.t() * Fmat.t();
         // left out mean part
 
 
@@ -192,7 +192,7 @@ arma::vec rcpp_grad_ram(arma::vec par,
         }
 
 
-        deriv15 = F * B * A2 * E * F.t() + F * B * S2 * B.t() * F.t();
+        deriv15 = Fmat * B * A2 * E * Fmat.t() + Fmat * B * S2 * B.t() * Fmat.t();
         // left out mean part
 
 

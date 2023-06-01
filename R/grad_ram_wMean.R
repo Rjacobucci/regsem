@@ -1,6 +1,6 @@
 
 grad_ram_wMean = function(par,ImpCov,SampCov22,Areg,Sreg,
-                           A,S,F,SampMean,lambda,type,m,mu,m.pars){
+                           A,S,Fmat,SampMean,lambda,type,m,mu,m.pars){
 
 
   #mats = extractMatrices(fit.growth)
@@ -37,14 +37,14 @@ grad_ram_wMean = function(par,ImpCov,SampCov22,Areg,Sreg,
     for(i in 1:length(grad.out)){
 
       A2 <- A == i;
-      A2[A2==T] <- 1
+      A2[A2==TRUE] <- 1
       S2 <- S == i;
-      S2[S2==T] <- 1
+      S2[S2==TRUE] <- 1
       m2 = m.pars == i
-      m2[m2==T] <- 1
+      m2[m2==TRUE] <- 1
 
-      deriv15 <- F %*% B %*% A2 %*% E %*% t(F) + F %*% B %*% S2 %*% t(B) %*% t(F)
-      deriv20 <- F %*% B %*% A2 %*% B %*% m + F %*% B %*% m2
+      deriv15 <- Fmat %*% B %*% A2 %*% E %*% t(Fmat) + Fmat %*% B %*% S2 %*% t(B) %*% t(Fmat)
+      deriv20 <- Fmat %*% B %*% A2 %*% B %*% m + Fmat %*% B %*% m2
 
       grad.out[i]  <- trace(solve(ImpCov) %*% deriv15 %*% C) -
                       (t(b) %*% solve(ImpCov) %*% deriv15 + 2 * t(deriv20)) %*% solve(ImpCov) %*% b
@@ -59,11 +59,11 @@ grad_ram_wMean = function(par,ImpCov,SampCov22,Areg,Sreg,
     for(i in 1:length(grad.out)){
 
       A2 <- A == i;
-      A2[A2==T] <- 1
+      A2[A2==TRUE] <- 1
       S2 <- S == i;
-      S2[S2==T] <- 1
+      S2[S2==TRUE] <- 1
 
-      deriv15 <- F %*% B %*% A2 %*% E %*% t(F) + F %*% B %*% S2 %*% t(B) %*% t(F)
+      deriv15 <- Fmat %*% B %*% A2 %*% E %*% t(Fmat) + Fmat %*% B %*% S2 %*% t(B) %*% t(Fmat)
       # left out mean part
       grad.out[i]  <- trace(solve(ImpCov) %*% deriv15 %*% C) + if(i <= A.iter) lambda*sign(Areg[A==i]) else(0)# just penalize when A
 
@@ -76,11 +76,11 @@ grad_ram_wMean = function(par,ImpCov,SampCov22,Areg,Sreg,
     for(i in 1:length(grad.out)){
 
       A2 <- A == i;
-      A2[A2==T] <- 1
+      A2[A2==TRUE] <- 1
       S2 <- S == i;
-      S2[S2==T] <- 1
+      S2[S2==TRUE] <- 1
 
-      deriv15 <- F %*% B %*% A2 %*% E %*% t(F) + F %*% B %*% S2 %*% t(B) %*% t(F)
+      deriv15 <- Fmat %*% B %*% A2 %*% E %*% t(Fmat) + Fmat %*% B %*% S2 %*% t(B) %*% t(Fmat)
       # left out mean part
       grad.out[i]  <- trace(solve(ImpCov) %*% deriv15 %*% C) +
                       if(i <= A.iter) 2*lambda*Areg[A==i] else(0)

@@ -6,6 +6,7 @@
 #' Exploratory Factor Analysis -- Scharf & Nestler (in press at SEM)
 #' @param nFactors Number of latent factors to generate.
 #' @param variables Names of variables to be used as indicators
+#' @return model Full EFA model parameters.
 #' @keywords fa factor analysis
 #' @export
 #' @examples

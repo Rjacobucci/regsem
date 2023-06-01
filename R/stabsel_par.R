@@ -20,6 +20,7 @@
 #' @param type Penalty type
 #' @param pars_pen Parameter indicators to penalize.
 #' @param ... Any additional arguments to pass to regsem() or cv_regsem().
+#' @return NULL
 #' @export
 stabsel_par<-function(data,
                       model,

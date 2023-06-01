@@ -1,15 +1,17 @@
 Package: regsem
 Type: Package
 Title: Regularized Structural Equation Modeling
-Version: 1.9.4
-Author: Ross Jacobucci[aut,cre], 
-        Kevin J. Grimm [ctb], 
-        Andreas M. Brandmaier [ctb],
-        Sarfaraz Serang [ctb],
-        Rogier A. Kievit [ctb],
-        Florian Scharf [ctb],
-        Xiaobei Li [ctb], 
-        Ai Ye [ctb]
+Version: 1.9.5
+Authors@R: c(
+        person("Ross", "Jacobucci",email = "rcjacobuc@gmail.com",role = c("aut","cre")), 
+        person("Kevin","Grimm", role="ctb"),
+        person("Andreas","Brandmaier", role="ctb"),
+        person("Sarfaraz","Serang", role="ctb"),
+        person("Rogier","Kievit", role="ctb"),
+        person("Florian","Scharf", role="ctb"),
+        person("Xiaobei","Li", role="ctb"),
+        person("Ai","Ye", role="ctb")
+        )
 Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
 Description: Uses both ridge and lasso penalties (and extensions) to penalize
     specific parameters in structural equation models. The package offers additional

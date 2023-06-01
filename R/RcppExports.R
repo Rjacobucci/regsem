@@ -10,12 +10,12 @@
 #' @param A_fixed A matrix with fixed indicators.
 #' @param A_est A matrix with parameter estimates.
 #' @param S_est S matrix with parameter estimates.
-#' @param F F matrix.
+#' @param Fmat Fmat matrix.
 #' @param I Diagonal matrix of ones.
 #'
 #'
-rcpp_RAMmult <- function(par, A, S, S_fixed, A_fixed, A_est, S_est, F, I) {
-    .Call(`_regsem_rcpp_RAMmult`, par, A, S, S_fixed, A_fixed, A_est, S_est, F, I)
+rcpp_RAMmult <- function(par, A, S, S_fixed, A_fixed, A_est, S_est, Fmat, I) {
+    .Call(`_regsem_rcpp_RAMmult`, par, A, S, S_fixed, A_fixed, A_est, S_est, Fmat, I)
 }
 
 #' Calculates the objective function values.
@@ -47,14 +47,14 @@ rcpp_fit_fun <- function(ImpCov, SampCov, type2, lambda, gamma, pen_vec, pen_dif
 #' @param Sreg S matrix with current parameter estimates.
 #' @param A A matrix with parameter labels.
 #' @param S S matrix with parameter labels.
-#' @param F F matrix.
+#' @param Fmat Fmat matrix.
 #' @param lambda penalty value.
 #' @param type2 penalty type.
 #' @param pen_vec parameter indicators to be penalized.
 #' @param diff_par parameter values to take deviations from.
 #'
-rcpp_grad_ram <- function(par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par) {
-    .Call(`_regsem_rcpp_grad_ram`, par, ImpCov, SampCov, Areg, Sreg, A, S, F, lambda, type2, pen_vec, diff_par)
+rcpp_grad_ram <- function(par, ImpCov, SampCov, Areg, Sreg, A, S, Fmat, lambda, type2, pen_vec, diff_par) {
+    .Call(`_regsem_rcpp_grad_ram`, par, ImpCov, SampCov, Areg, Sreg, A, S, Fmat, lambda, type2, pen_vec, diff_par)
 }
 
 #' Compute quasi Hessian

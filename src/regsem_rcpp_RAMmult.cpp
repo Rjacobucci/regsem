@@ -14,7 +14,7 @@ using namespace arma;
 //' @param A_fixed A matrix with fixed indicators.
 //' @param A_est A matrix with parameter estimates.
 //' @param S_est S matrix with parameter estimates.
-//' @param F F matrix.
+//' @param Fmat Fmat matrix.
 //' @param I Diagonal matrix of ones.
 //'
 //'
@@ -26,7 +26,7 @@ List rcpp_RAMmult(NumericVector par,
           LogicalMatrix A_fixed,
           NumericMatrix A_est,
           NumericMatrix S_est,
-          IntegerMatrix F,
+          IntegerMatrix Fmat,
           IntegerMatrix I) {
 //  mat A2;
 //  mat S2;
@@ -68,13 +68,13 @@ for (double i = 0; i < Ssize; i++) {
 //NumericMatrix ImpCov;
 arma::mat A3 = Rcpp::as <arma::mat>(A2);
 arma::mat I3 = Rcpp::as<arma::mat>(I);
-arma::mat F3 = Rcpp::as <arma::mat>(F);
+arma::mat Fmat3 = Rcpp::as <arma::mat>(Fmat);
 arma::mat S3 = Rcpp::as<arma::mat>(S2);
 
 
 
 
-arma::mat ImpCov = F3 * pinv(I3-A3) * S3 * (pinv(I3-A3)).t() * F3.t();
+arma::mat ImpCov = Fmat3 * pinv(I3-A3) * S3 * (pinv(I3-A3)).t() * Fmat3.t();
 
 
 return Rcpp::List::create(

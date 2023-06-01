@@ -207,14 +207,14 @@ for(i in 1:nrow(A.pars)){
   A_est = A_est
 }
 # create F
-F <- A_init[1:(nvar + ifelse(mean==TRUE,1,0)),]
+Fmat <- A_init[1:(nvar + ifelse(mean==TRUE,1,0)),]
 
 varNames <- model@pta$vnames$ov.model[[1]]
 f.names <- colnames(A)[1:(length(varNames) + ifelse(mean==TRUE,1,0))]
 
 for(ii in 1:length(f.names)){
   #Numm = which(colnames(F)[ii] == f.names[ii])
-  F[ii,ii] = 1
+  Fmat[ii,ii] = 1
 }
 
 
@@ -440,7 +440,7 @@ matrices$A_fixed <- A_fixed
 matrices$S <- S
 matrices$S_est <- S_est
 matrices$S_fixed <- S_fixed
-matrices$F <- F
+matrices$Fmat <- Fmat
 matrices$parameters <- round(pars,3)
 matrices$mean <- mean
 matrices$defined_params <- defined_params

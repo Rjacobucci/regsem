@@ -16,6 +16,7 @@
 #' @param legend.cex cex of legend. See ?legend
 #' @param legend.bg legend background color. See ?legend
 #' @param grey.out Add grey to background
+#' @return Plot of parameter estimates across penalties
 #' @method plot cvregsem
 #' @export
 
